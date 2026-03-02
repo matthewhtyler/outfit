@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>outfit ✦</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #FAF6F0;
+  --cream-dark: #F2EBE0;
+  --cream-border: #E8DDD0;
+  --blush: #F0C4C0;
+  --blush-mid: #E8ADAB;
+  --rose: #C97B7A;
+  --text: #3D2E2A;
+  --text-mid: #7A5E58;
+  --text-light: #B09990;
+  --canvas-bg: #F5EFE8;
+  --shadow: 0 2px 12px rgba(180,130,120,0.12);
+  --shadow-hover: 0 6px 24px rgba(180,130,120,0.2);
+}
+
+body.night {
+  --cream: #1A1418;
+  --cream-dark: #241D20;
+  --cream-border: #352830;
+  --blush: #5A2F3A;
+  --blush-mid: #7A3F4A;
+  --rose: #C97B7A;
+  --text: #F0E8E4;
+  --text-mid: #B09090;
+  --text-light: #7A6060;
+  --canvas-bg: #14100E;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+  --shadow-hover: 0 6px 24px rgba(0,0,0,0.5);
+}
+body.night .closet-item img { background:#1E1618; }
+body.night .outfit-preview { background:var(--canvas-bg); }
+body.night .mode-btn.active { background:#3A2A2E; color:var(--text); }
+body.night .canvas-toolbar { background:#2A1E22; }
+body.night .toolbar-btn { background:#3A2A2E; }
+body.night .closet-item { background:#241D20; }
+
+/* Panel collapse buttons - on canvas edges */
+.panel-collapse-btn { position:absolute; top:50%; transform:translateY(-50%); width:22px; height:56px; background:var(--cream-dark); border:1px solid var(--cream-border); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-light); z-index:20; transition:background .2s, opacity .2s, transform .2s; padding:0; overflow:visible; }
+.panel-collapse-btn:hover { background:var(--blush); }
+#collapseLeft  { left:0;  border-radius:0 8px 8px 0; border-left:none; }
+#collapseRight { right:0; border-radius:8px 0 0 8px; border-right:none; }
+
+/* Rating modal */
+.star { transition:transform .1s; display:inline-block; color:var(--text-light); }
+.star:hover, .star.active { color:var(--rose); transform:scale(1.15); }
+/* Star badge on high-rated closet items */
+.closet-item .star-badge { position:absolute; bottom:4px; right:4px; font-size:11px; line-height:1; pointer-events:none; color:var(--text); opacity:0.55; }
+/* Return / Exchange section dividers */
+.closet-section-divider { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-light); padding:10px 4px 4px; opacity:0.7; }
+.closet-item .used-check { position:absolute; top:4px; right:4px; width:15px; height:15px; background:var(--rose); border-radius:50%; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.closet-item .used-check svg { width:8px; height:8px; display:block; }
+
+/* Vibe filter */
+.vibe-count-btn { cursor:pointer; padding:2px 6px; border-radius:10px; transition:all .2s; user-select:none; }
+.vibe-count-btn:hover { background:var(--cream-dark); }
+.vibe-count-btn.active { background:var(--blush); }
+.outfit-card.vibe-faded { opacity:0.3; }
+
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+
+header { display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--cream-border); background:var(--cream); flex-shrink:0; z-index:10; height:56px; position:relative; }
+.logo { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:26px; letter-spacing:4px; color:var(--text); font-style:italic; }
+.logo span { color:var(--rose); }
+.mode-toggle { display:flex; background:var(--cream-dark); border-radius:24px; padding:3px; gap:2px; }
+.mode-btn { padding:6px 18px; border:none; border-radius:20px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; background:transparent; color:var(--text-mid); transition:all .2s; }
+.mode-btn.active { background:white; color:var(--text); box-shadow:0 1px 6px rgba(180,130,120,.18); }
+
+.main { display:grid; grid-template-columns:var(--left-w,260px) 1fr var(--right-w,260px); flex:1; overflow:hidden; transition:grid-template-columns .25s ease; }
+.panel { display:flex; flex-direction:column; border-right:1px solid var(--cream-border); overflow:hidden; background:var(--cream); transition:width .25s ease; }
+.panel:last-child { border-right:none; border-left:1px solid var(--cream-border); }
+.panel-header { padding:14px 16px 10px; border-bottom:1px solid var(--cream-border); flex-shrink:0; }
+.panel-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:500; letter-spacing:1px; margin-bottom:2px; }
+.panel-subtitle { font-size:11px; color:var(--text-light); }
+.panel-body { flex:1; overflow-y:auto; padding:12px; }
+.panel-body::-webkit-scrollbar { width:3px; }
+.panel-body::-webkit-scrollbar-thumb { background:var(--blush); border-radius:2px; }
+
+.category-group { margin-bottom:16px; }
+.category-label { font-size:10px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-light); margin-bottom:8px; padding:0 2px; display:flex; align-items:center; gap:6px; }
+.category-label::after { content:''; flex:1; height:1px; background:var(--cream-border); }
+
+.closet-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.closet-item { position:relative; background:white; border-radius:10px; overflow:hidden; cursor:grab; border:1.5px solid transparent; transition:all .2s; box-shadow:var(--shadow); aspect-ratio:1; }
+.closet-item:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+.closet-item:active { cursor:grabbing; }
+.closet-item img { width:100%; height:100%; object-fit:contain; padding:6px; background:#FDFAF7; }
+.closet-item .item-name { display:none; }
+.closet-item-duo { display:flex; width:100%; height:100%; }
+.closet-item-duo img { width:50%; height:100%; object-fit:contain; padding:6px; background:#FDFAF7; }
+body.night .closet-item-duo img { background:#1E1618; }
+.closet-item .remove-btn { position:absolute; top:4px; right:4px; width:18px; height:18px; background:rgba(255,255,255,.9); border:none; border-radius:50%; font-size:10px; cursor:pointer; display:none; align-items:center; justify-content:center; color:var(--rose); }
+.closet-item:hover .remove-btn { display:flex; }
+
+.add-form { padding:12px; border-top:1px solid var(--cream-border); flex-shrink:0; }
+.add-form input { width:100%; padding:8px 12px; border:1.5px solid var(--cream-border); border-radius:20px; background:white; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--text); outline:none; transition:border-color .2s; margin-bottom:6px; }
+.add-form input:focus { border-color:var(--blush-mid); }
+.add-form input::placeholder { color:var(--text-light); }
+.btn-add { width:100%; padding:9px 16px; background:var(--blush); border:none; border-radius:20px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--text); cursor:pointer; transition:all .2s; }
+.btn-add:hover { background:var(--blush-mid); transform:translateY(-1px); }
+
+.canvas-wrapper { position:relative; background:var(--canvas-bg); overflow:hidden; background-image:radial-gradient(circle at 20% 20%,rgba(240,196,192,.08) 0%,transparent 60%),radial-gradient(circle at 80% 80%,rgba(240,196,192,.06) 0%,transparent 60%); }
+
+#stage { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:0; height:0; }
+.canvas-figure { position:absolute; top:0; left:0; transform:translate(-50%,-50%); width:200px; height:530px; opacity:0.5; pointer-events:none; z-index:0; }
+.canvas-figure svg { position:absolute; bottom:0; left:50%; transform:translateX(-50%); display:block; fill:var(--text-light); }
+
+/* Hair toggle */
+.stage-toggles { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; z-index:10; }
+.stage-toggle { display:flex; align-items:center; gap:7px; }
+.stage-toggle-label { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; color:var(--text-mid); user-select:none; }
+.stage-toggle-pill { position:relative; width:32px; height:18px; cursor:pointer; }
+.stage-toggle-pill input { opacity:0; width:0; height:0; position:absolute; }
+.stage-toggle-track { position:absolute; inset:0; border-radius:9px; background:var(--cream-border); transition:background .2s; }
+.stage-toggle-pill input:checked + .stage-toggle-track { background:var(--rose); }
+.stage-toggle-thumb { position:absolute; top:3px; left:3px; width:12px; height:12px; border-radius:50%; background:white; transition:transform .2s; pointer-events:none; }
+.stage-toggle-pill input:checked ~ .stage-toggle-thumb { transform:translateX(14px); }
+
+.canvas-drop-hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none; transition:opacity .3s; z-index:1; }
+/* Layer slider */
+#layerSliderWrap { position:absolute; left:14px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; align-items:center; z-index:10; height:160px; }
+#layerSlider { -webkit-appearance:slider-vertical; appearance:slider-vertical; writing-mode:vertical-lr; direction:rtl; width:4px; height:160px; cursor:pointer; accent-color:var(--rose); opacity:0.5; transition:opacity .2s; }
+#layerSlider:hover { opacity:1; }
+.canvas-drop-hint .hint-icon { font-size:40px; margin-bottom:12px; opacity:.5; color:var(--text-light); }
+.canvas-drop-hint p { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--text-light); font-style:italic; }
+
+.canvas-item { position:absolute; user-select:none; cursor:move; -webkit-user-drag:none; }
+.canvas-item img { width:100%; height:100%; object-fit:contain; display:block; pointer-events:none; filter:drop-shadow(0 4px 12px rgba(61,46,42,.15)); -webkit-user-drag:none; }
+.canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(201,123,122,.35)); }
+.canvas-item .item-controls { position:absolute; top:-30px; left:50%; transform:translateX(-50%); display:none; gap:4px; background:white; border-radius:12px; padding:4px 6px; box-shadow:var(--shadow); white-space:nowrap; z-index:10; }
+.canvas-item.selected .item-controls { display:flex; }
+body:not(.edit-mode) .canvas-item .item-controls { display:none !important; }
+.ctrl-btn { width:22px; height:22px; border:none; background:transparent; border-radius:6px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-mid); transition:background .15s; }
+.ctrl-btn:hover { background:var(--cream-dark); }
+.ctrl-btn.rotate-handle { cursor:grab; }
+.ctrl-btn.rotate-handle:active { cursor:grabbing; }
+.resize-handle { position:absolute; bottom:-6px; right:-6px; width:14px; height:14px; background:var(--rose); border:2px solid white; border-radius:50%; cursor:se-resize; display:none; box-shadow:0 1px 4px rgba(180,130,120,.3); }
+.canvas-item.selected .resize-handle { display:block; }
+body:not(.edit-mode) .closet-item .used-check { display:none; }
+body:not(.edit-mode) .canvas-item .resize-handle { display:none !important; }
+
+.canvas-toolbar { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:white; border-radius:24px; padding:8px 14px; box-shadow:0 4px 20px rgba(180,130,120,.2); z-index:10; }
+.toolbar-btn { padding:6px 16px; border:none; border-radius:16px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .2s; background:var(--cream-dark); color:var(--text-mid); }
+.toolbar-btn:hover { background:var(--blush); color:var(--text); }
+.toolbar-btn.primary { background:var(--blush); color:var(--text); }
+.toolbar-btn.primary:hover { background:var(--blush-mid); }
+.toolbar-sep { width:1px; background:var(--cream-border); margin:4px 0; }
+
+.outfit-card { background:var(--cream); border-radius:12px; overflow:hidden; margin-bottom:10px; border:1.5px solid var(--cream-border); box-shadow:var(--shadow); cursor:pointer; transition:all .2s; }
+.outfit-card:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
+.outfit-preview { height:90px; background:var(--canvas-bg); display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; overflow:hidden; }
+.outfit-preview img { height:65px; width:50px; object-fit:contain; }
+.outfit-info { padding:6px 10px 8px; display:flex; align-items:center; justify-content:center; gap:8px; position:relative; }
+.outfit-info .outfit-vibe { font-size:12px; line-height:1; position:absolute; right:8px; bottom:7px; }
+.outfit-actions { display:flex; gap:4px; opacity:0; transition:opacity .2s; position:absolute; top:6px; right:6px; }
+.outfit-card:hover .outfit-actions { opacity:1; }
+.outfit-card { position:relative; }
+.outfit-action-btn { width:20px; height:20px; border:none; background:var(--cream-dark); border-radius:50%; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-mid); }
+.outfit-action-btn:hover { background:var(--blush); }
+
+/* ── Modals ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(61,46,42,.5); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:100; opacity:0; pointer-events:none; transition:opacity .25s; }
+.modal-overlay.open { opacity:1; pointer-events:all; }
+
+/* Category picker */
+.cat-modal { background:var(--cream); border-radius:24px; width:760px; max-width:96vw; max-height:92vh; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(61,46,42,.3); transform:translateY(28px) scale(.97); transition:transform .32s cubic-bezier(.34,1.56,.64,1); overflow:hidden; }
+.modal-overlay.open .cat-modal { transform:translateY(0) scale(1); }
+.cat-modal-top { display:flex; flex:1; overflow:hidden; }
+
+.cat-preview-col { width:200px; flex-shrink:0; background:var(--cream-dark); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 16px; border-right:1px solid var(--cream-border); gap:12px; }
+.cat-preview-img { width:150px; height:150px; object-fit:contain; border-radius:12px; background:var(--cream-dark); padding:8px; box-shadow:var(--shadow); }
+.cat-preview-name { width:100%; padding:7px 12px; border:1.5px solid var(--cream-border); border-radius:20px; background:var(--cream-dark); font-family:'DM Sans',sans-serif; font-size:12px; color:var(--text); outline:none; text-align:center; }
+.cat-preview-name:focus { border-color:var(--blush-mid); }
+.illust-slot { display:flex; flex-direction:column; gap:4px; }
+.illust-slot-row { display:flex; align-items:center; gap:4px; }
+.illust-slot-preview { width:36px; height:36px; object-fit:contain; border-radius:6px; background:var(--cream-dark); border:1px solid var(--cream-border); flex-shrink:0; }
+.illust-slot-input { width:0; min-width:0; flex:1; padding:4px 6px; border:1.5px solid var(--cream-border); border-radius:10px; background:var(--cream-dark); font-family:'DM Sans',sans-serif; font-size:10px; color:var(--text); outline:none; }
+.illust-slot-input:focus { border-color:var(--blush-mid); }
+.illust-slot-remove { background:none; border:none; cursor:pointer; color:var(--text-light); font-size:14px; padding:0 2px; flex-shrink:0; line-height:1; }
+.illust-slot-remove:hover { color:var(--rose); }
+
+/* illustration preview img reuse */
+#catIllustrPreviewImg { opacity:0.4; }
+#catIllustrPreviewImg[src]:not([src=""]) { opacity:1; }
+
+.cat-preview-name::placeholder { color:var(--text-light); }
+
+.cat-picker-col { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.cat-picker-header { padding:20px 24px 14px; border-bottom:1px solid var(--cream-border); }
+.cat-picker-header h2 { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; font-style:italic; margin-bottom:3px; }
+.cat-picker-header p { font-size:11px; color:var(--text-light); }
+
+.cat-picker-body { flex:1; display:flex; overflow:hidden; padding:16px 20px; align-items:stretch; }
+
+/* Options list */
+.cat-options-col { flex:1; display:flex; flex-direction:column; gap:6px; justify-content:center; }
+.cat-opt { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1.5px solid var(--cream-border); border-radius:12px; cursor:pointer; background:var(--cream); transition:all .18s; }
+.cat-opt:hover { border-color:var(--blush-mid); background:var(--cream-dark); transform:translateX(4px); }
+.cat-opt.selected { border-color:var(--rose); background:var(--blush); transform:translateX(4px); }
+.cat-icon { width:44px; height:44px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.cat-icon svg { width:44px; height:44px; }
+.cat-text { flex:1; }
+.cat-name { font-size:13px; font-weight:500; color:var(--text); line-height:1.1; }
+body.night .cat-name { color:var(--text-mid); }
+.cat-desc { font-size:10px; color:var(--text-light); margin-top:1px; }
+.cat-check { display:none; }
+
+.cat-modal-footer { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-top:1px solid var(--cream-border); }
+.btn-cancel { padding:9px 20px; border:1.5px solid var(--cream-border); border-radius:10px; background:var(--cream); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; color:var(--text-mid); transition:all .2s; }
+.btn-cancel:hover { border-color:var(--blush-mid); }
+.btn-confirm { padding:9px 28px; border:none; border-radius:10px; background:var(--blush); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; color:var(--text); transition:all .2s; }
+.btn-confirm:hover { background:var(--blush-mid); }
+
+/* Add modal */
+.add-modal { background:var(--cream); border-radius:20px; padding:32px; width:340px; box-shadow:0 20px 60px rgba(61,46,42,.25); transform:translateY(20px); transition:transform .25s; text-align:center; }
+.modal-overlay.open .add-modal { transform:translateY(0); }
+.add-modal-icon { font-size:36px; font-family:'DM Sans',sans-serif; font-weight:300; color:var(--rose); letter-spacing:2px; margin-bottom:10px; }
+.add-modal-hint { font-size:13px; color:var(--text-mid); margin-bottom:16px; line-height:1.5; }
+.add-modal-log { display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; margin-bottom:4px; }
+.add-log-entry { display:flex; align-items:center; gap:8px; background:white; border-radius:10px; padding:7px 10px; border:1.5px solid var(--cream-border); text-align:left; }
+.add-log-entry img { width:32px; height:32px; object-fit:contain; border-radius:6px; flex-shrink:0; }
+.add-log-entry-name { font-size:12px; color:var(--text); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.add-log-entry-cat { font-size:10px; color:var(--text-light); }
+
+
+.save-modal { background:var(--cream); border-radius:20px; padding:28px 32px; width:380px; box-shadow:0 20px 60px rgba(61,46,42,.25); transform:translateY(20px); transition:transform .25s; }
+.modal-overlay.open .save-modal { transform:translateY(0); }
+.save-modal h2 { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:400; font-style:italic; margin-bottom:6px; }
+.save-modal p { font-size:13px; color:var(--text-mid); margin-bottom:20px; }
+.save-modal input { width:100%; padding:10px 14px; border:1.5px solid var(--cream-border); border-radius:12px; background:var(--cream-dark); font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); outline:none; margin-bottom:14px; transition:border-color .2s; }
+.save-modal input:focus { border-color:var(--blush-mid); }
+.vibe-picker { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.vibe-opt { flex:1; min-width:48px; padding:10px 6px; border:2px solid var(--cream-border); border-radius:12px; text-align:center; cursor:pointer; transition:all .2s; background:var(--cream-dark); }
+.vibe-opt:hover { border-color:var(--blush-mid); }
+.vibe-opt.selected { border-color:var(--rose); background:var(--blush); }
+.vibe-opt .vibe-emoji { font-size:22px; display:block; margin-bottom:3px; }
+.vibe-opt .vibe-label { font-size:10px; color:var(--text-mid); }
+.mood-dropdown-item { display:flex; align-items:center; gap:10px; padding:8px 14px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); transition:background .15s; white-space:nowrap; }
+.mood-dropdown-item:hover { background:var(--cream-dark); }
+.mood-dropdown-item .mood-check { width:14px; font-size:11px; color:var(--rose); }
+#moodFilterBtn { background-color:var(--cream) !important; }
+#starFilterBtn { background-color:var(--cream) !important; }
+.modal-actions { display:flex; gap:8px; }
+
+.empty-state { text-align:center; padding:30px 16px; color:var(--text-light); }
+.empty-state .empty-icon { margin-bottom:10px; display:flex; justify-content:center; }
+.empty-state p { font-size:12px; line-height:1.6; }
+
+.drag-ghost { position:fixed; pointer-events:none; z-index:1000; opacity:.85; transform:scale(.9); filter:drop-shadow(0 8px 20px rgba(180,130,120,.4)); }
+.toast { position:fixed; bottom:30px; right:30px; background:var(--text); color:white; padding:10px 20px; border-radius:20px; font-size:13px; box-shadow:0 4px 20px rgba(61,46,42,.25); transform:translateY(60px); opacity:0; transition:all .3s; z-index:200; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* Hamburger menu */
+.hamburger-wrap { position:relative; }
+.hamburger-btn { width:36px; height:36px; border:none; background:transparent; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border-radius:8px; transition:background .2s; }
+.hamburger-btn:hover { background:var(--cream-dark); }
+.hamburger-btn span { width:18px; height:1.5px; background:var(--text-light); border-radius:2px; display:block; }
+.hamburger-menu { position:absolute; top:calc(100% + 8px); right:0; background:var(--cream); border-radius:12px; box-shadow:0 8px 30px rgba(61,46,42,.18); border:1px solid var(--cream-border); min-width:140px; overflow:hidden; z-index:100; display:none; }
+.hamburger-wrap.open .hamburger-menu { display:block; }
+.hamburger-item { display:block; width:100%; padding:11px 16px; border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); text-align:left; cursor:pointer; transition:background .15s; }
+.hamburger-item:hover { background:var(--cream-dark); }
+
+
+@keyframes zonePulse { 0%,100%{r:4;} 50%{r:6;} }
+.zone-dot-active { animation:zonePulse 1s infinite; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="cyclePanels()" title="Toggle panels" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;color:var(--text-light);display:flex;align-items:center;transition:background .15s;" onmouseenter="this.style.background='var(--cream-dark)'" onmouseleave="this.style.background='none'">
+      <svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="1" width="6" height="18" rx="1.5"/>
+        <rect x="10" y="1" width="6" height="18" rx="1.5"/>
+        <rect x="19" y="1" width="6" height="18" rx="1.5"/>
+      </svg>
+    </button>
+  </div>
+  <div style="justify-self:end; display:flex; align-items:center;">
+    <div class="hamburger-wrap" id="hamburgerWrap">
+      <button class="hamburger-btn" onclick="toggleHamburger()" title="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="hamburger-menu">
+        <button class="hamburger-item" onclick="menuSave()">Save ✦</button>
+        <button class="hamburger-item" onclick="menuOpen()">Open</button>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileOpen(event)"/>
+  </div>
+</header>
+
+<div class="main" id="mainGrid">
+  <!-- Left: Closet -->
+  <div class="panel" id="closetPanel">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="panel-title" style="margin-bottom:0;">Closet</div>
+          <div class="panel-subtitle" id="closetSubtitle" style="margin-top:2px;">0 items</div>
+        </div>
+        <div style="position:relative;">
+          <button id="starFilterBtn" onclick="toggleStarDropdown()" style="background-color:var(--cream);background:var(--cream);border:1px solid var(--text);cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;color:var(--text);display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by rating">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+          </button>
+          <div id="starDropdown" style="display:none;position:absolute;right:0;top:32px;background:var(--cream);border:1.5px solid var(--cream-border);border-radius:14px;box-shadow:0 8px 32px rgba(61,46,42,.15);z-index:200;min-width:140px;padding:6px 0;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body" id="closetBody">
+      <div class="empty-state" id="closetEmpty">
+        <div class="empty-icon"><span style="font-size:32px;opacity:.5;color:var(--text-light);">
+          <svg viewBox="0 0 36 28" fill="none" width="32" height="28">
+            <path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--text-light)" stroke="var(--text-light)" stroke-width="0.5"/>
+          </svg>
+        </span></div>
+        <p>Add items below...</p>
+      </div>
+    </div>
+    <div class="add-form">
+      <button class="btn-add" onclick="openAddModal()">Add ✦</button>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-wrapper" id="canvas" ondragover="event.preventDefault()" ondrop="handleCanvasDrop(event)">
+    <!-- Centered stage: figure + items move together on resize -->
+    <div id="stage">
+      <!-- Figure backdrop -->
+      <div class="canvas-figure" id="canvasFigure">
+        <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 304 1061.03" width="148.99" height="520" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);display:block;fill:var(--text-light);">
+          <path d="M88.94,659.23c-25.35-96.12-36.57-129.81-3.91-227.04,5.53-16.46,22.94-38.34,26.37-51.59,2.14-8.24.57-17.02-1.45-25.16l-9.11-36.82c-.61-2.46-.53-4.23-3.58-5.05l-3.16,22c-2.43,16.96-4.5,33.28-5.28,50.39-1.05,23.1-17.74,72.64-25.96,96.01-5.17,14.72-8.93,29.04-12.78,44.23-4.76,18.8,9.01,20.13,8.61,47.47-.27,18.23,6.81,28.4.36,35.05,3.4,1.92,6.84,3.17,7.82,7.47-5.32.52-8.24-4.28-13.95-2.8,4.1,4.7,18.36,6.99,14.39,14.49l-8.81-3.84c.89,5.69,4.65,6.81,1.75,11.85l-15.5-16.51c-1.81-1.93-5.26-4.25-5.91-6.67-2.43-9.05-4.52-16.09-10.07-24.09,5.34-18.32,1.24-36.64,3.15-54.91,3.24-31.05,7.38-60.63,8.79-91.91.88-19.46,3.42-38.27,9.45-56.5,3.8-11.49,6.46-21.81,7.2-33.96,1.69-27.72,3.54-55,3.09-82.88l-9.55,4.61,7.88-6.27c1.07-.85,1.58-3.81,1.07-4.96-12.65,8.28-24.68,10.16-38.31,8.58l10.24-1.39c2.59-.35,3.61-1.96,4.98-3.94,2.62-3.8,9.16-3.98,9.93-9.79-6.5,3.57-12.06,6.85-19.07,6.59,4.6-2.81,8.17-5.9,11.7-10.68l-10.68,1.48c-10.09,1.39-20.6.44-28.66-4.56,9.54,1.55,19.51,1.49,26.35-4.05,1.36-12.88,4.45-25.55,13.93-34.47,2.24-2.11,4.44-4.3,6.27-6.71-9.17,2.22-15.77,3.96-24.04,4.81-13.86,1.42-17.8,13.52-20.54,24.22.26-13.18,1.1-18.5,9.4-27.37-.5-.47-3.21-1.74-3.65-1.17-1.75,2.21-3.63,7.53-4.53,10.44-1.96-3.8,5.01-14.96,1.6-14.53,4.84-.61,6.3-5.89,17.13-10.69,7.36-3.26,13.95-6.18,19.69-11.43-7.17.3-11.88,3.22-18.07,2.42,8.21-1.17,14.58-4.64,21.17-9.58l12.32-9.22-14.46-.62c-5.8-.25-14.09,8.66-17.8,7.78l13.75-9.18c-6.56-2.66-11-3.38-16.97-4.57,6.59-.77,12.54.11,19.14.73,15.9,1.52,31.59-12.43,37.85-26.8l-11.62,3.77c4.59-3.42,10.79-3.56,14.14-10.15l-13.7,4.93c-7.74,2.78-11.36,8.96-13.52,16.47l.28-11.81c-6.85.57-13.36.11-19.53-2.01,6.85.56,12.85-.74,17.83-5.67,8.57-8.47,17.08-16.57,26.6-24.13,2.74-2.18,5.09-4.54,7.13-7.87l-21.81,4.01c-7.21,1.33-14.04,3.58-18.48,10.13,6.42-17.42,30.39-13.18,46.08-23.84.67-13.82,6.51-24.92,12.87-36.66,1.39-2.56,2.18-5.38,4.58-7.26,4.93-3.87,9.51-8.11,13.15-12.94,7.13-9.47,17.12-13.52,27.14-18.9,10.82-5.81,22.98-9.18,34.47-2.59,4.55,2.61,7.89,7.15,6.49,13.06,2.11,1.17,4.61,2.16,7.57,3.22,5.31,1.91,11.12,8.1,11.57,14.08.3,3.96.04,7.36,3.01,10.71,4.1,4.63,8.12,9.31,9.59,15.15-1.34-2.31-2.34-4.74-5.26-5.19,6.05,25.35,15.6,35.22,14.64,61.22-.4,10.74-6.16,17.04-10.79,25.45-6.11,11.1-11.99,22.08-25.83,26.82,6.38,7.73,14.13,11.55,22.58,15.84,7.75,3.93,15.57,5.3,24.27,5.65s18.22,3.72,24.11,10.58c9.39,10.95,9.78,37.35,9.16,51.77-1.5,35.12-.32,69.44,2.4,104.35,1.63,21.02,12.96,30.24,15.65,70.42l2.67,39.94c1.24,18.6,2.48,36.62,5.39,54.97,1.61,10.15,2.55,19.65.75,29.97-2.07,11.87,3.85,24.32,1.16,36.02-1.79,7.8-5.75,16.68-8.86,24.61,1.24,1.18-20,23-20.3,22.67-3.79-4.29,2.01-7.13,3.47-12.24l-11.51,5.39c-.91-9.07,9.12-8.66,12.72-14.35l-11,2.43c1.14-8.28,14.01-7.81,17.96-17.41,2.45-5.96,4.26-12.49-.61-18.58-5.49,8.91-2.54,21.43-9.55,26.84-4.06-.42-4.28-5.42-3.48-8.47,2.92-11.06,3.62-21.54,3.66-33,.06-15.74,12.55-21.52,8.83-39.05-2.91-13.71-6.79-26.41-11.2-39.85-8.4-25.61-16.73-50.4-23.56-76.44-2.78-10.61-4.13-20.53-4.6-31.48-.61-14.3-2.03-28.1-4.4-42.09-1.41-8.29-.83-16.23-4.82-24.96l-10.71,42.12c-6.23,24.49-2.48,29.42,8.94,48.92,6.26,10.69,12.34,20.99,16.1,32.9,21.75,68.92,23.69,108.43,5.6,178.78l-22.65,88.12c-7.62,29.63-8.86,58.75-4.1,88.92,3.65,23.13,2.9,45.47-1.52,68.4-5.22,27.07-12.97,52.62-20.68,79.02-4.64,15.92-13.29,46.13-8.78,61.51l-2.51,10.77c1.88,6.44,4.98,12.38,8.09,18.47,2.91,5.71,5.89,11.47,11.28,15.22,2.8,1.95,5.57,7.26,1.52,9.31-1.82.92-5.39,2.1-7.52,2.53l-8.76,1.75c-2.65.53-6.46,2.17-8.79-.09-2.99-2.9-4.15,6.47-16.2.89l-4.41-8.1c.3-3.43,1.6-8.52.43-11.22l-4.11-9.44-4.31,11.24-.05,8.97-4.65,7.4c-3.86,6.15-10.93.87-15.35.71-3.44-.13-6.59,1.56-9.56-.73-2.01-.12-5.46-.41-7.37-.88l-6.9-1.72c-1.89-.47-3.98-2.28-4.18-4.13-.81-7.45,9.83-6.45,16.29-22.8,2.14-5.42,7.46-12.15,6.88-18.06-.68-6.96-1.69-12.28-.51-19.25,1.27-7.47-.06-15.51-1.84-23.02-15.18-63.87-39.92-111.49-29.77-180.65,3.46-23.59,4.55-46.6-1.56-69.79l-15.43-58.49ZM175.11,3.4c4.81.24,8.92,4.44,11.97,7.04C182.86-.21,169.83-.13,161.37,2.71l13.74.69ZM101.53,64.96l6.13-17.74c-7.61,8.51-11.91,18.91-12.75,30,3.25-3.85,5.13-7.95,6.62-12.26ZM222.72,135.97c7.16-6.13,7.48-28.01,5.26-35.08-.52,6.11-.9,11.3-2.83,16.82l-2.44,18.27ZM45.9,129.71c2.92.35,6.96.17,8.22-1.23,1.01-1.12,1.84-3.54,2.27-5.16l-10.49,6.38ZM198.73,161.87c8.96-3.04,15.57-9.34,18.59-17.94-1.83.23-4.05,1.44-5.04,2.82-4.14,5.82-8.58,10.16-13.55,15.11ZM28.8,241.76c6.26-4.38,9.99-10.35,11.69-16.97-5.68,4.79-10,10.14-11.69,16.97ZM174.96,954.31c1.01-25.21-.04-49.67-2.18-74.87-1.36-16.05-1.14-31.13.75-46.98l4.17-35.04c2.19-18.42-9.17-33.04-5.92-72.98l3.01-36.97c1.59-19.49.78-38.39-1.21-57.86-2.87-28.04-3.41-60.12,3.28-88.43-6.63,3.19-12.32,3.26-18.46.08,7.87,32.97,6,59.38,2.76,91.88-1.18,11.87-2.54,23.39-2.29,35.41.82,40.35,9.86,64.13-.34,105.98-1.87,7.67-2.45,15.23-1.3,23.04,4.82,32.92,8.23,53.28,4.97,86.82-2.25,23.11-3.38,45.62-2.72,68.83.4,13.89,2.07,26.69,8.16,39.99,4.49-13.24,6.81-25.55,7.34-38.91ZM53.03,592.74c-.72-4.27-1.33-8.14-3.37-11.89-6.1,7.96-2.35,19.97,5.62,25.28l-2.26-13.39Z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Hair toggle -->
+    <div class="stage-toggles">
+      <div class="stage-toggle">
+        <span class="stage-toggle-label">hair</span>
+        <label class="stage-toggle-pill">
+          <input type="checkbox" id="hairToggle" onchange="setHair(this.checked?'up':'down')">
+          <div class="stage-toggle-track"></div>
+          <div class="stage-toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="stage-toggle">
+        <span class="stage-toggle-label">photos</span>
+        <label class="stage-toggle-pill">
+          <input type="checkbox" id="photosToggle" onchange="setViewMode(this.checked?'photos':'illustrations')">
+          <div class="stage-toggle-track"></div>
+          <div class="stage-toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="stage-toggle" style="margin-left:49px;">
+        <span class="stage-toggle-label">edit</span>
+        <label class="stage-toggle-pill">
+          <input type="checkbox" id="editToggle" onchange="setEditMode(this.checked)">
+          <div class="stage-toggle-track"></div>
+          <div class="stage-toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="canvas-drop-hint" id="dropHint"></div>
+
+    <!-- Layer slider -->
+    <div id="layerSliderWrap">
+      <input type="range" id="layerSlider" orient="vertical" min="0" max="100" value="100" step="1">
+    </div>
+
+    <div class="canvas-toolbar">
+      <button class="toolbar-btn" onclick="clearCanvas()">✕ Clear</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" onclick="bringForward()">↑ Forward</button>
+      <button class="toolbar-btn" onclick="sendBack()">↓ Back</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn primary" onclick="openSaveModal()">Save ✦</button>
+    </div>
+  </div>
+
+  <!-- Right: Saved Outfits -->
+  <div class="panel" id="outfitsPanel">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="panel-title" style="margin-bottom:0;">Outfits</div>
+          <div class="panel-subtitle" id="outfitsSubtitle" style="margin-top:2px;">saved looks</div>
+        </div>
+        <div style="position:relative;">
+          <button id="moodFilterBtn" onclick="toggleMoodDropdown()" style="background-color:var(--cream);background:var(--cream);border:1px solid var(--text);cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;color:var(--text);display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by mood">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+          </button>
+          <div id="moodDropdown" style="display:none;position:absolute;right:0;top:32px;background:var(--cream);border:1.5px solid var(--cream-border);border-radius:14px;box-shadow:0 8px 32px rgba(61,46,42,.15);z-index:200;min-width:160px;padding:6px 0;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body" id="outfitsBody">
+      <div class="empty-state" id="outfitsEmpty">
+        <div class="empty-icon"><span style="font-size:32px;opacity:.5;color:var(--text-light);">✦</span></div>
+        <p>No outfits yet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Item Modal ── -->
+<div class="modal-overlay" id="addModal">
+  <div class="add-modal">
+    <div class="add-modal-icon">⌘V</div>
+    <p class="add-modal-hint">Paste an image URL to add it to your closet</p>
+    <div class="add-modal-log" id="addLog"></div>
+    <button class="btn-confirm" onclick="closeAddModal()" style="width:100%;margin-top:8px;">Done</button>
+  </div>
+</div>
+
+<!-- ── Category Picker Modal ── -->
+<div class="modal-overlay" id="catModal">
+  <div class="cat-modal">
+    <div class="cat-modal-top">
+
+      <!-- Image preview side -->
+      <div class="cat-preview-col">
+        <img class="cat-preview-img" id="catPreviewImg" src="" alt="preview" />
+        <input class="cat-preview-name" id="catPhotoUrlInput" placeholder="Photo URL…" oninput="updatePhotoPreview(this.value)" />
+        <input class="cat-preview-name" id="catNameInput" placeholder="Item name…" />
+        <div style="font-size:10px;color:var(--text-light);text-align:center;line-height:1.5;margin-bottom:12px;">Edit photo URL or name above.</div>
+        <div style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+          <span>Illustration</span>
+          <button onclick="addIllustrSlot()" style="background:none;border:none;cursor:pointer;color:var(--rose);font-size:16px;line-height:1;padding:0 2px;" title="Add another illustration piece">+</button>
+        </div>
+        <div id="illustrSlots" style="display:flex;flex-direction:column;gap:6px;width:100%;"></div>
+        <div style="font-size:10px;color:var(--text-light);text-align:center;line-height:1.5;margin-top:4px;">⌘V anywhere to paste.</div>
+      </div>
+
+      <!-- Picker side -->
+      <div class="cat-picker-col">
+        <div class="cat-picker-header">
+          <h2>What kind of item is this?</h2>
+          <p>Select the category that best describes your item</p>
+        </div>
+        <div class="cat-picker-body">
+
+          <!-- Category list -->
+          <div class="cat-options-col">
+
+            <div class="cat-opt" data-cat="Bra" onclick="selectCategory('Bra')" onmouseenter="hoverZone('Bra')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 30" fill="none">
+                  <!-- Left strap -->
+                  <path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <!-- Right strap -->
+                  <path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <!-- Underwire band -->
+                  <path d="M6 18 Q22 22 38 18" stroke="#C97B7A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  <!-- Left cup -->
+                  <path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
+                  <!-- Right cup -->
+                  <path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
+                  <!-- Cup seam detail — left -->
+                  <path d="M10 9 Q14 14 14 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
+                  <!-- Cup seam detail — right -->
+                  <path d="M34 9 Q30 14 30 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
+                  <!-- Centre gore -->
+                  <rect x="20.5" y="13" width="3" height="5" rx="1" fill="#E8ADAB" stroke="#C97B7A" stroke-width="0.7"/>
+                  <!-- Tiny centre bow -->
+                  <path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="#C97B7A" opacity=".7"/>
+                  <!-- Side bands -->
+                  <path d="M6 18 L4 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
+                  <path d="M38 18 L40 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Bra</div><div class="cat-desc">bra, bralette, bandeau, bustier</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="Panties" onclick="selectCategory('Panties')" onmouseenter="hoverZone('Panties')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 28" fill="none">
+                  <!-- Waistband -->
+                  <line x1="6" y1="5" x2="38" y2="5" stroke="#C97B7A" stroke-width="2.2" stroke-linecap="round"/>
+                  <!-- Curved triangle -->
+                  <path d="M6 5 Q16 10 22 18 Q28 10 38 5 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3" stroke-linejoin="round"/>
+                  <!-- Waistband bow -->
+                  <path d="M20.2 4.8 Q18.6 3.2 19.8 2.4 Q21 4.2 22 4.2 Q23 4.2 24.2 2.4 Q25.4 3.2 23.8 4.8" fill="#C97B7A" opacity=".75"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Panties</div><div class="cat-desc">briefs, thong, boyshorts, g-string</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="Lingerie" onclick="selectCategory('Lingerie')" onmouseenter="hoverZone('Lingerie')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 52" fill="none">
+                  <!-- ── BRA ── -->
+                  <!-- Left strap -->
+                  <path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <!-- Right strap -->
+                  <path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <!-- Underwire -->
+                  <path d="M6 18 Q22 22 38 18" stroke="#C97B7A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  <!-- Left cup -->
+                  <path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
+                  <!-- Right cup -->
+                  <path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
+                  <!-- Cup seams -->
+                  <path d="M10 9 Q14 14 14 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
+                  <path d="M34 9 Q30 14 30 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
+                  <!-- Centre gore -->
+                  <rect x="20.5" y="13" width="3" height="5" rx="1" fill="#E8ADAB" stroke="#C97B7A" stroke-width="0.7"/>
+                  <!-- Centre bow -->
+                  <path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="#C97B7A" opacity=".7"/>
+                  <!-- Side bands -->
+                  <path d="M6 18 L4 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
+                  <path d="M38 18 L40 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
+
+                  <!-- ── THONG (shifted down 26px) ── -->
+                  <!-- Waistband -->
+                  <line x1="6" y1="29" x2="38" y2="29" stroke="#C97B7A" stroke-width="2.2" stroke-linecap="round"/>
+                  <!-- Curved triangle -->
+                  <path d="M6 29 Q16 34 22 42 Q28 34 38 29 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3" stroke-linejoin="round"/>
+                  <!-- Waistband bow -->
+                  <path d="M20.2 28.8 Q18.6 27.2 19.8 26.4 Q21 28.2 22 28.2 Q23 28.2 24.2 26.4 Q25.4 27.2 23.8 28.8" fill="#C97B7A" opacity=".75"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Lingerie</div><div class="cat-desc">matching bra &amp; panties set</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="Costume" onclick="selectCategory('Costume')" onmouseenter="hoverZone('Costume')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 36" fill="none">
+                  <!-- Mask / masquerade shape -->
+                  <path d="M4 16 Q4 8 12 8 Q17 8 20 13 Q22 16 22 16 Q22 16 24 13 Q27 8 32 8 Q40 8 40 16 Q40 22 36 23 Q32 24 28 20 Q25 17 22 17 Q19 17 16 20 Q12 24 8 23 Q4 22 4 16 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3"/>
+                  <!-- Eye holes -->
+                  <ellipse cx="13" cy="16" rx="4" ry="3.5" fill="white" stroke="#C97B7A" stroke-width="1"/>
+                  <ellipse cx="31" cy="16" rx="4" ry="3.5" fill="white" stroke="#C97B7A" stroke-width="1"/>
+                  <!-- Ribbons -->
+                  <path d="M4 16 Q2 18 1 22" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <path d="M40 16 Q42 18 43 22" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <!-- Star detail -->
+                  <path d="M22 6 L22.6 4 L23.2 6 L25 6 L23.6 7 L24.2 9 L22 8 L19.8 9 L20.4 7 L19 6 L20.8 6 Z" fill="#C97B7A" opacity=".6"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Costume</div><div class="cat-desc">cosplay, roleplay, fantasy wear</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="DressBabydoll" onclick="selectCategory('DressBabydoll')" onmouseenter="hoverZone('DressBabydoll')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 36 32" fill="none">
+                  <path d="M13 2 L9 9 L4 30 L32 30 L27 9 L23 2Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
+                  <path d="M13 2 Q18 7 23 2" stroke="#C97B7A" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                  <path d="M9 9 Q7 9 4 11" stroke="#C97B7A" stroke-width=".9" fill="none"/>
+                  <path d="M27 9 Q29 9 32 11" stroke="#C97B7A" stroke-width=".9" fill="none"/>
+                  <line x1="4" y1="17" x2="32" y2="17" stroke="#C97B7A" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Dress / Babydoll</div><div class="cat-desc">full dress, chemise, babydoll</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="Top" onclick="selectCategory('Top')" onmouseenter="hoverZone('Top')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 36 28" fill="none">
+                  <path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Top</div><div class="cat-desc">shirt, blouse, sweater, jacket, coat</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="Shorts" onclick="selectCategory('Shorts')" onmouseenter="hoverZone('Shorts')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 28" fill="none">
+                  <!-- Waistband -->
+                  <rect x="6" y="3" width="32" height="5" rx="2" fill="#E8ADAB" stroke="#C97B7A" stroke-width="1.1"/>
+                  <!-- Left leg -->
+                  <path d="M6 8 L6 22 Q6 25 10 25 L19 25 L22 14 L22 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2" stroke-linejoin="round"/>
+                  <!-- Right leg -->
+                  <path d="M38 8 L38 22 Q38 25 34 25 L25 25 L22 14 L22 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2" stroke-linejoin="round"/>
+                  <!-- Centre seam -->
+                  <line x1="22" y1="8" x2="22" y2="14" stroke="#C97B7A" stroke-width="0.8" opacity=".5"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Shorts</div><div class="cat-desc">shorts, hot pants, boyshorts</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="Skirt" onclick="selectCategory('Skirt')" onmouseenter="hoverZone('Skirt')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 28" fill="none">
+                  <!-- Waistband -->
+                  <rect x="10" y="3" width="24" height="4" rx="2" fill="#E8ADAB" stroke="#C97B7A" stroke-width="1.1"/>
+                  <!-- Skirt flare -->
+                  <path d="M10 7 L4 25 L40 25 L34 7 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2" stroke-linejoin="round"/>
+                  <!-- Pleat lines -->
+                  <line x1="18" y1="7" x2="14" y2="25" stroke="#C97B7A" stroke-width="0.7" opacity=".35"/>
+                  <line x1="26" y1="7" x2="30" y2="25" stroke="#C97B7A" stroke-width="0.7" opacity=".35"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Skirt</div><div class="cat-desc">mini, midi, maxi, wrap</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+            <div class="cat-opt" data-cat="SocksStockings" onclick="selectCategory('SocksStockings')" onmouseenter="hoverZone('SocksStockings')" onmouseleave="clearHover()">
+              <div class="cat-icon">
+                <svg viewBox="0 0 44 36" fill="none">
+                  <path d="
+                    M13 2
+                    L21 2
+                    L21 22
+                    C21 26 24 28 28 28
+                    L32 28
+                    C35 28 37 27 37 30
+                    C37 33 34 34 31 34
+                    L18 34
+                    C14 34 11 31 11 27
+                    L11 6
+                    C11 4 12 2 13 2
+                    Z
+                  " fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3" stroke-linejoin="round"/>
+                  <!-- Cuff band -->
+                  <rect x="11" y="2" width="10" height="4" rx="1.5" fill="#E8ADAB" stroke="#C97B7A" stroke-width="1" opacity=".85"/>
+                  <!-- Cuff ribs -->
+                  <line x1="14.5" y1="2" x2="14.5" y2="6" stroke="#C97B7A" stroke-width="0.7" opacity=".5"/>
+                  <line x1="17.5" y1="2" x2="17.5" y2="6" stroke="#C97B7A" stroke-width="0.7" opacity=".5"/>
+                </svg>
+              </div>
+              <div class="cat-text"><div class="cat-name">Socks / Stockings</div><div class="cat-desc">knee-highs, tights, thigh-highs, hosiery</div></div>
+              <div class="cat-check">✓</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-modal-footer" style="justify-content:center;">
+      <button class="btn-cancel" onclick="closeCatModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmSaveCatModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Outfit Modal -->
+<div class="modal-overlay" id="editOutfitModal">
+  <div class="save-modal">
+    <input type="text" id="editOutfitName" placeholder="Name this outfit…" />
+    <div class="mood-label" style="font-size:11px;color:var(--text-mid);margin-bottom:8px;font-family:'DM Sans',sans-serif;">Mood</div>
+    <div class="vibe-picker" id="editMoodPicker"></div>
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="saveEditOutfit()" style="flex:1;">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Save Outfit Modal -->
+<div class="modal-overlay" id="saveModal">
+  <div class="save-modal">
+    <input type="text" id="outfitNameInput" placeholder="Name this outfit…" />
+    <div class="mood-label" style="font-size:11px;color:var(--text-mid);margin-bottom:8px;font-family:'DM Sans',sans-serif;">Mood</div>
+    <div class="vibe-picker" id="saveMoodPicker"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSaveModal()">Cancel</button>
+      <button class="btn-confirm" onclick="saveOutfit()" style="flex:1;">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ratingModal">
+  <div class="save-modal" style="width:300px;text-align:center;">
+    <div style="width:80px;height:80px;margin:0 auto 16px;border-radius:12px;overflow:hidden;background:var(--cream-dark);"><img id="ratingThumbImg" style="width:100%;height:100%;object-fit:contain;padding:6px;" /></div>
+    <div id="ratingStars" style="display:flex;justify-content:center;gap:6px;margin-bottom:20px;font-size:28px;cursor:pointer;">
+      <span class="star" data-v="1">☆</span>
+      <span class="star" data-v="2">☆</span>
+      <span class="star" data-v="3">☆</span>
+      <span class="star" data-v="4">☆</span>
+      <span class="star" data-v="5">☆</span>
+    </div>
+    <div id="ratingActions" class="modal-actions" style="flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="drag-ghost" id="dragGhost" style="display:none;"><img id="dragGhostImg" style="width:80px;height:80px;object-fit:contain;" /></div>
+
+<script>
+// v2026-03-02-r3
+let closetItems = JSON.parse(localStorage.getItem('outfit-closet') || '[]');
+let savedOutfits = JSON.parse(localStorage.getItem('outfit-saved') || '[]');
+let canvasItems = [];
+let activeOutfitId = null; // id of outfit currently loaded on canvas
+let selectedId = null;
+// ── Moods ──
+const MOODS = [
+  { key: '😇', label: 'Innocent', svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/><path d="M7 7 Q12 5 17 7" fill="none"/></svg>' },
+  { key: '🌸', label: 'Soft',     svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C9 3 7 5.5 7 8c0 2 1 3.5 2.5 4.5C8 13.5 7 15 7 17c0 2.5 2 4 5 4s5-1.5 5-4c0-2-1-3.5-2.5-4.5C16 11.5 17 10 17 8c0-2.5-2-5-5-5z"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>' },
+  { key: '🌹', label: 'Elegant',  svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M12 12c0 0-4-3-4-7a4 4 0 0 1 8 0c0 4-4 7-4 7z"/><path d="M9 15c-2 1-3 3-3 4"/></svg>' },
+  { key: '🔥', label: 'Sexy',  svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 0-6 6-6 12a6 6 0 0 0 12 0c0-3-2-6-2-6s-1 3-3 4c0 0 1-5-1-10z"/></svg>' },
+  { key: '😈', label: 'Naughty', svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M8 16s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="11" x2="9.01" y2="11" stroke-width="2.5"/><line x1="15" y1="11" x2="15.01" y2="11" stroke-width="2.5"/><path d="M7 6 L12 9 L17 6" stroke-width="1.4"/></svg>' },
+];
+let vibeFilter = null;
+let selectedVibe = MOODS[0].key;
+let showMoods = true;
+let starFilter = null; // null = all, 1-5 = show only that rating
+
+function renderMoodPicker(containerId, currentMood, onSelect) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  MOODS.forEach(mood => {
+    const opt = document.createElement('div');
+    opt.className = 'vibe-opt' + (currentMood === mood.key ? ' selected' : '');
+    opt.innerHTML = `<span class="vibe-emoji">${mood.key}</span>`;
+    opt.addEventListener('click', () => {
+      container.querySelectorAll('.vibe-opt').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      onSelect(mood.key);
+    });
+    container.appendChild(opt);
+  });
+}
+let zCounter = 1;
+let pendingItem = null;
+// Per-item saved placement: { [item.id]: {x,y,w,h} }
+let itemPositions = JSON.parse(localStorage.getItem('outfit-item-positions') || '{}');
+// Per-category default placement for illustrated items: { [category]: {x,y,w,h} }
+let categoryDefaults = JSON.parse(localStorage.getItem('outfit-cat-defaults') || '{}');
+let pendingCategory = null;
+
+const CAT_CONFIG = {
+  Bra:            { label: 'Bra' },
+  Panties:        { label: 'Panties' },
+  Lingerie:  { label: 'Lingerie' },
+  Costume:        { label: 'Costume' },
+  DressBabydoll:  { label: 'Dress / Babydoll' },
+  Top:            { label: 'Top' },
+  Shorts:         { label: 'Shorts' },
+  Skirt:          { label: 'Skirt' },
+  SocksStockings: { label: 'Socks / Stockings' },
+};
+const CAT_ORDER = Object.keys(CAT_CONFIG);
+
+// ── Add modal ──
+let pasteHandler = null;
+
+function openAddModal() {
+  document.getElementById('addLog').innerHTML = '';
+  document.getElementById('addModal').classList.add('open');
+  pasteHandler = e => {
+    const text = (e.clipboardData || window.clipboardData).getData('text').trim();
+    if (!text) return;
+    e.preventDefault();
+    // Treat as URL — open categorize popup
+    // If cat modal already open and photo is set, paste goes to illustration
+    const catModalOpen = document.getElementById('catModal').classList.contains('open');
+    if (catModalOpen && document.getElementById('catPreviewImg').src && document.getElementById('catPreviewImg').src !== window.location.href) {
+      document.getElementById('catIllustrInput').value = text;
+      updateIllustrPreview(text);
+      return;
+    }
+    pendingItem = { src: text, name: '' };
+    pendingCategory = null;
+    recategorizeId = null;
+    document.getElementById('catPreviewImg').src = text;
+    document.getElementById('catPhotoUrlInput').value = text;
+    document.getElementById('catNameInput').value = '';
+    setIllustrSlots([]);
+    document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+    document.getElementById('catModal').classList.add('open');
+  };
+  document.addEventListener('paste', pasteHandler);
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+  if (pasteHandler) { document.removeEventListener('paste', pasteHandler); pasteHandler = null; }
+}
+
+// ── Category picker ──
+function prepareAddItem() {
+  // legacy — no longer called from UI but kept for safety
+}
+
+function hoverZone(cat) {}
+function clearHover() {}
+
+let recategorizeId = null; // id of item being recategorized, or null for new
+
+function selectCategory(cat) {
+  pendingCategory = cat;
+  document.querySelectorAll('.cat-opt').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.cat-opt[data-cat="${cat}"]`)?.classList.add('selected');
+  // Prefill empty or bare-prefix slots with this category's prefix
+  const prefix = catPrefix(cat);
+  illustSlots.forEach((slot, i) => {
+    const v = slot.src;
+    const isBarePrefix = !v || (!hasNumber(v) && !v.includes('/') && !v.includes('.'));
+    if (isBarePrefix) illustSlots[i].src = prefix;
+  });
+  renderIllustrSlots();
+  confirmAddItem();
+}
+
+function closeCatModal() {
+  document.getElementById('catModal').classList.remove('open');
+  pendingItem = null; pendingCategory = null; recategorizeId = null;
+}
+
+function confirmAddItem() {
+  if (!pendingCategory) { showToast('Please select a category first'); return; }
+  const name = document.getElementById('catNameInput').value.trim() || 'Item';
+  if (recategorizeId) {
+    const item = closetItems.find(i => String(i.id) === String(recategorizeId));
+    if (item) {
+      item.category = pendingCategory; item.name = name;
+      const photoSrc = document.getElementById('catPhotoUrlInput').value.trim();
+      if (photoSrc) item.src = photoSrc;
+      const illSrcs = getIllustrSrcs();
+      item.illustrationSrcs = illSrcs;
+      item.illustrationSrc = illSrcs[0] || '';
+      // Sync any canvas items that came from this closet item
+      const itemIdStr = String(item.id);
+      canvasItems.forEach((ci, idx) => {
+        if (ci.itemId !== itemIdStr) return;
+        const pieces = canvasItems.filter(c => c.itemId === itemIdStr);
+        const pieceIdx = pieces.indexOf(ci);
+        const newIllustSrc = illSrcs[pieceIdx] || illSrcs[0] || '';
+        ci.illustrationSrc = newIllustSrc;
+        ci.canvasSrc = newIllustSrc || ci.src;
+        if (photoSrc) ci.src = photoSrc;
+        renderCanvasItem(ci);
+      });
+      // Explicitly persist — don't rely on renderCloset side-effect
+      localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+    }
+    showToast(`Moved to ${CAT_CONFIG[pendingCategory]?.label || pendingCategory}`);
+    renderCloset();
+    closeCatModal();
+  } else {
+    const illustrationSrcs = getIllustrSrcs();
+    const photoSrc = document.getElementById('catPhotoUrlInput').value.trim() || pendingItem.src;
+    const newItem = { id: Date.now() + Math.random(), src: photoSrc, illustrationSrcs, illustrationSrc: illustrationSrcs[0] || '', name, category: pendingCategory };
+    closetItems.push(newItem);
+    renderCloset();
+    // Log entry in add modal
+    const log = document.getElementById('addLog');
+    if (log) {
+      const entry = document.createElement('div');
+      entry.className = 'add-log-entry';
+      entry.innerHTML = `<img src="${newItem.src}" onerror="this.style.opacity=.3"/><div class="add-log-entry-cat">${CAT_CONFIG[pendingCategory]?.label || pendingCategory}</div>`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+    // Close cat modal but keep add modal open
+    document.getElementById('catModal').classList.remove('open');
+    pendingItem = null; pendingCategory = null; recategorizeId = null;
+  }
+}
+
+let collapsedCats = new Set();
+
+// ── Closet ──
+
+// ── Illustration slots ──
+let illustSlots = []; // array of {src} during editing
+
+function renderIllustrSlots() {
+  const container = document.getElementById('illustrSlots');
+  if (!container) return;
+  container.innerHTML = '';
+  if (illustSlots.length === 0) {
+    addIllustrSlot(); return;
+  }
+  illustSlots.forEach((slot, i) => {
+    const isPrefix = slot.src && !hasNumber(slot.src) && !slot.src.includes('/') && !slot.src.includes('.');
+    const div = document.createElement('div');
+    div.className = 'illust-slot';
+    div.innerHTML = `
+      <div class="illust-slot-row">
+        <img class="illust-slot-preview" src="" style="opacity:0.3"/>
+        <input class="illust-slot-input" placeholder="Illustration URL…" value="${slot.src || ''}"
+          style="color:${isPrefix ? 'var(--text-light)' : 'var(--text)'}"
+          oninput="updateSlotSrc(${i}, this.value)" data-slot="${i}"/>
+        ${illustSlots.length > 1 ? `<button class="illust-slot-remove" onclick="removeIllustrSlot(${i})">−</button>` : ''}
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function addIllustrSlot() {
+  let newSrc = pendingCategory ? catPrefix(pendingCategory) : '';
+  // Try to infer from the first slot: e.g. "shorts1" → "shorts1b", "shorts1a" → "shorts1b"
+  const first = illustSlots[0]?.src || '';
+  if (first && hasNumber(first)) {
+    // Strip trailing letter if present, then find what letter to append
+    const match = first.match(/^(.*\d)([a-z]?)$/i);
+    if (match) {
+      const base = match[1];
+      // Find the last used letter across all slots
+      const letters = illustSlots.map(s => {
+        const m = s.src.match(/^.*\d([a-z])$/i);
+        return m ? m[1].toLowerCase() : '';
+      }).filter(Boolean);
+      if (letters.length === 0 && !match[2]) {
+        // First slot has no letter yet — first slot gets 'a', new slot gets 'b'
+        illustSlots[0].src = base + 'a';
+        newSrc = base + 'b';
+        renderIllustrSlots(); // re-render to show updated first slot
+      } else {
+        const lastLetter = letters.sort().pop() || (match[2] || 'a');
+        newSrc = base + String.fromCharCode(lastLetter.charCodeAt(0) + 1);
+      }
+    }
+  }
+  illustSlots.push({ src: newSrc });
+  renderIllustrSlots();
+}
+
+function removeIllustrSlot(i) {
+  illustSlots.splice(i, 1);
+  if (illustSlots.length === 0) illustSlots.push({ src: '' });
+  renderIllustrSlots();
+}
+
+const ILLUST_BASE = 'https://matthewhtyler.github.io/outfit/images/';
+
+function catPrefix(cat) {
+  const label = CAT_CONFIG[cat]?.label || cat;
+  return label.split(/[\s\/]/)[0].toLowerCase();
+}
+
+function hasNumber(val) { return /\d/.test(val); }
+
+function expandIllustrUrl(val) {
+  if (!val || !hasNumber(val)) return '';
+  return (val.includes('/') || val.includes('.')) ? val : ILLUST_BASE + val + '.png';
+}
+
+function updateSlotSrc(i, val) {
+  illustSlots[i].src = val.trim();
+  const expanded = expandIllustrUrl(val.trim());
+  const container = document.getElementById('illustrSlots');
+  const inputs = container.querySelectorAll('.illust-slot-input');
+  const img = container.querySelectorAll('.illust-slot-preview')[i];
+  if (inputs[i]) inputs[i].style.color = hasNumber(val) ? 'var(--text)' : 'var(--text-light)';
+  if (img) { img.src = expanded || ''; img.style.opacity = expanded ? '1' : '0.3'; }
+}
+
+function getIllustrSrcs() {
+  return illustSlots.map(s => expandIllustrUrl(s.src)).filter(Boolean);
+}
+
+function unexpandIllustrUrl(src) {
+  if (!src) return '';
+  if (src.startsWith(ILLUST_BASE) && src.endsWith('.png')) {
+    return src.slice(ILLUST_BASE.length, -4);
+  }
+  return src;
+}
+
+function setIllustrSlots(srcs) {
+  illustSlots = (srcs && srcs.length) ? srcs.map(src => ({ src: unexpandIllustrUrl(src) })) : [{ src: '' }];
+  renderIllustrSlots();
+}
+
+// legacy compat — called from old paste path
+function updatePhotoPreview(src) {
+  const img = document.getElementById('catPreviewImg');
+  img.src = src;
+}
+
+function confirmSaveCatModal() {
+  if (!pendingCategory) { showToast('Select a category first'); return; }
+  const photoUrl = document.getElementById('catPhotoUrlInput').value.trim();
+  if (photoUrl && pendingItem) pendingItem.src = photoUrl;
+  confirmAddItem();
+}
+
+function updateIllustrPreview(src) {
+  if (illustSlots.length === 0) illustSlots.push({ src: '' });
+  const lastEmpty = illustSlots.findIndex(s => !s.src);
+  if (lastEmpty >= 0) illustSlots[lastEmpty].src = src;
+  else illustSlots.push({ src });
+  renderIllustrSlots();
+}
+function makeClosetEl(item, outfitSrcs) {
+  const el = document.createElement('div');
+  el.className = 'closet-item'; el.draggable = true; el.dataset.id = item.id;
+  const isInOutfit = outfitSrcs.has(item.src);
+  const checkBadge = isInOutfit ? `<div class="used-check"><svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : '';
+  const starBadge = (item.rating >= 4) ? `<div class="star-badge">☆</div>` : '';
+  const illSrcs = item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []);
+  const showDuo = item.category === 'Costume' && viewMode === 'illustrations' && illSrcs.length >= 2;
+  let imgHtml;
+  if (showDuo) {
+    imgHtml = `<div class="closet-item-duo"><img src="${illSrcs[0]}" alt="${item.name}" onerror="this.style.opacity=.3"/><img src="${illSrcs[1]}" alt="${item.name}" onerror="this.style.opacity=.3"/></div>`;
+  } else {
+    const dispSrc = itemDisplaySrc(item);
+    imgHtml = `<img src="${dispSrc}" alt="${item.name}" onerror="this.style.opacity=.3"/>`;
+  }
+  el.innerHTML = `${imgHtml}<div class="item-name">${item.name}</div>${checkBadge}${starBadge}<button class="remove-btn" onclick="removeClosetItem('${item.id}',event)">−</button>`;
+  el.addEventListener('dragstart', e => startClosetDrag(e, item));
+  el.addEventListener('dblclick', () => addToCanvasCenter(item));
+  el.addEventListener('click', e => {
+    if (e.altKey) {
+      e.preventDefault();
+      recategorizeId = item.id;
+      pendingItem = { src: item.src, name: item.name };
+      pendingCategory = item.category;
+      document.getElementById('catPreviewImg').src = item.src;
+      document.getElementById('catPhotoUrlInput').value = item.src;
+      document.getElementById('catNameInput').value = item.name;
+      setIllustrSlots(item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []));
+      if (!item.illustrationSrcs?.length && !item.illustrationSrc) {
+        const prefix = catPrefix(item.category);
+        illustSlots.forEach((slot, i) => { if (!slot.src) illustSlots[i].src = prefix; });
+        renderIllustrSlots();
+      }
+      document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+      document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
+      document.getElementById('catModal').classList.add('open');
+    } else if (e.metaKey || e.ctrlKey) {
+      e.preventDefault();
+      openRatingModal(item);
+    } else if (!editMode) {
+      addToCanvasCenter(item);
+    }
+  });
+  return el;
+}
+
+function renderCloset() {
+  const body = document.getElementById('closetBody');
+  document.getElementById('closetEmpty').style.display = closetItems.length ? 'none' : '';
+  body.querySelectorAll('.category-group, .closet-section-divider').forEach(g => g.remove());
+  if (!closetItems.length) return;
+  const outfitSrcs = new Set();
+  savedOutfits.forEach(o => o.items.forEach(ci => outfitSrcs.add(ci.src)));
+  const cats = {};
+  closetItems.forEach(item => {
+    if (item.status === 'exchange' || item.status === 'return') return;
+    if (starFilter !== null && (item.rating || 0) < starFilter) return;
+    if (!cats[item.category]) cats[item.category] = [];
+    cats[item.category].push(item);
+  });
+  CAT_ORDER.forEach(cat => {
+    if (!cats[cat]) return;
+    const collapsed = collapsedCats.has(cat);
+    const group = document.createElement('div');
+    group.className = 'category-group';
+    const label = document.createElement('div');
+    label.className = 'category-label';
+    label.style.cursor = 'pointer';
+    label.style.userSelect = 'none';
+    label.innerHTML = `<span class="cat-collapse-arrow" style="font-size:9px;margin-right:4px;display:inline-block;transform:rotate(${collapsed ? '-90' : '0'}deg);transition:transform .2s;">${'▾'}</span>${CAT_CONFIG[cat]?.label || cat}`;
+    label.addEventListener('click', e => {
+      if (e.altKey) {
+        // Option-click: toggle all cats + Exchange + Return sections
+        const statusKeys = ['__exchange', '__return'];
+        const allCatKeys = CAT_ORDER.filter(c => cats[c]);
+        const allKeys = [...allCatKeys, ...statusKeys];
+        const allCollapsed = allKeys.every(k => collapsedCats.has(k));
+        allKeys.forEach(k => allCollapsed ? collapsedCats.delete(k) : collapsedCats.add(k));
+      } else {
+        collapsed ? collapsedCats.delete(cat) : collapsedCats.add(cat);
+      }
+      renderCloset();
+    });
+    group.appendChild(label);
+    const grid = document.createElement('div');
+    grid.className = 'closet-grid';
+    grid.id = `grid-${cat}`;
+    grid.style.display = collapsed ? 'none' : '';
+    group.appendChild(grid);
+    body.appendChild(group);
+    cats[cat].forEach(item => {
+      grid.appendChild(makeClosetEl(item, outfitSrcs));
+    });
+  });
+
+  // ── Exchange and Return sections ──
+  ['exchange', 'return'].forEach(status => {
+    const statusItems = closetItems.filter(i => i.status === status);
+    if (!statusItems.length) return;
+    const label = status === 'exchange' ? 'Exchange' : 'Return';
+    const collapsed = collapsedCats.has(`__${status}`);
+
+    const divider = document.createElement('div');
+    divider.className = 'closet-section-divider category-label';
+    divider.style.cssText = 'cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px;padding:10px 4px 4px;';
+    divider.innerHTML = `<span style="font-size:9px;margin-right:2px;display:inline-block;transform:rotate(${collapsed?'-90':'0'}deg);transition:transform .2s;">▾</span>${label}`;
+    divider.addEventListener('click', e => {
+      if (e.altKey) {
+        // Toggle all cats and both status sections
+        const allKeys = [...CAT_ORDER.filter(c => cats[c]).map(c => c), '__exchange', '__return'];
+        const allCollapsed = allKeys.every(k => collapsedCats.has(k));
+        allKeys.forEach(k => allCollapsed ? collapsedCats.delete(k) : collapsedCats.add(k));
+      } else {
+        if (collapsedCats.has(`__${status}`)) collapsedCats.delete(`__${status}`);
+        else collapsedCats.add(`__${status}`);
+      }
+      renderCloset();
+    });
+    body.appendChild(divider);
+
+    // Wrap all category groups in a collapsible container
+    const container = document.createElement('div');
+    container.style.display = collapsed ? 'none' : '';
+    body.appendChild(container);
+
+    const secCats = {};
+    statusItems.forEach(item => {
+      if (!secCats[item.category]) secCats[item.category] = [];
+      secCats[item.category].push(item);
+    });
+    CAT_ORDER.forEach(cat => {
+      if (!secCats[cat]) return;
+      const group = document.createElement('div');
+      group.className = 'category-group';
+      const lbl = document.createElement('div');
+      lbl.className = 'category-label';
+      lbl.style.opacity = '0.7';
+      lbl.textContent = CAT_CONFIG[cat]?.label || cat;
+      const grid = document.createElement('div');
+      grid.className = 'closet-grid';
+      secCats[cat].forEach(item => { grid.appendChild(makeClosetEl(item, outfitSrcs)); });
+      group.appendChild(lbl);
+      group.appendChild(grid);
+      container.appendChild(group);
+    });
+  });
+
+  localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+  const n = closetItems.length;
+  document.getElementById('closetSubtitle').textContent = `${n} item${n === 1 ? '' : 's'}`;
+}
+
+function removeClosetItem(id, e) {
+  e.stopPropagation();
+  closetItems = closetItems.filter(i => String(i.id) !== String(id));
+  renderCloset();
+}
+
+// ── Drag ──
+let closetDragItem = null;
+
+function startClosetDrag(e, item) {
+  closetDragItem = item;
+  document.getElementById('dragGhostImg').src = item.src;
+  e.dataTransfer.effectAllowed = 'copy';
+  e.dataTransfer.setDragImage(document.createElement('div'), 0, 0);
+  document.getElementById('dragGhost').style.display = 'block';
+}
+document.addEventListener('dragend', () => { document.getElementById('dragGhost').style.display = 'none'; closetDragItem = null; });
+document.addEventListener('dragover', e => {
+  const g = document.getElementById('dragGhost');
+  if (g.style.display !== 'none') { g.style.left = (e.clientX-40)+'px'; g.style.top = (e.clientY-40)+'px'; }
+});
+function handleCanvasDrop(e) {
+  e.preventDefault();
+  if (!closetDragItem) return;
+  const rect = document.getElementById('stage').getBoundingClientRect();
+  addToCanvas(closetDragItem, e.clientX - rect.left - 60, e.clientY - rect.top - 60);
+  closetDragItem = null;
+  document.getElementById('dragGhost').style.display = 'none';
+}
+
+// ── Canvas ──
+function addToCanvasCenter(item) {
+  const size = 350;
+  addToCanvas(item, -size / 2, -size / 2, size);
+}
+
+function addToCanvas(item, x, y, forceSize) {
+  if (editMode) setHair('up');
+  resetLayerSlider();
+
+  // In non-edit mode: swap out any existing items from the same category (Skirt/Shorts and Lingerie/Costume are interchangeable)
+  if (!editMode) {
+    const LINGERIE_COSTUME_SWAP = new Set(['Lingerie', 'Costume']);
+    const swapGroup = (item.category === 'Skirt' || item.category === 'Shorts')
+      ? ci => ci.category === 'Skirt' || ci.category === 'Shorts'
+      : LINGERIE_COSTUME_SWAP.has(item.category)
+      ? ci => LINGERIE_COSTUME_SWAP.has(ci.category)
+      : ci => ci.category === item.category;
+    const toRemove = canvasItems.filter(swapGroup);
+    toRemove.forEach(ci => document.getElementById(ci.id)?.remove());
+    canvasItems = canvasItems.filter(ci => !swapGroup(ci));
+  }
+
+  const srcs = (item.illustrationSrcs && item.illustrationSrcs.length) ? item.illustrationSrcs
+              : (item.illustrationSrc ? [item.illustrationSrc] : []);
+  const hasIllust = srcs.length > 0;
+
+  if (hasIllust) {
+    // Multi-piece: check for saved multi-placement first
+    const savedPieces = itemPositions[String(item.id)]; // array of {src,x,y,w,h}
+    const catDefault = categoryDefaults[item.category];
+
+    if (Array.isArray(savedPieces)) {
+      const sorted = [...savedPieces].sort((a, b) => (a.z || 0) - (b.z || 0));
+      let lastCi;
+      sorted.forEach(piece => {
+        const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
+          src: item.src, illustrationSrc: piece.src, canvasSrc: piece.src,
+          name: item.name, itemId: String(item.id), category: item.category,
+          x: piece.x, y: piece.y, w: piece.w, h: piece.h, rot: piece.rot||0, flipped: piece.flipped||false, z: ++zCounter };
+        canvasItems.push(ci); renderCanvasItem(ci); lastCi = ci;
+      });
+      if (lastCi) selectItem(lastCi.id);
+    } else {
+      let lastCi;
+      srcs.forEach((src, idx) => {
+        let px2, py2, pw2, ph2;
+        if (catDefault && Array.isArray(catDefault) && catDefault[idx]) {
+          ({ x: px2, y: py2, w: pw2, h: ph2 } = catDefault[idx]);
+        } else if (catDefault && !Array.isArray(catDefault) && idx === 0) {
+          ({ x: px2, y: py2, w: pw2, h: ph2 } = catDefault);
+        } else {
+          px2 = x + idx * 20; py2 = y + idx * 20;
+          pw2 = ph2 = forceSize || 350;
+        }
+        const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
+          src: item.src, illustrationSrc: src, canvasSrc: src,
+          name: item.name, itemId: String(item.id), category: item.category,
+          x: px2, y: py2, w: pw2, h: ph2, rot: 0, flipped: false, z: ++zCounter };
+        canvasItems.push(ci); renderCanvasItem(ci); lastCi = ci;
+      });
+      if (lastCi) selectItem(lastCi.id);
+    }
+    updateDropHint();
+    applyZTiers();
+    return;
+  }
+
+  // Photo item — single canvas item with saved/default/centered placement
+  const savedPlacement = itemPositions[String(item.id)];
+  const catDefault = categoryDefaults[item.category];
+  let px, py, pw, ph, savedZ, savedRot = 0, savedFlipped = false;
+  if (Array.isArray(savedPlacement)) {
+    ({ x: px, y: py, w: pw, h: ph } = savedPlacement[0]);
+    savedZ = savedPlacement[0].z;
+    savedRot = savedPlacement[0].rot || 0;
+    savedFlipped = savedPlacement[0].flipped || false;
+  } else if (savedPlacement) {
+    ({ x: px, y: py, w: pw, h: ph } = savedPlacement);
+    savedZ = savedPlacement.z;
+    savedRot = savedPlacement.rot || 0;
+    savedFlipped = savedPlacement.flipped || false;
+  } else if (catDefault && !Array.isArray(catDefault)) {
+    ({ x: px, y: py, w: pw, h: ph } = catDefault);
+    savedZ = catDefault.z;
+  } else {
+    px = x; py = y;
+    pw = ph = Math.max(350, forceSize || 350);
+  }
+
+  const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
+    src: item.src, illustrationSrc: '', canvasSrc: item.src,
+    name: item.name, itemId: String(item.id), category: item.category,
+    x: px, y: py, w: pw, h: ph, rot: savedRot, flipped: savedFlipped, z: ++zCounter };
+  canvasItems.push(ci); renderCanvasItem(ci);
+  updateDropHint();
+  applyZTiers();
+  selectItem(ci.id);
+}
+
+function renderCanvasItem(ci) {
+  document.getElementById(ci.id)?.remove();
+  const stage = document.getElementById('stage');
+  const el = document.createElement('div');
+  el.className = 'canvas-item'; el.id = ci.id; el.draggable = false;
+  el.style.cssText = `left:${ci.x}px;top:${ci.y}px;width:${ci.w}px;height:${ci.h}px;transform:rotate(${ci.rot||0}deg);z-index:${ci.z};cursor:${editMode?'grab':'default'};`;
+  const flipTransform = ci.flipped ? 'scaleX(-1)' : '';
+  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform}"/><div class="resize-handle"></div>`;
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('resize-handle')) { if (editMode) startResize(e, ci.id); return; }
+    if (e.target.classList.contains('rotate-handle')) { if (editMode) startRotate(e, ci.id); return; }
+    if (e.target.tagName === 'BUTTON') return;
+    selectItem(ci.id);
+    if (editMode) startCanvasDrag(e, ci.id);
+  });
+  el.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    if (editMode) openCtxMenu(e.clientX, e.clientY, ci.id);
+  });
+  stage.appendChild(el);
+}
+
+function selectItem(id) {
+  document.querySelectorAll('.canvas-item').forEach(el => el.classList.remove('selected'));
+  selectedId = id;
+  if (id) document.getElementById(id)?.classList.add('selected');
+}
+
+function updateDropHint() { document.getElementById('dropHint').style.opacity = canvasItems.length ? '0' : '1'; }
+
+function removeCanvasItem(id) {
+  canvasItems = canvasItems.filter(i => i.id !== id);
+  document.getElementById(id)?.remove(); selectedId = null; updateDropHint();
+}
+
+function clearCanvas() {
+  canvasItems = []; document.querySelectorAll('.canvas-item').forEach(el => el.remove());
+  selectedId = null; activeOutfitId = null; updateDropHint();
+  resetLayerSlider();
+}
+
+function normalizeZOrder() {
+  // Sort items by current z, reassign clean integers 1..n
+  const sorted = [...canvasItems].sort((a, b) => a.z - b.z);
+  sorted.forEach((ci, i) => {
+    ci.z = i + 1;
+    const el = document.getElementById(ci.id);
+    if (el) el.style.zIndex = ci.z;
+  });
+  zCounter = canvasItems.length;
+}
+
+function bringForward() {
+  if (!selectedId) return;
+  normalizeZOrder();
+  const sorted = [...canvasItems].sort((a, b) => a.z - b.z);
+  const idx = sorted.findIndex(i => i.id === selectedId);
+  if (idx < sorted.length - 1) {
+    const ci = sorted[idx];
+    const next = sorted[idx + 1];
+    ci.z++; next.z--;
+    document.getElementById(ci.id).style.zIndex = ci.z;
+    document.getElementById(next.id).style.zIndex = next.z;
+  }
+}
+
+function sendBack() {
+  if (!selectedId) return;
+  normalizeZOrder();
+  const sorted = [...canvasItems].sort((a, b) => a.z - b.z);
+  const idx = sorted.findIndex(i => i.id === selectedId);
+  if (idx > 0) {
+    const ci = sorted[idx];
+    const prev = sorted[idx - 1];
+    ci.z--; prev.z++;
+    document.getElementById(ci.id).style.zIndex = ci.z;
+    document.getElementById(prev.id).style.zIndex = prev.z;
+  }
+}
+
+function flipItem(id) {
+  const ci = canvasItems.find(i => i.id === id);
+  if (!ci) return;
+  ci.flipped = !ci.flipped;
+  const img = document.getElementById(id)?.querySelector('img');
+  if (img) img.style.transform = ci.flipped ? 'scaleX(-1)' : '';
+}
+
+function startRotate(e, id) {
+  e.preventDefault(); e.stopPropagation();
+  const ci = canvasItems.find(i => i.id === id);
+  if (!ci) return;
+  const el = document.getElementById(id);
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+  const startRot = ci.rot || 0;
+  const onMove = me => {
+    const angle = Math.atan2(me.clientY - cy, me.clientX - cx) * 180 / Math.PI;
+    ci.rot = startRot + (angle - startAngle);
+    el.style.transform = `rotate(${ci.rot}deg)`;
+  };
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function startCanvasDrag(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  const ci = canvasItems.find(i => i.id === id);
+  if (!ci) return;
+  document.getElementById('dragGhost').style.display = 'none';
+  const el = document.getElementById(ci.id);
+  const img = el?.querySelector('img');
+  if (img) img.style.filter = 'none';
+  const rect = document.getElementById('stage').getBoundingClientRect();
+  const offX = e.clientX - ci.x - rect.left, offY = e.clientY - ci.y - rect.top;
+  const onMove = me => {
+    const r = document.getElementById('stage').getBoundingClientRect();
+    ci.x = me.clientX - r.left - offX;
+    ci.y = me.clientY - r.top - offY;
+    el.style.left = ci.x+'px'; el.style.top = ci.y+'px';
+  };
+  const onUp = () => {
+    // Restore drop shadow — use selected filter if item is still selected, else default
+    if (img) {
+      img.style.filter = el.classList.contains('selected')
+        ? 'drop-shadow(0 4px 16px rgba(201,123,122,.35))'
+        : 'drop-shadow(0 4px 12px rgba(61,46,42,.15))';
+    }
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function startResize(e, id) {
+  e.preventDefault(); e.stopPropagation();
+  const ci = canvasItems.find(i => i.id === id);
+  if (!ci) return;
+  const sx = e.clientX, sy = e.clientY, sw = ci.w, sh = ci.h;
+  const onMove = me => {
+    ci.w = Math.max(40, sw + me.clientX - sx); ci.h = Math.max(40, sh + me.clientY - sy);
+    const el = document.getElementById(id); el.style.width = ci.w+'px'; el.style.height = ci.h+'px';
+  };
+  const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+  document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+}
+
+let viewMode = 'illustrations'; // 'photos' | 'illustrations'
+let editMode = false; // edit mode off by default
+
+function setEditMode(on) {
+  editMode = !!on;
+  document.getElementById('editToggle').checked = editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  document.querySelectorAll('.canvas-item').forEach(el => {
+    el.style.cursor = editMode ? 'grab' : 'default';
+  });
+  if (!editMode) selectItem(null);
+}
+
+function setTheme(t) {
+  document.body.classList.toggle('night', t === 'night');
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  const cb = document.getElementById('photosToggle');
+  if (cb) cb.checked = mode === 'photos';
+  renderCloset();
+  renderOutfits();
+}
+
+function itemDisplaySrc(item) {
+  if (viewMode === 'illustrations') {
+    const srcs = item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []);
+    if (srcs.length) return srcs[0]; // show first piece in closet grid
+  }
+  return item.src;
+}
+
+// ── Panel collapse ──
+const panelState = { closet: true, outfits: true };
+let logoCycle = 0; // 0=both, 1=none, 2=closet only, 3=outfits only
+
+function setPanels(left, right) {
+  panelState.closet = left;
+  panelState.outfits = right;
+  const lw = left ? '260px' : '0px';
+  const rw = right ? '260px' : '0px';
+  const lPanel = document.getElementById('closetPanel');
+  const rPanel = document.getElementById('outfitsPanel');
+  lPanel.style.width = lw; lPanel.style.overflow = left ? '' : 'hidden'; lPanel.style.borderRight = left ? '' : 'none';
+  rPanel.style.width = rw; rPanel.style.overflow = right ? '' : 'hidden'; rPanel.style.borderLeft = right ? '' : 'none';
+  document.getElementById('mainGrid').style.gridTemplateColumns = `${lw} 1fr ${rw}`;
+  const toggle = document.getElementById('headerToggle');
+  if (toggle) { toggle.style.left = lw; toggle.style.right = rw; }
+  const closetBtn = document.getElementById('toggleClosetBtn');
+  const outfitsBtn = document.getElementById('toggleOutfitsBtn');
+  if (closetBtn)  closetBtn.style.opacity  = left  ? '1' : '0.35';
+  if (outfitsBtn) outfitsBtn.style.opacity = right ? '1' : '0.35';
+}
+
+function cyclePanels() {
+  // 0: both → 1: none → 2: closet only → 3: outfits only → back to 0
+  logoCycle = (logoCycle + 1) % 4;
+  if      (logoCycle === 0) setPanels(true,  true);
+  else if (logoCycle === 1) setPanels(false, false);
+  else if (logoCycle === 2) setPanels(true,  false);
+  else                      setPanels(false, true);
+}
+
+function cycleLeft()  { setPanels(!panelState.closet,  panelState.outfits);  }
+function cycleRight() { setPanels(panelState.closet,   !panelState.outfits); }
+
+// ── Vibe filter ──
+function toggleVibeFilter(vibe) {
+  vibeFilter = vibeFilter === vibe ? null : vibe;
+  renderOutfits();
+}
+
+// ── Used item highlight ──
+// ── Outfits ──
+function openSaveModal() {
+  if (!canvasItems.length) { showToast('Add some items to the canvas first'); return; }
+  if (activeOutfitId) {
+    // Update the loaded outfit in place — no prompt needed
+    const outfit = savedOutfits.find(o => o.id === activeOutfitId);
+    if (outfit) {
+      persistPlacements();
+      outfit.items = JSON.parse(JSON.stringify(canvasItems));
+      outfit.timestamp = new Date().toLocaleDateString();
+      localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+      renderOutfits();
+      showToast(`Updated ${outfit.vibe}`);
+    }
+    return;
+  }
+  document.getElementById('saveModal').classList.add('open');
+  renderMoodPicker('saveMoodPicker', selectedVibe, k => { selectedVibe = k; });
+  setTimeout(() => document.getElementById('outfitNameInput').focus(), 100);
+}
+function closeSaveModal() { document.getElementById('saveModal').classList.remove('open'); }
+
+function selectVibe(v) {
+  selectedVibe = v;
+  renderMoodPicker('saveMoodPicker', selectedVibe, k => { selectedVibe = k; });
+}
+
+function selectEditVibe(v) {
+  editingVibe = v;
+  renderMoodPicker('editMoodPicker', editingVibe, k => { editingVibe = k; });
+}
+
+function persistPlacements() {
+  // Group canvas items by itemId for multi-piece tracking
+  const byItem = {};
+  canvasItems.forEach(ci => {
+    if (!ci.itemId) return;
+    if (!byItem[ci.itemId]) byItem[ci.itemId] = [];
+    byItem[ci.itemId].push(ci);
+  });
+
+  Object.entries(byItem).forEach(([itemId, pieces]) => {
+    if (pieces.length === 1 && !pieces[0].illustrationSrc) {
+      const p = pieces[0];
+      itemPositions[itemId] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false };
+    } else {
+      itemPositions[itemId] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false }));
+      const cat = pieces[0].category;
+      if (cat && !categoryDefaults[cat]) {
+        categoryDefaults[cat] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z }));
+      }
+    }
+  });
+
+  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+  localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+}
+
+function saveOutfit() {
+  const name = document.getElementById('outfitNameInput').value.trim() || 'My Outfit';
+  persistPlacements();
+  savedOutfits.unshift({ id: Date.now(), name, vibe: selectedVibe, items: JSON.parse(JSON.stringify(canvasItems)), timestamp: new Date().toLocaleDateString() });
+  localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+  renderOutfits(); closeSaveModal();
+  document.getElementById('outfitNameInput').value = '';
+  clearCanvas();
+  renderCloset();
+  showToast(`"${name}" saved ${selectedVibe}`);
+}
+
+function renderOutfits() {
+  const body = document.getElementById('outfitsBody');
+  body.querySelectorAll('.outfit-card').forEach(c => c.remove());
+  document.getElementById('outfitsEmpty').style.display = savedOutfits.length ? 'none' : '';
+  const count = savedOutfits.length;
+  document.getElementById('outfitsSubtitle').textContent = count ? `${count} saved look${count === 1 ? '' : 's'}` : 'saved looks';
+  // Highlight mood filter button if active
+  const btn = document.getElementById('moodFilterBtn');
+  if (btn) btn.style.background = vibeFilter ? 'var(--blush)' : '';
+  savedOutfits.forEach((outfit, idx) => {
+    const card = document.createElement('div');
+    const faded = vibeFilter && outfit.vibe !== vibeFilter ? ' vibe-faded' : '';
+    card.className = 'outfit-card' + faded;
+    card.dataset.src = outfit.items.map(i => i.src).join('||');
+    const imgs = outfit.items.slice(0,4).map(i => {
+      const src = (viewMode === 'illustrations' && i.illustrationSrc) ? i.illustrationSrc : i.src;
+      return `<img src="${src}"/>`;
+    }).join('');
+    card.innerHTML = `
+      <div class="outfit-preview">${imgs}</div>
+      <div class="outfit-info">
+        <span style="position:absolute;bottom:8px;left:10px;font-size:10px;color:var(--text-light);font-family:'DM Sans',sans-serif;">${idx + 1}</span>
+        <span class="outfit-vibe" style="display:${showMoods ? '' : 'none'}">${outfit.vibe}</span>
+        ${outfit.name && outfit.name !== 'My Outfit' ? `<span style="font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-mid);font-style:italic;">${outfit.name}</span>` : ''}
+      </div>
+      <div class="outfit-actions">
+        <button class="outfit-action-btn" title="Load" onclick="loadOutfit(${outfit.id},event)">↩</button>
+        <button class="outfit-action-btn" title="Delete" onclick="deleteOutfit(${outfit.id},event)">✕</button>
+      </div>`;
+    let clickTimer;
+    card.addEventListener('click', () => { clickTimer = setTimeout(() => loadOutfit(outfit.id), 220); });
+    card.addEventListener('dblclick', () => { clearTimeout(clickTimer); openEditOutfitModal(outfit.id); });
+    body.appendChild(card);
+  });
+}
+
+function loadOutfit(id, e) {
+  if (e) e.stopPropagation();
+  const outfit = savedOutfits.find(o => o.id === id);
+  if (!outfit) return;
+  clearCanvas();
+  activeOutfitId = id;
+  outfit.items.forEach(ci => { canvasItems.push({...ci}); renderCanvasItem({...ci}); });
+  updateDropHint();
+  if (editMode) setHair('down');
+  pinLingerieToBack();
+  resetLayerSlider();
+  showToast(`Loaded ${outfit.vibe}`);
+}
+
+let editingOutfitId = null;
+let editingVibe = MOODS[0].key;
+
+function openEditOutfitModal(id) {
+  const outfit = savedOutfits.find(o => o.id === id);
+  if (!outfit) return;
+  editingOutfitId = id;
+  editingVibe = outfit.vibe || MOODS[0].key;
+  document.getElementById('editOutfitName').value = (outfit.name && outfit.name !== 'My Outfit') ? outfit.name : '';
+  renderMoodPicker('editMoodPicker', editingVibe, k => { editingVibe = k; });
+  document.getElementById('editOutfitModal').classList.add('open');
+  setTimeout(() => document.getElementById('editOutfitName').focus(), 100);
+}
+
+function toggleVibeFilter(mood) {
+  vibeFilter = vibeFilter === mood ? null : mood;
+  renderOutfits();
+}
+
+let moodDropdownOpen = false;
+function toggleMoodDropdown() {
+  moodDropdownOpen = !moodDropdownOpen;
+  const dd = document.getElementById('moodDropdown');
+  if (!moodDropdownOpen) { dd.style.display = 'none'; return; }
+  const total = savedOutfits.length;
+  dd.innerHTML = '';
+
+  // Show moods toggle
+  const showItem = document.createElement('div');
+  showItem.className = 'mood-dropdown-item';
+  showItem.innerHTML = `<span class="mood-check">${showMoods ? '✓' : ''}</span><span style="flex:1;">Show moods</span>`;
+  showItem.addEventListener('click', () => {
+    showMoods = !showMoods;
+    moodDropdownOpen = false; dd.style.display = 'none';
+    renderOutfits();
+  });
+  dd.appendChild(showItem);
+
+  // Divider
+  const div0 = document.createElement('div');
+  div0.style.cssText = 'height:1px;background:var(--cream-border);margin:4px 0;';
+  dd.appendChild(div0);
+
+  // All option
+  const allItem = document.createElement('div');
+  allItem.className = 'mood-dropdown-item';
+  allItem.innerHTML = `<span class="mood-check">${vibeFilter === null ? '✓' : ''}</span><span style="font-size:15px;width:20px;text-align:center;">🙂</span><span style="flex:1;">All</span><span style="color:var(--text-light);font-size:11px;">${total}</span>`;
+  allItem.addEventListener('click', () => { vibeFilter = null; moodDropdownOpen = false; dd.style.display = 'none'; renderOutfits(); });
+  dd.appendChild(allItem);
+
+  // Divider
+  const div = document.createElement('div');
+  div.style.cssText = 'height:1px;background:var(--cream-border);margin:4px 0;';
+  dd.appendChild(div);
+
+  MOODS.forEach(mood => {
+    const count = savedOutfits.filter(o => o.vibe === mood.key).length;
+    if (!count) return;
+    const item = document.createElement('div');
+    item.className = 'mood-dropdown-item';
+    item.innerHTML = `<span class="mood-check">${vibeFilter === mood.key ? '✓' : ''}</span><span style="font-size:15px;width:20px;text-align:center;">${mood.key}</span><span style="flex:1;">${mood.label}</span><span style="color:var(--text-light);font-size:11px;">${count}</span>`;
+    item.addEventListener('click', () => { toggleVibeFilter(mood.key); moodDropdownOpen = false; dd.style.display = 'none'; });
+    dd.appendChild(item);
+  });
+  dd.style.display = 'block';
+}
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  if (moodDropdownOpen && !e.target.closest('#moodFilterBtn') && !e.target.closest('#moodDropdown')) {
+    moodDropdownOpen = false;
+    document.getElementById('moodDropdown').style.display = 'none';
+  }
+});
+
+function saveEditOutfit() {
+  const outfit = savedOutfits.find(o => o.id === editingOutfitId);
+  if (outfit) {
+    outfit.name = document.getElementById('editOutfitName').value.trim() || '';
+    outfit.vibe = editingVibe;
+    localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+    renderOutfits();
+  }
+  document.getElementById('editOutfitModal').classList.remove('open');
+  editingOutfitId = null;
+}
+
+
+function deleteOutfit(id, e) {
+  e.stopPropagation();
+  savedOutfits = savedOutfits.filter(o => o.id !== id);
+  localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+  renderOutfits();
+}
+
+document.getElementById('canvas').addEventListener('mousedown', e => {
+  if (e.target.id === 'canvas' || e.target.closest('.canvas-drop-hint')) selectItem(null);
+});
+
+document.getElementById('outfitNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveOutfit(); });
+document.getElementById('catNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddItem(); });
+document.getElementById('catModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeCatModal(); });
+document.getElementById('saveModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeSaveModal(); });
+document.getElementById('addModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeAddModal(); });
+document.getElementById('editOutfitModal').addEventListener('click', e => { if (e.target === e.currentTarget) document.getElementById('editOutfitModal').classList.remove('open'); });
+document.getElementById('editOutfitName').addEventListener('keydown', e => { if (e.key === 'Enter') saveEditOutfit(); });
+
+// ── Hamburger menu ──
+function toggleHamburger() {
+  document.getElementById('hamburgerWrap').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#hamburgerWrap')) {
+    document.getElementById('hamburgerWrap').classList.remove('open');
+  }
+});
+
+function menuSave() {
+  document.getElementById('hamburgerWrap').classList.remove('open');
+  const data = {
+    exportedAt: new Date().toISOString(),
+    closet: closetItems,
+    savedOutfits: savedOutfits,
+    canvas: canvasItems,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `outfit-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Saved ✦');
+}
+
+function menuOpen() {
+  document.getElementById('hamburgerWrap').classList.remove('open');
+  document.getElementById('fileInput').click();
+}
+
+function migrateImportData(data) {
+  if (!data.closet && data.items) data.closet = data.items;
+  if (!data.closet && data.closetItems) data.closet = data.closetItems;
+  if (!data.savedOutfits && data.outfits) data.savedOutfits = data.outfits;
+
+  const VALID_CATS = new Set(Object.keys(CAT_CONFIG));
+  const VALID_STATUS = new Set(['return', 'exchange']);
+
+  function migrateItem(item) {
+    if (!item || typeof item !== 'object') return item;
+    try {
+      if (item.category === 'BraAndPanties') item.category = 'Lingerie';
+      if (item.category === 'Used') item.category = item.originalCategory || 'Top';
+      if (!VALID_CATS.has(item.category)) item.category = 'Top';
+      delete item.originalCategory;
+      if (item.own) { delete item.own; } // 'own' no longer a status — item stays in main closet
+      if (item.keep === 'return') item.status = 'return';
+      if (item.keep === 'exchange') item.status = 'exchange';
+      delete item.keep;
+      if (item.status && !VALID_STATUS.has(item.status)) delete item.status; // clear invalid statuses like 'own'
+      if (!item.id) item.id = Date.now() + Math.random();
+    } catch(e) { console.warn('item migration error', e, item); }
+    return item;
+  }
+
+  function migrateOutfitVibe(vibe) {
+    const validKeys = new Set(MOODS.map(m => m.key));
+    return validKeys.has(vibe) ? vibe : MOODS[0].key;
+  }
+
+  function migrateCanvasItem(ci) {
+    if (!ci || typeof ci !== 'object') return ci;
+    try {
+      if (ci.category === 'BraAndPanties') ci.category = 'Lingerie';
+      if (ci.rot === undefined || ci.rot === null) ci.rot = 0;
+      if (!ci.flipped) ci.flipped = false;
+    } catch(e) {}
+    return ci;
+  }
+
+  try { if (Array.isArray(data.closet)) data.closet = data.closet.map(migrateItem); } catch(e) { console.warn('closet migration failed', e); }
+  try {
+    if (Array.isArray(data.savedOutfits)) {
+      data.savedOutfits = data.savedOutfits.map(o => {
+        if (!o) return o;
+        try { o.vibe = migrateOutfitVibe(o.vibe); } catch(e) {}
+        try { if (Array.isArray(o.items)) o.items = o.items.map(migrateCanvasItem); } catch(e) {}
+        return o;
+      });
+    }
+  } catch(e) { console.warn('savedOutfits migration failed', e); }
+  try { if (Array.isArray(data.canvas)) data.canvas = data.canvas.map(migrateCanvasItem); } catch(e) {}
+  return data;
+}
+
+function handleFileOpen(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      let data;
+      try {
+        data = JSON.parse(ev.target.result);
+      } catch(parseErr) {
+        showToast('Invalid file'); return;
+      }
+      if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+        showToast('Invalid file'); return;
+      }
+      data = migrateImportData(data);
+      if (data.closet && Array.isArray(data.closet)) {
+        closetItems = data.closet;
+        localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+        renderCloset();
+      }
+      if (data.savedOutfits && Array.isArray(data.savedOutfits)) {
+        savedOutfits = data.savedOutfits;
+        localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+        renderOutfits();
+      }
+      if (data.canvas && Array.isArray(data.canvas)) {
+        canvasItems = [];
+        document.querySelectorAll('.canvas-item').forEach(el => el.remove());
+        data.canvas.forEach(ci => { try { canvasItems.push({...ci}); renderCanvasItem({...ci}); } catch(e) {} });
+        updateDropHint();
+      }
+      showToast('Opened ✦');
+    } catch(err) { console.error('Import error:', err); showToast('Import error — check console'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── Export ──
+function exportData() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    closet: closetItems,
+    savedOutfits: savedOutfits,
+    canvas: canvasItems,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `outfit-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported ♡');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2300);
+}
+
+// ── Init ──
+// ── Migrate: restore any items stuck in Used back to their original category ──
+let migratedUsed = false;
+closetItems.forEach(item => {
+  if (item.category === 'Used') {
+    item.category = item.originalCategory || 'Top';
+    migratedUsed = true;
+  }
+  if (item.category === 'BraAndPanties') {
+    item.category = 'Lingerie';
+    migratedUsed = true;
+  }
+  delete item.originalCategory;
+});
+if (migratedUsed) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+
+// ── Purge legacy sample items seeded in earlier versions ──
+const SAMPLE_SRCS = [
+  'https://images.unsplash.com/photo-1594938298603-c8148c4b4f7e',
+  'https://images.unsplash.com/photo-1591047139829-d91aecb6caea',
+  'https://images.unsplash.com/photo-1541099649105-f69ad21f3246',
+  'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa',
+];
+const VALID_CATS = new Set(Object.keys(CAT_CONFIG));
+const before = closetItems.length;
+closetItems = closetItems.filter(i =>
+  !SAMPLE_SRCS.some(s => i.src && i.src.startsWith(s)) &&
+  VALID_CATS.has(i.category)
+);
+if (closetItems.length !== before) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+
+renderCloset(); renderOutfits(); updateDropHint();
+
+
+
+// ── Z-tier ordering (back → front) ──
+const LINGERIE_CATS = new Set(['Bra', 'Panties', 'Lingerie']);
+const Z_TIERS = [
+  new Set(['Panties']),
+  new Set(['Bra']),
+  new Set(['Lingerie']),
+  new Set(['SocksStockings']),
+  new Set(['Shorts', 'Skirt']),
+  new Set(['Top']),
+];
+function getTier(category) {
+  for (let i = 0; i < Z_TIERS.length; i++) {
+    if (Z_TIERS[i].has(category)) return i;
+  }
+  return null; // no tier = free z
+}
+function applyZTiers() {
+  // Only reorder items that belong to a defined tier
+  const tiered = canvasItems.filter(ci => getTier(ci.category) !== null);
+  const free = canvasItems.filter(ci => getTier(ci.category) === null);
+  if (!tiered.length) return;
+  // Sort tiered items by tier ascending
+  tiered.sort((a, b) => getTier(a.category) - getTier(b.category));
+  // Find the minimum z across all items to anchor below
+  const allZ = canvasItems.map(ci => ci.z);
+  const minZ = allZ.length ? Math.min(...allZ) : 1;
+  // Assign tiered items z values starting from minZ, preserving relative order within same tier
+  let z = minZ;
+  tiered.forEach(ci => {
+    ci.z = z++;
+    const el = document.getElementById(ci.id);
+    if (el) el.style.zIndex = ci.z;
+  });
+  // Bump free items above all tiered items
+  const maxTieredZ = z - 1;
+  free.forEach(ci => {
+    if (ci.z <= maxTieredZ) {
+      ci.z = ++z;
+      const el = document.getElementById(ci.id);
+      if (el) el.style.zIndex = ci.z;
+    }
+  });
+}
+function pinLingerieToBack() { applyZTiers(); }
+
+let starDropdownOpen = false;
+function toggleStarDropdown() {
+  starDropdownOpen = !starDropdownOpen;
+  const dd = document.getElementById('starDropdown');
+  if (!starDropdownOpen) { dd.style.display = 'none'; return; }
+  dd.innerHTML = '';
+  // All option
+  const allItem = document.createElement('div');
+  allItem.className = 'mood-dropdown-item';
+  allItem.innerHTML = `<span class="mood-check">${starFilter === null ? '✓' : ''}</span><span style="flex:1;">All</span>`;
+  allItem.addEventListener('click', () => { starFilter = null; starDropdownOpen = false; dd.style.display = 'none'; updateStarFilterBtn(); renderCloset(); });
+  dd.appendChild(allItem);
+  const div = document.createElement('div');
+  div.style.cssText = 'height:1px;background:var(--cream-border);margin:4px 0;';
+  dd.appendChild(div);
+  for (let i = 5; i >= 1; i--) {
+    const item = document.createElement('div');
+    item.className = 'mood-dropdown-item';
+    const stars = '★'.repeat(i) + '☆'.repeat(5 - i);
+    item.innerHTML = `<span class="mood-check">${starFilter === i ? '✓' : ''}</span><span style="letter-spacing:1px;font-size:13px;">${stars}</span>`;
+    const val = i;
+    item.addEventListener('click', () => { starFilter = val; starDropdownOpen = false; dd.style.display = 'none'; updateStarFilterBtn(); renderCloset(); });
+    dd.appendChild(item);
+  }
+  dd.style.display = 'block';
+}
+function updateStarFilterBtn() {
+  const btn = document.getElementById('starFilterBtn');
+  if (!btn) return;
+  btn.style.background = starFilter ? 'var(--blush)' : 'var(--cream)';
+  btn.style.backgroundColor = starFilter ? 'var(--blush)' : 'var(--cream)';
+}
+document.addEventListener('click', e => {
+  if (starDropdownOpen && !e.target.closest('#starFilterBtn') && !e.target.closest('#starDropdown')) {
+    starDropdownOpen = false;
+    document.getElementById('starDropdown').style.display = 'none';
+  }
+});
+let ratingItemId = null;
+
+function openRatingModal(item) {
+  ratingItemId = item.id;
+  document.getElementById('ratingThumbImg').src = item.src;
+  updateRatingStars(item.rating || 0);
+
+  const actions = document.getElementById('ratingActions');
+  const status = item.status;
+  let topButtons = [];
+
+  if (status === 'return') {
+    topButtons = [
+      { label: 'Exchange', action: () => setStatusAndClose('exchange') },
+      { label: 'Keep', action: () => setStatusAndClose(null) },
+    ];
+  } else if (status === 'exchange') {
+    topButtons = [
+      { label: 'Return', action: () => setStatusAndClose('return') },
+      { label: 'Keep', action: () => setStatusAndClose(null) },
+    ];
+  } else {
+    topButtons = [
+      { label: 'Exchange', action: () => setStatusAndClose('exchange') },
+      { label: 'Return', action: () => setStatusAndClose('return') },
+    ];
+  }
+
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;width:100%;';
+  topButtons.forEach(({ label, action }) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-cancel';
+    btn.style.flex = '1';
+    btn.textContent = label;
+    btn.addEventListener('click', action);
+    row.appendChild(btn);
+  });
+  actions.innerHTML = '';
+  actions.appendChild(row);
+  const doneBtn = document.createElement('button');
+  doneBtn.className = 'btn-confirm';
+  doneBtn.style.width = '100%';
+  doneBtn.textContent = 'Done';
+  doneBtn.addEventListener('click', closeRatingModal);
+  actions.appendChild(doneBtn);
+
+  document.getElementById('ratingModal').classList.add('open');
+}
+function closeRatingModal() {
+  document.getElementById('ratingModal').classList.remove('open');
+  ratingItemId = null;
+  localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+  renderCloset();
+}
+function setStatusAndClose(status) {
+  const item = closetItems.find(i => String(i.id) === String(ratingItemId));
+  if (item) {
+    if (status === null) delete item.status;
+    else item.status = status;
+  }
+  closeRatingModal();
+}
+function updateRatingStars(rating) {
+  document.querySelectorAll('#ratingStars .star').forEach(s => {
+    const v = Number(s.dataset.v);
+    s.textContent = v <= rating ? '★' : '☆';
+    s.classList.toggle('active', v <= rating);
+  });
+}
+// Wire star clicks and hover
+document.getElementById('ratingStars').addEventListener('click', e => {
+  const star = e.target.closest('.star');
+  if (!star || !ratingItemId) return;
+  const v = Number(star.dataset.v);
+  const item = closetItems.find(i => String(i.id) === String(ratingItemId));
+  if (!item) return;
+  // Toggle off if same star clicked
+  const newRating = item.rating === v ? 0 : v;
+  item.rating = newRating;
+  updateRatingStars(newRating);
+  // Auto-close on 4/5 (own) or 1/2 (return)
+  if (newRating >= 4) {
+    item.status = 'own';
+    closeRatingModal();
+  } else if (newRating > 0 && newRating <= 2) {
+    item.status = 'return';
+    closeRatingModal();
+  }
+});
+document.getElementById('ratingStars').addEventListener('mouseover', e => {
+  const star = e.target.closest('.star');
+  if (!star) return;
+  const v = Number(star.dataset.v);
+  document.querySelectorAll('#ratingStars .star').forEach(s => {
+    s.textContent = Number(s.dataset.v) <= v ? '★' : '☆';
+  });
+});
+document.getElementById('ratingStars').addEventListener('mouseleave', () => {
+  const item = ratingItemId ? closetItems.find(i => String(i.id) === String(ratingItemId)) : null;
+  updateRatingStars(item?.rating || 0);
+});
+function resetLayerSlider() {
+  const slider = document.getElementById('layerSlider');
+  if (slider) { slider.value = 100; applyLayerSlider(100); }
+}
+function applyLayerSlider(pct) {
+  if (!canvasItems.length) return;
+  const zVals = canvasItems.map(ci => ci.z).sort((a, b) => a - b);
+  const maxZ = zVals[zVals.length - 1];
+  const minZ = zVals[0];
+  // pct=100 → show all, pct=0 → show only bottom layer
+  const threshold = minZ + Math.round((pct / 100) * (maxZ - minZ));
+  canvasItems.forEach(ci => {
+    const el = document.getElementById(ci.id);
+    if (el) el.style.visibility = ci.z <= threshold ? 'visible' : 'hidden';
+  });
+}
+document.getElementById('layerSlider').addEventListener('input', function() {
+  applyLayerSlider(Number(this.value));
+});
+function openCtxMenu(x, y, ciId) {
+  const ci = canvasItems.find(i => i.id === ciId);
+  if (!ci) return;
+  const catLabel = CAT_CONFIG[ci.category]?.label || ci.category;
+  const menu = document.getElementById('ctxMenu');
+  const setItem = document.getElementById('ctxSetDefault');
+  const resetItem = document.getElementById('ctxResetDefault');
+  setItem.textContent = `Set as default for ${catLabel}`;
+  setItem.onclick = () => { setCtxDefault(ciId); closeCtxMenu(); };
+  const hasCatDefault = !!categoryDefaults[ci.category];
+  resetItem.textContent = `Reset to default`;
+  resetItem.style.opacity = hasCatDefault ? '1' : '0.35';
+  resetItem.style.pointerEvents = hasCatDefault ? 'all' : 'none';
+  resetItem.onclick = () => { resetToDefault(ciId); closeCtxMenu(); };
+  const hasSavedPos = !!itemPositions[String(ci.itemId || ci.id)];
+  const posSaved = document.getElementById('ctxPosSaved');
+  posSaved.style.opacity = hasSavedPos ? '1' : '0.35';
+  posSaved.style.color = hasSavedPos ? 'var(--text)' : 'var(--text-light)';
+  posSaved.innerHTML = hasSavedPos
+    ? `<svg style="display:inline;vertical-align:-2px;margin-right:5px;" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Position saved`
+    : `Position saved`;
+  menu.style.display = 'block';
+  const mw = 200, mh = 115;
+  menu.style.left = Math.min(x, window.innerWidth - mw) + 'px';
+  menu.style.top = Math.min(y, window.innerHeight - mh) + 'px';
+  selectItem(ciId);
+}
+function closeCtxMenu() {
+  document.getElementById('ctxMenu').style.display = 'none';
+}
+function setCtxDefault(ciId) {
+  const ci = canvasItems.find(i => i.id === ciId);
+  if (!ci || !ci.category) return;
+  if (ci.itemId) {
+    const pieces = canvasItems.filter(c => c.itemId === ci.itemId).sort((a, b) => a.z - b.z);
+    categoryDefaults[ci.category] = pieces.map(p => ({
+      src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z
+    }));
+  } else {
+    categoryDefaults[ci.category] = { x: ci.x, y: ci.y, w: ci.w, h: ci.h, z: ci.z };
+  }
+  localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+  showToast(`Default set for ${CAT_CONFIG[ci.category]?.label || ci.category}`);
+}
+function resetToDefault(ciId) {
+  const ci = canvasItems.find(i => i.id === ciId);
+  if (!ci || !ci.category) return;
+  const def = categoryDefaults[ci.category];
+  if (!def) return;
+  if (ci.itemId && Array.isArray(def)) {
+    // Multi-piece: apply each default piece position to matching canvas piece
+    const pieces = canvasItems.filter(c => c.itemId === ci.itemId).sort((a, b) => a.z - b.z);
+    pieces.forEach((p, idx) => {
+      const d = def[idx] || def[0];
+      p.x = d.x; p.y = d.y; p.w = d.w; p.h = d.h;
+      const el = document.getElementById(p.id);
+      if (el) { el.style.left = p.x+'px'; el.style.top = p.y+'px'; el.style.width = p.w+'px'; el.style.height = p.h+'px'; }
+    });
+  } else if (!ci.itemId || !Array.isArray(def)) {
+    const d = Array.isArray(def) ? def[0] : def;
+    ci.x = d.x; ci.y = d.y; ci.w = d.w; ci.h = d.h;
+    const el = document.getElementById(ci.id);
+    if (el) { el.style.left = ci.x+'px'; el.style.top = ci.y+'px'; el.style.width = ci.w+'px'; el.style.height = ci.h+'px'; }
+  }
+  showToast(`Reset to default`);
+}
+document.addEventListener('click', closeCtxMenu);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCtxMenu(); });
+
+const HAIRUP_PATH = "M133.02,1062.69c-.92,2.16.35,7.22,0,9.71-1.49,2.57-3.37,5.84-4.94,8.08-3.54,5.06-11.43,1.73-15.1.06-1.85,1.72-16-1.17-17.83-1.63l-9.99-2.5c-.35-2.02-.51-5.71-.31-8.1,6.44-3.91,11.08-9.23,14.46-15.66l7.18-13.64c4.91-9.34-1.41-11.06.06-18.67,1.87-9.7,1.67-18.91-.8-28.44l-8.32-32.09-7.7-25.99-6.45-22.76c-6.44-22.72-10.24-45.65-10.47-69.5-.19-19.92,6.42-44.69,5.76-68.32-.48-17.03-3.49-33.11-7.89-49.5l-11.09-41.3-6.04-22.3c-8.99-33.2-21.61-86.04-18.04-119.94,3.16-30.05,9.81-58.96,20.13-87.38,5.11-14.08,13.32-26.08,20.96-38.71,5.52-9.13,8.45-18.62,5.62-29.25l-7.86-29.56c-2.17-8.14-2.94-15.97-6.51-24.57-3.96,14.18-4.17,27.38-5.77,41.18-1.61,13.86-2.38,27.16-2.89,41.07-.45,12.13-10.24,43.51-14.31,56.45l-7.9,25.14c-5.9,18.77-12.27,36.85-16.77,56.03-3.08,13.11,8.78,21.35,9.16,35.46.33,12.28.85,23.47,3.3,35.59.51,2.51-.6,5.91-1.74,7.77,1.79,2.84,7,3.32,6.56,9.21l-12.79-3.79,11.98,7.9c1.94,1.28,3,5.82,1.49,7.29l-9.33-5.17,3.61,7.88c.72,1.56-.75,5.3-2.56,5.04l-19.67-21.46-2.96-9.05c-1.83-5.58-4.83-11.57-7.26-16.82l2.4-29.9-.76-25.28c-.06-1.89,7.25-49.05,7.93-70.62.91-29.09,3.8-57.47,12.88-85.21,1.91-5.82,3.75-11.31,4.17-17.45l3.65-53.33c1.37-20.06.33-39.49-.15-59.58-.36-14.86.38-42.71,13.18-51.94,18.33-13.23,33.78-1.01,59.5-16.3,6.94-4.13,11.34-11.06,11.44-19.51.52-45.53-1.92-14.93-13.41-48.56-9.3,2-20.7-22.93-11.49-30.85-5.02-21.28-.09-46.6,17.57-61.34-5.64-11.28-2.24-23.59,6.35-32.01C122.18-.21,133.19-1.94,145.01,1.99c2.06.68,12.25-.27,21.09,12.47,5.35,7.73,5.24,17.23,3.15,26.14,16.44,15.79,21.44,39.05,16.34,61.06,7.81,8.46.65,26.68-7.9,30.83-1.07.52-4.62.81-4.67,2.33-.25,7.94-7.97,12.58-10.28,18.99-3.71,10.29-2.09,22.81-.9,33.51.73,6.53,6.59,11.44,11.75,14.35,11.07,6.24,22.88,8.33,35.59,8.34,11.23.01,22.77,4.24,28.66,14.14,8.34,14.02,7.67,41.47,6.98,57.98-1.02,24.59-.34,48.34,1.46,72.86.81,11.01.97,21.4,2.84,32.14,1.19,6.85,4.5,13.09,6.36,19.73,10.35,36.97,7.21,54.13,10.17,88.99l1.47,17.33c1.17,13.82,4.86,27.16,5,41.12.19,18.64-1.31,36.68,2.06,55.09l-6.47,12.87c-1.65,3.28-.97,9.6-3.56,12.49l-20.88,23.27c-3.92-4.91-.21-7.52,1.14-12.37l-6.38,3.19c-.72.36-2.31,1.01-2.65.45-2.52-4.25,2.79-7.96,5.77-10.72,2-.87,1.89-.94-.05-.43l-4.42-.78c.25-3.97,4.06-6.05,7.36-8.02-1.9-1.64-3.75-4.43-3.18-6.68,7.22-28.36-.91-33.15,10.53-56.14,3.07-6.18,3.91-11.74,2.49-18.62-3.82-18.51-10.21-35.83-15.96-53.83l-9.84-30.8c-4.99-15.61-10.57-30.97-11.86-47.55-2.23-28.56-3.91-56.2-8.45-84.43-1.32,1.24-2.64,3.12-2.96,4.48-3.55,15.11-7.37,29.6-11.69,44.48-3.21,11.04-1.87,21.36,3.68,31.24,12.28,21.91,17.06,24.51,24.69,49.09,13.85,44.55,21.25,83.34,13.81,130.18-2.06,13-4.08,25.15-7.3,37.81l-13.28,52.21c-10.98,43.17-23.4,79.79-15.91,126.01,8.8,54.29-4.02,94.17-19.34,145.26-4.3,14.33-7.28,28.28-10.77,42.71-2.37,9.78-.52,19.41-.95,29.08-.31,6.94-1.68,11.37,1.71,18.02,5.07,9.95,10.19,20.42,19.32,27.37l-.54,5.97c-.11,1.26-2.38,1.59-4.03,2.08l-5.49,1.64c-3.31.99-15.37,3.48-18.34,1.67-4.01,1.74-10.19,4.32-14.69-.06-8.02-7.8-3.37-14.29-4.31-17.04l-3.87-11.4-4.51,10.56ZM144.73,929.97l-2.42-37.35c-.53-8.23-.72-16.33-.05-24.57,1.15-14.27,2.38-28.14,4.44-42.37,3.86-26.75-7.72-42.54-5.64-69.26l3.63-46.75c1.21-15.55,1.18-30.28-.16-45.93-2.93-34.28-5.47-65.72,1.72-100.14-5.65,2.47-11.31,2.11-17.29-.01,5,20.52,5.86,40.9,4.48,61.84l-3.57,54.27c-2.52,38.28,9.58,70.76-.53,115.81-1.5,6.7-2.93,13.71-1.99,20.6,3.53,25.95,7.52,51.39,5.65,77.82-2.02,28.43-3.82,55.71-2.83,84.13.45,12.79,1.3,24.78,7.54,36.52,1.51-6.42,4.49-12.97,5.47-20,2.99-21.42,2.99-42.41,1.56-64.6ZM23.79,612.32c-.46-3.64-1.66-7.2-3.77-10.47-5.67,8.49-2.21,19.01,5.58,24.84l-1.81-14.37ZM246.61,627.91c9.47-3.9,13.38-16.52,8.28-26.04-7,7.76-2.81,13.78-8.28,26.04Z";
+const HAIRUP_VIEWBOX = "0 0 274.18 1083.17";
+const HAIRDOWN_PATH = document.querySelector('#canvasFigure path')?.getAttribute('d') || '';
+const HAIRDOWN_VIEWBOX = "0 0 304 1061.03";
+let hairMode = 'down';
+
+function setHair(mode) {
+  hairMode = mode;
+  const fig = document.getElementById('canvasFigure');
+  const svg = fig.querySelector('svg');
+  const path = fig.querySelector('path');
+  const cb = document.getElementById('hairToggle');
+  if (cb) cb.checked = mode === 'up';
+  if (mode === 'up') {
+    svg.setAttribute('viewBox', HAIRUP_VIEWBOX);
+    svg.setAttribute('width', '134.16');
+    svg.setAttribute('height', '530');
+    path.setAttribute('d', HAIRUP_PATH);
+    svg.style.transform = 'translateX(calc(-50% + 7px))';
+  } else {
+    svg.setAttribute('viewBox', HAIRDOWN_VIEWBOX);
+    svg.setAttribute('width', '148.99');
+    svg.setAttribute('height', '520');
+    path.setAttribute('d', HAIRDOWN_PATH);
+    svg.style.transform = 'translateX(-50%)';
+  }
+}
+
+</script>
+<div id="ctxMenu" style="display:none;position:fixed;z-index:9999;background:white;border-radius:10px;padding:4px;box-shadow:0 4px 20px rgba(61,46,42,.18);min-width:190px;">
+  <div id="ctxSetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
+  <div id="ctxResetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
+  <div style="height:1px;background:var(--cream-border);margin:3px 8px;"></div>
+  <div id="ctxPosSaved" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;border-radius:7px;white-space:nowrap;cursor:default;pointer-events:none;"></div>
+</div>
+
+</body>
+</html>
