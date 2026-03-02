@@ -198,7 +198,9 @@ body.night .closet-item-duo img { background:#1E1618; }
 .canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(201,123,122,.35)); }
 .canvas-item .item-controls { position:absolute; top:-30px; left:50%; transform:translateX(-50%); display:none; gap:4px; background:white; border-radius:12px; padding:4px 6px; box-shadow:var(--shadow); white-space:nowrap; z-index:999999; }
 .canvas-item.selected .item-controls { display:flex; }
-body:not(.edit-mode) .canvas-item .item-controls { display:none !important; }
+body:not(.edit-mode) #fwdBtn,
+body:not(.edit-mode) #backBtn,
+body:not(.edit-mode) #fwdBackSep { display:none !important; }
 
 /* Picture mode */
 body.picture-mode header,
@@ -233,8 +235,8 @@ body.picture-mode #canvas {
 body:not(.edit-mode) .closet-item .used-check { display:none; }
 body:not(.edit-mode) .canvas-item .resize-handle { display:none !important; }
 
-.canvas-toolbar { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:white; border-radius:24px; padding:8px 14px; box-shadow:0 4px 20px rgba(180,130,120,.2); z-index:10; }
-.toolbar-btn { padding:6px 16px; border:none; border-radius:16px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .2s; background:var(--cream-dark); color:var(--text-mid); }
+.canvas-toolbar { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:white; border-radius:24px; padding:8px 14px; box-shadow:0 4px 20px rgba(180,130,120,.2); z-index:10; white-space:nowrap; flex-wrap:nowrap; }
+.toolbar-btn { padding:6px 16px; border:none; border-radius:16px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .2s; background:var(--cream-dark); color:var(--text-mid); white-space:nowrap; flex-shrink:0; }
 .toolbar-btn:hover { background:var(--blush); color:var(--text); }
 .toolbar-btn.primary { background:var(--blush); color:var(--text); }
 .toolbar-btn.primary:hover { background:var(--blush-mid); }
