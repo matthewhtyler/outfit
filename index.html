@@ -349,7 +349,40 @@ body.night .cat-name { color:var(--text-mid); }
 @keyframes zonePulse { 0%,100%{r:4;} 50%{r:6;} }
 .zone-dot-active { animation:zonePulse 1s infinite; }
 
-/* ── Mobile (iPhone / small screens) ── */
+/* ── Photos mode overlay ── */
+.photo-thumb {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--cream-dark);
+  box-shadow: 0 2px 8px rgba(61,46,42,.18);
+  cursor: pointer;
+  pointer-events: all;
+  border: 1.5px solid var(--cream-border);
+  transition: border-color .15s, transform .15s;
+}
+.photo-thumb:hover { border-color: var(--rose); transform: scale(1.06); }
+.photo-thumb.highlighted { border-color: var(--rose); box-shadow: 0 0 0 2px var(--rose); }
+.photo-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.photo-thumb-dot {
+  position: absolute;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--rose);
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+  z-index: 16;
+}
+#photosLineSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 14;
+  overflow: visible;
+}
 @media (max-width: 600px) {
   /* Narrow panels to show 1 item per row */
   .closet-grid { grid-template-columns: 1fr; }
@@ -481,6 +514,9 @@ body.night .cat-name { color:var(--text-mid); }
     </div>
 
     <div class="canvas-drop-hint" id="dropHint"></div>
+
+    <!-- Photos mode thumbnail overlay -->
+    <div id="photosOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;z-index:15;"></div>
 
     <!-- Layer slider -->
     <div id="layerSliderWrap">
@@ -931,6 +967,7 @@ function renderMoodPicker(containerId, currentMood, onSelect) {
 }
 let zCounter = 1;
 let pendingItem = null;
+let toastTimer = null;
 // Per-item saved placement: { [item.id]: {x,y,w,h} }
 let itemPositions = JSON.parse(localStorage.getItem('outfit-item-positions') || '{}');
 // Per-category default placement for illustrated items: { [category]: {x,y,w,h} }
@@ -1474,6 +1511,7 @@ function addToCanvas(item, x, y, forceSize) {
     }
     updateDropHint();
     applyZTiers();
+    renderPhotosOverlay();
     return;
   }
 
@@ -1507,6 +1545,7 @@ function addToCanvas(item, x, y, forceSize) {
   updateDropHint();
   applyZTiers();
   selectItem(ci.id);
+  renderPhotosOverlay();
 }
 
 function renderCanvasItem(ci) {
@@ -1542,12 +1581,14 @@ function updateDropHint() { document.getElementById('dropHint').style.opacity = 
 function removeCanvasItem(id) {
   canvasItems = canvasItems.filter(i => i.id !== id);
   document.getElementById(id)?.remove(); selectedId = null; updateDropHint();
+  renderPhotosOverlay();
 }
 
 function clearCanvas() {
   canvasItems = []; document.querySelectorAll('.canvas-item').forEach(el => el.remove());
   selectedId = null; activeOutfitId = null; updateDropHint();
   resetLayerSlider();
+  renderPhotosOverlay();
 }
 
 function normalizeZOrder() {
@@ -1708,6 +1749,138 @@ function setViewMode(mode) {
   if (cb) cb.checked = mode === 'photos';
   renderCloset();
   renderOutfits();
+  renderPhotosOverlay();
+}
+
+function renderPhotosOverlay() {
+  const overlay = document.getElementById('photosOverlay');
+  if (!overlay) return;
+
+  // Clear old content
+  overlay.innerHTML = '';
+  overlay.style.display = 'none';
+
+  if (viewMode !== 'photos' || canvasItems.length === 0) return;
+
+  overlay.style.display = 'block';
+
+  const canvas = document.getElementById('canvas');
+  const stage = document.getElementById('stage');
+  const canvasRect = canvas.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+
+  // Stage origin relative to canvas
+  const stageOffX = stageRect.left - canvasRect.left;
+  const stageOffY = stageRect.top - canvasRect.top;
+
+  // Deduplicate items by itemId — one thumb per unique garment
+  const seen = new Set();
+  const uniqueItems = canvasItems.filter(ci => {
+    if (seen.has(ci.itemId)) return false;
+    seen.add(ci.itemId); return true;
+  });
+
+  // Split into left and right columns
+  const half = Math.ceil(uniqueItems.length / 2);
+  const leftItems  = uniqueItems.slice(0, half);
+  const rightItems = uniqueItems.slice(half);
+
+  // Thumb dimensions
+  const THUMB_W = 52, THUMB_H = 52, THUMB_GAP = 10;
+  const MARGIN = 10; // from canvas edge
+
+  // Helper: get item center in canvas coords
+  function itemCenter(ci) {
+    return {
+      x: stageOffX + ci.x + ci.w / 2,
+      y: stageOffY + ci.y + ci.h / 2
+    };
+  }
+
+  // Calculate total column height for vertical centering
+  function colHeight(items) {
+    return items.length * THUMB_H + (items.length - 1) * THUMB_GAP;
+  }
+
+  const canvasH = canvasRect.height;
+
+  // SVG for lines
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.id = 'photosLineSvg';
+  svg.setAttribute('width', canvasRect.width);
+  svg.setAttribute('height', canvasRect.height);
+  overlay.appendChild(svg);
+
+  function drawThumb(ci, thumbX, thumbY, side) {
+    // Thumbnail card
+    const thumb = document.createElement('div');
+    thumb.className = 'photo-thumb';
+    thumb.style.left = thumbX + 'px';
+    thumb.style.top = thumbY + 'px';
+    const img = document.createElement('img');
+    img.src = ci.src;
+    img.alt = ci.name || '';
+    thumb.appendChild(img);
+
+    // Highlight matching closet item on click
+    thumb.addEventListener('click', () => {
+      // Scroll closet panel to this item
+      const closetEl = document.querySelector(`.closet-item[data-id="${ci.itemId}"]`);
+      if (closetEl) {
+        closetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        closetEl.style.outline = '2px solid var(--rose)';
+        closetEl.style.outlineOffset = '2px';
+        setTimeout(() => { closetEl.style.outline = ''; closetEl.style.outlineOffset = ''; }, 1500);
+      }
+    });
+
+    overlay.appendChild(thumb);
+
+    // Connection dot on the item
+    const center = itemCenter(ci);
+    const dot = document.createElement('div');
+    dot.className = 'photo-thumb-dot';
+    dot.style.left = center.x + 'px';
+    dot.style.top = center.y + 'px';
+    overlay.appendChild(dot);
+
+    // Line from thumb edge to item center
+    const thumbConnX = side === 'left' ? thumbX + THUMB_W : thumbX;
+    const thumbConnY = thumbY + THUMB_H / 2;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', thumbConnX);
+    line.setAttribute('y1', thumbConnY);
+    line.setAttribute('x2', center.x);
+    line.setAttribute('y2', center.y);
+    line.setAttribute('stroke', 'var(--rose)');
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('stroke-dasharray', '3 3');
+    line.setAttribute('opacity', '0.5');
+    svg.appendChild(line);
+  }
+
+  // Left column — right-aligned near left edge
+  if (leftItems.length > 0) {
+    const totalH = colHeight(leftItems);
+    let startY = (canvasH - totalH) / 2;
+    leftItems.forEach((ci, i) => {
+      const tx = MARGIN;
+      const ty = startY + i * (THUMB_H + THUMB_GAP);
+      drawThumb(ci, tx, ty, 'left');
+    });
+  }
+
+  // Right column — left-aligned near right edge
+  if (rightItems.length > 0) {
+    const totalH = colHeight(rightItems);
+    let startY = (canvasH - totalH) / 2;
+    rightItems.forEach((ci, i) => {
+      const tx = canvasRect.width - MARGIN - THUMB_W;
+      const ty = startY + i * (THUMB_H + THUMB_GAP);
+      drawThumb(ci, tx, ty, 'right');
+    });
+  }
 }
 
 function itemDisplaySrc(item) {
@@ -1876,6 +2049,7 @@ function loadOutfit(id, e) {
   if (editMode) setHair('down');
   pinLingerieToBack();
   resetLayerSlider();
+  renderPhotosOverlay();
   showToast(`Loaded ${outfit.vibe}`);
 }
 
@@ -2874,6 +3048,8 @@ function setHair(mode) {
     setSilhouette(ap.gender || 'female');
   }
 })();
+
+window.addEventListener('resize', () => { renderPhotosOverlay(); });
 
 </script>
 <div id="ctxMenu" style="display:none;position:fixed;z-index:9999;background:white;border-radius:10px;padding:4px;box-shadow:0 4px 20px rgba(61,46,42,.18);min-width:190px;">
