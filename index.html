@@ -82,13 +82,23 @@ body.handsome .canvas-figure svg path { fill:#34342b !important; }
 body.handsome header { background:#30342b; border-bottom-color:#1e221a; }
 body.handsome header .logo { color:#D8CDB8; }
 body.handsome header .hamburger-btn span { background:#D8CDB8; }
-body.handsome header button { color:#D8CDB8 !important; }
+body.handsome header > div button { color:#D8CDB8 !important; }
+body.handsome .hamburger-item { color:var(--text) !important; }
+body.handsome .hamburger-item svg { color:var(--text) !important; }
 /* Layer slider circle */
 body.handsome #layerSlider { accent-color:#30342b; }
 
 body.handsome .stage-toggle-label { color:#D8CDB8; }
 body.handsome #shareBtn { background:#30342b; color:#D8CDB8; }
 body.handsome #shareBtn:hover { background:#1e221a; color:#D8CDB8; }
+/* Handsome: all highlighted/confirm buttons match canvas Save button */
+body.handsome .btn-confirm { background:#30342b; color:#D8CDB8; }
+body.handsome .btn-confirm:hover { background:#1e221a; color:#D8CDB8; }
+body.handsome .gender-radio input:checked + label { background:#30342b; border-color:#30342b; color:#D8CDB8; }
+/* Popup titles: not italic */
+body.handsome .save-modal h2,
+body.handsome .person-modal h2,
+body.handsome .cat-picker-header h2 { font-style:normal; }
 body.handsome .logo-diamond::before { content:'◆'; }
 body.handsome .theme-diamond { display:none; }
 body.handsome .theme-diamond-h { display:inline !important; }
@@ -441,10 +451,6 @@ body.night .cat-name { color:var(--text-mid); }
         <span></span><span></span><span></span>
       </button>
       <div class="hamburger-menu" id="hamburgerMenu">
-        <!-- New Person -->
-        <button class="hamburger-item" id="newPersonBtn" onclick="openNewPersonModal()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Person…
-        </button>
         <!-- Dynamic people list injected here -->
         <div id="peopleMenuItems"></div>
         <div style="height:1px;background:var(--cream-border);margin:4px 0;"></div>
@@ -850,20 +856,20 @@ body.night .cat-name { color:var(--text-mid); }
     </div>
     <label>Moods</label>
     <select id="personMoodsSelect">
-      <option value="0">❄️🌿☀️🍁 Seasons</option>
-      <option value="1">👕🧣🍷👔 Casual–Formal (M)</option>
-      <option value="2">👚🧣🍸👗 Casual–Formal (F)</option>
-      <option value="3">😇🌹🔥😈 Innocent–Naughty</option>
-      <option value="4">🌸🌹🌻🌷 Florals</option>
+      <option value="0">❄️🌿☀️🍁</option>
+      <option value="1">👕🧣🍷👔</option>
+      <option value="2">👚🧣🍸👗</option>
+      <option value="3">😇🌹🔥😈</option>
+      <option value="4">🌸🌹🌻🌷</option>
     </select>
     <label>Theme</label>
     <select id="personThemeSelect">
-      <option value="petite">Petite ✦</option>
-      <option value="handsome">Handsome ◆</option>
+      <option value="petite">Petite</option>
+      <option value="handsome">Handsome</option>
       <option value="night">Night</option>
     </select>
     <div class="modal-actions" style="margin-top:20px;">
-      <button class="btn-cancel" onclick="closePersonModal()">Cancel</button>
+      <button class="btn-cancel" onclick="closePersonModal()" style="flex:1;">Cancel</button>
       <button class="btn-confirm" id="personSaveBtn" onclick="savePerson()" style="flex:1;">Create</button>
     </div>
   </div>
@@ -883,30 +889,22 @@ body.night .cat-name { color:var(--text-mid); }
           <input type="checkbox" id="fullButtonsToggle" onchange="setFullButtons(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--rose);">
         </label>
       </div>
-      <div style="padding:14px 16px;border-bottom:1px solid var(--cream-border);">
+      <div style="padding:14px 16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div style="font-size:13px;font-weight:500;color:var(--text);">Theme</div>
             <div style="font-size:11px;color:var(--text-light);margin-top:2px;">Choose your visual style</div>
           </div>
           <select id="themeSelect" onchange="setTheme(this.value)" style="padding:5px 10px;border:1.5px solid var(--cream-border);border-radius:10px;background:var(--cream-dark);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);outline:none;cursor:pointer;">
-            <option value="petite">Petite ✦</option>
-            <option value="handsome">Handsome ◆</option>
+            <option value="petite">Petite</option>
+            <option value="handsome">Handsome</option>
             <option value="night">Night</option>
           </select>
         </div>
       </div>
-      <div style="padding:14px 16px;">
-        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
-          <div>
-            <div style="font-size:13px;font-weight:500;color:var(--text);">Hide New Person</div>
-            <div style="font-size:11px;color:var(--text-light);margin-top:2px;">Remove the New Person option from the menu</div>
-          </div>
-          <input type="checkbox" id="hideNewPersonToggle" onchange="setHideNewPerson(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--rose);">
-        </label>
-      </div>
     </div>
-    <div class="modal-actions" style="margin-top:16px;">
+    <div class="modal-actions" style="margin-top:16px;gap:8px;">
+      <button class="btn-cancel" onclick="closeSettings();openNewPersonModal();" style="flex:1;white-space:nowrap;">New Person</button>
       <button class="btn-confirm" style="flex:1;" onclick="closeSettings()">Close</button>
     </div>
   </div>
@@ -2362,18 +2360,20 @@ function savePerson() {
       if (oldSpectrum !== moodsSpectrum) {
         const oldSpec = MOOD_SPECTRUMS[oldSpectrum] || MOOD_SPECTRUMS[0];
         const newSpec = MOOD_SPECTRUMS[moodsSpectrum] || MOOD_SPECTRUMS[0];
-        (person.outfits || []).forEach(o => {
-          const oldIdx = oldSpec.findIndex(m => m.key === o.vibe);
-          if (oldIdx >= 0 && newSpec[oldIdx]) o.vibe = newSpec[oldIdx].key;
-          else if (newSpec[0]) o.vibe = newSpec[0].key;
-        });
-        // Also update live canvas/saved if this is active person
-        if (editingPersonId === activePersonId) {
-          savedOutfits.forEach(o => {
-            const oldIdx = oldSpec.findIndex(m => m.key === o.vibe);
-            if (oldIdx >= 0 && newSpec[oldIdx]) o.vibe = newSpec[oldIdx].key;
-          });
+        function remapVibe(vibe) {
+          const oldIdx = oldSpec.findIndex(m => m.key === vibe);
+          if (oldIdx >= 0 && newSpec[oldIdx]) return newSpec[oldIdx].key;
+          return newSpec[0] ? newSpec[0].key : vibe;
         }
+        // For active person, remap the live savedOutfits array (savePeopleData will snapshot this)
+        if (editingPersonId === activePersonId) {
+          savedOutfits.forEach(o => { o.vibe = remapVibe(o.vibe); });
+          // Also remap the currently selected vibe for the save picker
+          selectedVibe = remapVibe(selectedVibe);
+        }
+        // Always remap person.outfits (for inactive person this is the source of truth;
+        // for active person savePeopleData will overwrite it from savedOutfits anyway)
+        (person.outfits || []).forEach(o => { o.vibe = remapVibe(o.vibe); });
       }
       person.moodsSpectrum = moodsSpectrum;
       // If editing active person, apply theme + moods now
@@ -2428,25 +2428,11 @@ function openSettings() {
   document.getElementById('fullButtonsToggle').checked = fullButtons;
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = currentTheme;
-  const hnp = document.getElementById('hideNewPersonToggle');
-  if (hnp) hnp.checked = hideNewPerson;
   document.getElementById('settingsModal').classList.add('open');
 }
 
 // ── Full buttons setting ──
 let fullButtons = false;
-let hideNewPerson = localStorage.getItem('wardrobe-hide-new-person') === '1';
-function setHideNewPerson(on) {
-  hideNewPerson = on;
-  localStorage.setItem('wardrobe-hide-new-person', on ? '1' : '');
-  const btn = document.getElementById('newPersonBtn');
-  if (btn) btn.style.display = on ? 'none' : '';
-}
-// Apply on boot
-if (hideNewPerson) {
-  const btn = document.getElementById('newPersonBtn');
-  if (btn) btn.style.display = 'none';
-}
 function setFullButtons(on) {
   fullButtons = on;
   localStorage.setItem('wardrobe-full-buttons', on ? '1' : '');
@@ -2564,8 +2550,10 @@ function migrateImportData(data) {
   }
 
   function migrateOutfitVibe(vibe) {
-    const validKeys = new Set(MOODS.map(m => m.key));
-    return validKeys.has(vibe) ? vibe : MOODS[0].key;
+    // Accept any emoji key that exists in any mood spectrum
+    const allValidKeys = new Set(MOOD_SPECTRUMS.flatMap(s => s.map(m => m.key)));
+    if (allValidKeys.has(vibe)) return vibe;
+    return MOODS[0].key;
   }
 
   function migrateCanvasItem(ci) {
@@ -2731,9 +2719,10 @@ renderPeopleMenu();
 const LINGERIE_CATS = new Set(['Bra', 'Panties', 'Lingerie']);
 const Z_TIERS = [
   new Set(['Panties']),
+  new Set(['SocksStockings']),
   new Set(['Bra']),
   new Set(['Lingerie']),
-  new Set(['SocksStockings', 'Shoes']),
+  new Set(['Shoes']),
   new Set(['Shorts', 'Skirt', 'Pants']),
   new Set(['Top', 'TShirt', 'ButtonShirt', 'Sweater', 'Sweatshirt']),
   new Set(['Jacket']),
