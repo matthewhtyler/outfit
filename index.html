@@ -353,8 +353,6 @@ body.night .cat-name { color:var(--text-mid); }
 @media (max-width: 600px) {
   /* Narrow panels to show 1 item per row */
   .closet-grid { grid-template-columns: 1fr; }
-  #closetPanel, #outfitsPanel { width: 120px !important; min-width: 120px; max-width: 120px; }
-  .main { grid-template-columns: 120px 1fr 120px !important; }
 
   /* Shift the stage container (canvas-wrapper contents) up 30px */
   #stage { top: calc(50% - 30px) !important; }
@@ -362,7 +360,10 @@ body.night .cat-name { color:var(--text-mid); }
   /* Shift toolbar up 15px */
   .canvas-toolbar { bottom: 31px; }
 
-  /* Never show both panels at once: hide right panel when left is visible and vice versa */
+  /* Outfit preview: overlap items so they fit in narrow panel */
+  .outfit-preview { gap: 0; padding: 6px 4px; justify-content: center; }
+  .outfit-preview img { margin-left: -14px; width: 40px; height: 55px; }
+  .outfit-preview img:first-child { margin-left: 0; }
 }
 
 </style>
@@ -1722,10 +1723,6 @@ const panelState = { closet: true, outfits: true };
 let logoCycle = 0; // 0=both, 1=none, 2=closet only, 3=outfits only
 
 function setPanels(left, right) {
-  // On small screens, never show both panels at once
-  const isMobile = window.innerWidth <= 600;
-  if (isMobile && left && right) right = false;
-
   panelState.closet = left;
   panelState.outfits = right;
   const lw = left ? (window.innerWidth <= 600 ? '120px' : '260px') : '0px';
@@ -2235,6 +2232,7 @@ function openSettings() {
 }
 
 // ── Full buttons setting ──
+let fullButtons = false;
 let hideNewPerson = localStorage.getItem('wardrobe-hide-new-person') === '1';
 function setHideNewPerson(on) {
   hideNewPerson = on;
