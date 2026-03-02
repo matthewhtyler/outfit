@@ -99,7 +99,7 @@ body.handsome .theme-diamond-h { display:inline !important; }
 .vibe-count-btn.active { background:var(--blush); }
 .outfit-card.vibe-faded { opacity:0.3; }
 
-body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
 
 header { display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--cream-border); background:var(--cream); flex-shrink:0; z-index:1000; height:56px; position:relative; }
 .logo { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:26px; letter-spacing:4px; color:var(--text); font-style:italic; }
@@ -108,7 +108,7 @@ header { display:flex; align-items:center; justify-content:space-between; paddin
 .mode-btn { padding:6px 18px; border:none; border-radius:20px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; background:transparent; color:var(--text-mid); transition:all .2s; }
 .mode-btn.active { background:white; color:var(--text); box-shadow:0 1px 6px rgba(180,130,120,.18); }
 
-.main { display:grid; grid-template-columns:var(--left-w,260px) 1fr var(--right-w,260px); flex:1; overflow:hidden; transition:grid-template-columns .25s ease; }
+.main { display:grid; grid-template-columns:var(--left-w,260px) 1fr var(--right-w,260px); flex:1; min-height:0; overflow:hidden; transition:grid-template-columns .25s ease; }
 .panel { display:flex; flex-direction:column; border-right:1px solid var(--cream-border); overflow:hidden; background:var(--cream); transition:width .25s ease; }
 .panel:last-child { border-right:none; border-left:1px solid var(--cream-border); }
 .panel-header { padding:14px 16px 10px; border-bottom:1px solid var(--cream-border); flex-shrink:0; }
@@ -2664,6 +2664,8 @@ closetItems = closetItems.filter(i =>
 if (closetItems.length !== before) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
 
 renderCloset(); renderOutfits(); updateDropHint();
+// On small screens, start with both panels closed
+if (window.innerWidth <= 430) setPanels(false, false);
 // Load persisted settings
 if (localStorage.getItem('wardrobe-full-buttons')) { fullButtons = true; }
 applyFullButtons();
