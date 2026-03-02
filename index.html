@@ -266,7 +266,7 @@ body.night .cat-name { color:var(--text-mid); }
 .hamburger-btn span { width:18px; height:1.5px; background:var(--text-light); border-radius:2px; display:block; }
 .hamburger-menu { position:absolute; top:calc(100% + 8px); right:0; background:var(--cream); border-radius:12px; box-shadow:0 8px 30px rgba(61,46,42,.18); border:1px solid var(--cream-border); min-width:140px; overflow:hidden; z-index:1001; display:none; }
 .hamburger-wrap.open .hamburger-menu { display:block; }
-.hamburger-item { display:block; width:100%; padding:11px 16px; border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); text-align:left; cursor:pointer; transition:background .15s; }
+.hamburger-item { display:flex; align-items:center; width:100%; padding:11px 16px; border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); text-align:left; cursor:pointer; transition:background .15s; }
 .hamburger-item:hover { background:var(--cream-dark); }
 
 
@@ -292,8 +292,16 @@ body.night .cat-name { color:var(--text-mid); }
         <span></span><span></span><span></span>
       </button>
       <div class="hamburger-menu">
-        <button class="hamburger-item" onclick="menuSave()">Save ✦</button>
-        <button class="hamburger-item" onclick="menuOpen()">Open</button>
+        <button class="hamburger-item" onclick="menuOpen()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M7 17L17 7"/><polyline points="7,7 17,7 17,17"/></svg>Open…
+        </button>
+        <button class="hamburger-item" onclick="menuSave()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save
+        </button>
+        <div style="height:1px;background:var(--cream-border);margin:4px 0;"></div>
+        <button class="hamburger-item" onclick="openSettings()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+        </button>
       </div>
     </div>
     <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileOpen(event)"/>
@@ -651,6 +659,23 @@ body.night .cat-name { color:var(--text-mid); }
     <div class="cat-modal-footer" style="justify-content:center;">
       <button class="btn-cancel" onclick="closeCatModal()">Cancel</button>
       <button class="btn-confirm" onclick="confirmSaveCatModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="save-modal" style="width:320px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;letter-spacing:1px;margin-bottom:20px;">Settings</div>
+    <div style="border:1px solid var(--cream-border);border-radius:14px;overflow:hidden;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--cream-border);">
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;">Fetch Data</div>
+        <div style="font-size:11px;color:var(--text-light);margin-bottom:12px;">Load wardrobe from remote source. This will replace your current data.</div>
+        <button class="btn-confirm" id="fetchDataBtn" onclick="fetchRemoteData()" style="width:100%;">Fetch Data</button>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-cancel" style="flex:1;" onclick="closeSettings()">Close</button>
     </div>
   </div>
 </div>
@@ -1744,6 +1769,35 @@ document.addEventListener('click', e => {
   }
 });
 
+function openSettings() {
+  document.getElementById('hamburgerWrap').classList.remove('open');
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+document.getElementById('settingsModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeSettings();
+});
+
+function fetchRemoteData() {
+  const btn = document.getElementById('fetchDataBtn');
+  btn.textContent = 'Fetching…';
+  btn.disabled = true;
+  fetch('https://matthewhtyler.github.io/outfit/outfit.json')
+    .then(r => { if (!r.ok) throw new Error('fetch failed'); return r.json(); })
+    .then(data => {
+      const changed = mergeImportData(data);
+      btn.textContent = changed ? 'Done ✦' : 'Up to date';
+      setTimeout(() => { btn.textContent = 'Fetch Data'; btn.disabled = false; }, 1500);
+    })
+    .catch(e => {
+      btn.textContent = 'Failed';
+      setTimeout(() => { btn.textContent = 'Fetch Data'; btn.disabled = false; }, 2000);
+      console.error('Fetch error:', e);
+    });
+}
+
 function menuSave() {
   document.getElementById('hamburgerWrap').classList.remove('open');
   const data = {
@@ -1822,6 +1876,32 @@ function migrateImportData(data) {
   return data;
 }
 
+function mergeImportData(data) {
+  const migrated = migrateImportData(data);
+  let changed = false;
+  if (migrated.closet && Array.isArray(migrated.closet)) {
+    const existingIds = new Set(closetItems.map(i => String(i.id)));
+    const newItems = migrated.closet.filter(i => !existingIds.has(String(i.id)));
+    if (newItems.length) {
+      closetItems = closetItems.concat(newItems);
+      localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+      renderCloset();
+      changed = true;
+    }
+  }
+  if (migrated.savedOutfits && Array.isArray(migrated.savedOutfits)) {
+    const existingIds = new Set(savedOutfits.map(o => String(o.id)));
+    const newOutfits = migrated.savedOutfits.filter(o => !existingIds.has(String(o.id)));
+    if (newOutfits.length) {
+      savedOutfits = savedOutfits.concat(newOutfits);
+      localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+      renderOutfits();
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 function handleFileOpen(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -1829,32 +1909,10 @@ function handleFileOpen(e) {
   reader.onload = ev => {
     try {
       let data;
-      try {
-        data = JSON.parse(ev.target.result);
-      } catch(parseErr) {
-        showToast('Invalid file'); return;
-      }
-      if (typeof data !== 'object' || data === null || Array.isArray(data)) {
-        showToast('Invalid file'); return;
-      }
-      data = migrateImportData(data);
-      if (data.closet && Array.isArray(data.closet)) {
-        closetItems = data.closet;
-        localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
-        renderCloset();
-      }
-      if (data.savedOutfits && Array.isArray(data.savedOutfits)) {
-        savedOutfits = data.savedOutfits;
-        localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
-        renderOutfits();
-      }
-      if (data.canvas && Array.isArray(data.canvas)) {
-        canvasItems = [];
-        document.querySelectorAll('.canvas-item').forEach(el => el.remove());
-        data.canvas.forEach(ci => { try { canvasItems.push({...ci}); renderCanvasItem({...ci}); } catch(e) {} });
-        updateDropHint();
-      }
-      showToast('Opened ✦');
+      try { data = JSON.parse(ev.target.result); } catch(parseErr) { showToast('Invalid file'); return; }
+      if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
+      const changed = mergeImportData(data);
+      showToast(changed ? 'Imported ✦' : 'Nothing new to import');
     } catch(err) { console.error('Import error:', err); showToast('Import error — check console'); }
   };
   reader.readAsText(file);
@@ -1917,32 +1975,6 @@ closetItems = closetItems.filter(i =>
 if (closetItems.length !== before) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
 
 renderCloset(); renderOutfits(); updateDropHint();
-
-// Auto-load default data only if no localStorage data exists at all
-if (!localStorage.getItem('outfit-closet') && !localStorage.getItem('outfit-saved')) {
-  fetch('https://matthewhtyler.github.io/outfit/outfit.json')
-    .then(r => { if (!r.ok) throw new Error('fetch failed'); return r.json(); })
-    .then(data => {
-      const migrated = migrateImportData(data);
-      if (migrated.closet && Array.isArray(migrated.closet) && migrated.closet.length) {
-        closetItems = migrated.closet;
-        localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
-        renderCloset();
-      }
-      if (migrated.savedOutfits && Array.isArray(migrated.savedOutfits) && migrated.savedOutfits.length) {
-        savedOutfits = migrated.savedOutfits;
-        localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
-        renderOutfits();
-      }
-      if (migrated.canvas && Array.isArray(migrated.canvas) && migrated.canvas.length) {
-        canvasItems = [];
-        document.querySelectorAll('.canvas-item').forEach(el => el.remove());
-        migrated.canvas.forEach(ci => { try { canvasItems.push({...ci}); renderCanvasItem({...ci}); } catch(e) {} });
-        updateDropHint();
-      }
-    })
-    .catch(e => console.log('Default data not available:', e.message));
-}
 
 
 
