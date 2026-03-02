@@ -64,8 +64,10 @@ body.handsome {
 body.handsome .closet-item img { background:#EDE5D8; }
 body.handsome .outfit-preview { background:var(--canvas-bg); }
 body.handsome .mode-btn.active { background:white; color:var(--text); }
-body.handsome .canvas-toolbar { background:#a29782; }
-body.handsome .toolbar-btn { background:var(--cream-dark); }
+body.handsome .canvas-toolbar { background:#1d1d1c; }
+body.handsome .toolbar-btn { background:#a29782; color:#D8CDB8; }
+body.handsome .toolbar-btn.primary { background:#D8CDB8; color:var(--text-mid); }
+body.handsome .toolbar-btn.primary:hover { background:#c4b8a4; color:var(--text-mid); }
 body.handsome .closet-item { background:var(--cream); }
 body.handsome .logo span { color:#30342b; }
 body.handsome .stage-toggle-pill input:checked + .stage-toggle-track { background:#30342b; }
@@ -73,9 +75,7 @@ body.handsome .vibe-opt.selected { border-color:#30342b; background:var(--blush)
 body.handsome .cat-opt.selected { border-color:#30342b; background:var(--blush); }
 body.handsome .canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(48,52,43,.4)); }
 body.handsome .resize-handle { background:#30342b; }
-/* Save button: dark accent, text matches cream-dark bg of other buttons */
-body.handsome .toolbar-btn.primary { background:#30342b; color:#D8CDB8; }
-body.handsome .toolbar-btn.primary:hover { background:#1e221a; color:#D8CDB8; }
+/* Save button: light bg swapped with other buttons */
 /* Silhouette: very desaturated warm grey */
 body.handsome .canvas-figure svg { fill:#34342b !important; }
 body.handsome .canvas-figure svg path { fill:#34342b !important; }
@@ -373,7 +373,14 @@ body.night .cat-name { color:var(--text-mid); }
 .gender-radio label:hover { border-color:var(--blush-mid); }
 
 
-@keyframes zonePulse { 0%,100%{r:4;} 50%{r:6;} }
+.edit-person-row { display:flex; align-items:center; gap:8px; padding:8px 10px; border:1.5px solid var(--cream-border); border-radius:10px; background:var(--cream-dark); cursor:grab; user-select:none; }
+.edit-person-row:active { cursor:grabbing; }
+.edit-person-row.drag-over { border-color:var(--rose); background:var(--blush); }
+.edit-person-name { flex:1; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); background:transparent; border:none; outline:none; cursor:text; padding:0; min-width:0; }
+.edit-person-name:focus { color:var(--rose); }
+.edit-person-trash { background:none; border:none; cursor:pointer; color:var(--text-light); padding:2px 4px; border-radius:4px; line-height:1; flex-shrink:0; transition:color .15s; }
+.edit-person-trash:hover { color:var(--rose); }
+.drag-handle { color:var(--text-light); font-size:12px; cursor:grab; flex-shrink:0; line-height:1; padding:0 2px; }
 .zone-dot-active { animation:zonePulse 1s infinite; }
 
 /* ── Photos mode overlay ── */
@@ -575,7 +582,7 @@ body.night .cat-name { color:var(--text-mid); }
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div class="panel-title" style="margin-bottom:0;">Outfits</div>
-          <div class="panel-subtitle" id="outfitsSubtitle" style="margin-top:2px;">saved looks</div>
+          <div class="panel-subtitle" id="outfitsSubtitle" style="margin-top:2px;">0 saved</div>
         </div>
         <div style="position:relative;">
           <button id="moodFilterBtn" onclick="toggleMoodDropdown()" style="background-color:var(--cream);background:var(--cream);border:none;cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;color:var(--text);display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by mood">
@@ -589,7 +596,7 @@ body.night .cat-name { color:var(--text-mid); }
     <div class="panel-body" id="outfitsBody">
       <div class="empty-state" id="outfitsEmpty">
         <div class="empty-icon"><span style="font-size:32px;opacity:.5;color:var(--text-light);"><span class="theme-diamond">✦</span><span class="theme-diamond-h" style="display:none;">◆</span></span></div>
-        <p>No outfits yet.</p>
+        <p>No outfits</p>
       </div>
     </div>
   </div>
@@ -840,6 +847,10 @@ body.night .cat-name { color:var(--text-mid); }
     <h2 id="personModalTitle">New Person</h2>
     <label>Name</label>
     <input type="text" id="personNameInput" placeholder="Person's name…" />
+    <div id="importTargetRow" style="display:none;">
+      <label>Import to</label>
+      <select id="importTargetSelect" style="width:100%;padding:9px 13px;border:1.5px solid var(--cream-border);border-radius:10px;background:var(--cream-dark);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;margin-bottom:2px;"></select>
+    </div>
     <label>Gender</label>
     <div class="gender-radios">
       <div class="gender-radio">
@@ -876,6 +887,27 @@ body.night .cat-name { color:var(--text-mid); }
   </div>
 </div>
 
+<!-- Edit People Modal -->
+<div class="modal-overlay" id="editPeopleModal">
+  <div class="person-modal" style="width:340px;max-width:95vw;">
+    <h2>Edit People</h2>
+    <div id="editPeopleList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;min-height:40px;"></div>
+    <button class="btn-confirm" onclick="closeEditPeopleModal();openNewPersonModal();" style="width:100%;">+ New Person</button>
+  </div>
+</div>
+
+<!-- Delete Person Confirm Modal -->
+<div class="modal-overlay" id="deletePersonModal">
+  <div class="person-modal" style="width:300px;max-width:95vw;text-align:center;">
+    <h2 id="deletePersonTitle" style="margin-bottom:6px;">Delete Person?</h2>
+    <p id="deletePersonSub" style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;">This will erase their entire wardrobe.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="closeDeletePersonModal()" style="flex:1;">Cancel</button>
+      <button class="btn-cancel" id="deletePersonConfirmBtn" style="flex:1;border-color:var(--rose);color:var(--rose);">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- Settings Modal -->
 <div class="modal-overlay" id="settingsModal">
   <div class="save-modal" style="width:320px;">
@@ -905,7 +937,7 @@ body.night .cat-name { color:var(--text-mid); }
       </div>
     </div>
     <div class="modal-actions" style="margin-top:16px;gap:8px;">
-      <button class="btn-cancel" onclick="closeSettings();openNewPersonModal();" style="flex:1;white-space:nowrap;">New Person</button>
+      <button class="btn-cancel" onclick="closeSettings();openEditPeopleModal();" style="flex:1;white-space:nowrap;">Edit People</button>
       <button class="btn-confirm" style="flex:1;" onclick="closeSettings()">Close</button>
     </div>
   </div>
@@ -2034,7 +2066,7 @@ function renderOutfits() {
   body.querySelectorAll('.outfit-card').forEach(c => c.remove());
   document.getElementById('outfitsEmpty').style.display = savedOutfits.length ? 'none' : '';
   const count = savedOutfits.length;
-  document.getElementById('outfitsSubtitle').textContent = count ? `${count} saved look${count === 1 ? '' : 's'}` : 'saved looks';
+  document.getElementById('outfitsSubtitle').textContent = `${count} saved`;
   // Highlight mood filter button if active
   const btn = document.getElementById('moodFilterBtn');
   if (btn) btn.style.background = vibeFilter ? 'var(--blush)' : '';
@@ -2312,6 +2344,7 @@ let editingPersonId = null;
 
 function openNewPersonModal() {
   editingPersonId = null;
+  pendingImportData = null;
   document.getElementById('hamburgerWrap').classList.remove('open');
   document.getElementById('personModalTitle').textContent = 'New Person';
   document.getElementById('personSaveBtn').textContent = 'Create';
@@ -2319,6 +2352,14 @@ function openNewPersonModal() {
   document.getElementById('genderFemale').checked = true;
   document.getElementById('personMoodsSelect').value = '0';
   document.getElementById('personThemeSelect').value = 'petite';
+  // Hide import row, show all fields
+  document.getElementById('importTargetRow').style.display = 'none';
+  document.getElementById('importTargetSelect').onchange = null;
+  ['personNameInput','personMoodsSelect','personThemeSelect'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = '';
+  });
+  document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
+  document.querySelector('.gender-radios').style.display = '';
   document.getElementById('personModal').classList.add('open');
   setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
@@ -2327,6 +2368,7 @@ function openEditPersonModal(personId) {
   const person = people.find(p => p.id === personId);
   if (!person) return;
   editingPersonId = personId;
+  pendingImportData = null;
   document.getElementById('hamburgerWrap').classList.remove('open');
   document.getElementById('personModalTitle').textContent = 'Edit Person';
   document.getElementById('personSaveBtn').textContent = 'Save';
@@ -2334,6 +2376,14 @@ function openEditPersonModal(personId) {
   document.querySelectorAll('input[name=personGender]').forEach(r => r.checked = r.value === (person.gender || 'female'));
   document.getElementById('personMoodsSelect').value = String(person.moodsSpectrum || 0);
   document.getElementById('personThemeSelect').value = person.theme || 'petite';
+  // Hide import row, show all fields
+  document.getElementById('importTargetRow').style.display = 'none';
+  document.getElementById('importTargetSelect').onchange = null;
+  ['personNameInput','personMoodsSelect','personThemeSelect'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = '';
+  });
+  document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
+  document.querySelector('.gender-radios').style.display = '';
   document.getElementById('personModal').classList.add('open');
   setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
@@ -2341,9 +2391,44 @@ function openEditPersonModal(personId) {
 function closePersonModal() {
   document.getElementById('personModal').classList.remove('open');
   editingPersonId = null;
+  pendingImportData = null;
+  document.getElementById('importTargetRow').style.display = 'none';
+  document.getElementById('importTargetSelect').onchange = null;
+  ['personNameInput','personMoodsSelect','personThemeSelect'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = '';
+  });
+  document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
+  document.querySelector('.gender-radios').style.display = '';
 }
 
 function savePerson() {
+  // Handle import flow
+  if (document.getElementById('personModalTitle').textContent === 'Open Wardrobe') {
+    const targetId = document.getElementById('importTargetSelect').value;
+    if (targetId === '__new__') {
+      // Create new person first, then import into them
+      const name = document.getElementById('personNameInput').value.trim() || 'Person';
+      const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
+      const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
+      const theme = document.getElementById('personThemeSelect').value || 'petite';
+      const newPerson = { id: 'p_' + Date.now(), name, gender, moodsSpectrum, theme, closet: [], outfits: [] };
+      people.push(newPerson);
+      savePeopleData();
+      loadPersonData(newPerson.id);
+    } else {
+      // Import into existing person
+      if (targetId !== activePersonId) loadPersonData(targetId);
+    }
+    // Now do the actual import
+    if (pendingImportData) {
+      const changed = mergeImportData(pendingImportData);
+      showToast(changed ? 'Imported ' + getThemeDiamond() : 'Nothing new');
+      pendingImportData = null;
+    }
+    closePersonModal();
+    renderPeopleMenu();
+    return;
+  }
   const name = document.getElementById('personNameInput').value.trim() || 'Person';
   const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
   const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
@@ -2361,11 +2446,11 @@ function savePerson() {
       if (oldSpectrum !== moodsSpectrum) {
         const oldSpec = MOOD_SPECTRUMS[oldSpectrum] || MOOD_SPECTRUMS[0];
         const newSpec = MOOD_SPECTRUMS[moodsSpectrum] || MOOD_SPECTRUMS[0];
-        function remapVibe(vibe) {
+        const remapVibe = vibe => {
           const oldIdx = oldSpec.findIndex(m => m.key === vibe);
           if (oldIdx >= 0 && newSpec[oldIdx]) return newSpec[oldIdx].key;
           return newSpec[0] ? newSpec[0].key : vibe;
-        }
+        };
         // For active person, remap the live savedOutfits array (savePeopleData will snapshot this)
         if (editingPersonId === activePersonId) {
           savedOutfits.forEach(o => { o.vibe = remapVibe(o.vibe); });
@@ -2412,6 +2497,127 @@ document.getElementById('personModal').addEventListener('click', e => {
 });
 document.getElementById('personNameInput')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') savePerson();
+});
+
+// ── Edit People Modal ──
+function openEditPeopleModal() {
+  renderEditPeopleList();
+  document.getElementById('editPeopleModal').classList.add('open');
+}
+function closeEditPeopleModal() {
+  document.getElementById('editPeopleModal').classList.remove('open');
+}
+document.getElementById('editPeopleModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeEditPeopleModal();
+});
+
+function renderEditPeopleList() {
+  const list = document.getElementById('editPeopleList');
+  list.innerHTML = '';
+  people.forEach((person, idx) => {
+    const row = document.createElement('div');
+    row.className = 'edit-person-row';
+    row.draggable = true;
+    row.dataset.id = person.id;
+
+    const handle = document.createElement('span');
+    handle.className = 'drag-handle';
+    handle.textContent = '⠿';
+    handle.title = 'Drag to reorder';
+
+    const nameInput = document.createElement('input');
+    nameInput.className = 'edit-person-name';
+    nameInput.type = 'text';
+    nameInput.value = person.name || 'Person';
+    nameInput.title = 'Click to edit name';
+    nameInput.addEventListener('change', () => {
+      person.name = nameInput.value.trim() || 'Person';
+      savePeopleData();
+      renderPeopleMenu();
+    });
+    nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') nameInput.blur(); });
+
+    const trash = document.createElement('button');
+    trash.className = 'edit-person-trash';
+    trash.title = 'Delete person';
+    trash.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    trash.addEventListener('click', () => openDeletePersonModal(person.id));
+
+    row.appendChild(handle);
+    row.appendChild(nameInput);
+    row.appendChild(trash);
+    list.appendChild(row);
+
+    // Drag-to-reorder
+    row.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', person.id);
+      row.style.opacity = '0.4';
+    });
+    row.addEventListener('dragend', () => { row.style.opacity = ''; list.querySelectorAll('.edit-person-row').forEach(r => r.classList.remove('drag-over')); });
+    row.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; row.classList.add('drag-over'); });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      const fromId = e.dataTransfer.getData('text/plain');
+      const toId = person.id;
+      if (fromId === toId) return;
+      const fromIdx = people.findIndex(p => p.id === fromId);
+      const toIdx = people.findIndex(p => p.id === toId);
+      if (fromIdx < 0 || toIdx < 0) return;
+      const [moved] = people.splice(fromIdx, 1);
+      people.splice(toIdx, 0, moved);
+      savePeopleData();
+      renderPeopleMenu();
+      renderEditPeopleList();
+    });
+  });
+}
+
+// ── Delete Person Modal ──
+let deletingPersonId = null;
+function openDeletePersonModal(personId) {
+  const person = people.find(p => p.id === personId);
+  if (!person) return;
+  deletingPersonId = personId;
+  document.getElementById('deletePersonTitle').textContent = `Delete ${person.name || 'Person'}?`;
+  document.getElementById('deletePersonConfirmBtn').onclick = confirmDeletePerson;
+  document.getElementById('deletePersonModal').classList.add('open');
+}
+function closeDeletePersonModal() {
+  document.getElementById('deletePersonModal').classList.remove('open');
+  deletingPersonId = null;
+}
+function confirmDeletePerson() {
+  if (!deletingPersonId) return;
+  const idx = people.findIndex(p => p.id === deletingPersonId);
+  if (idx >= 0) {
+    people.splice(idx, 1);
+    // If deleted person was active, switch to first remaining or create default
+    if (deletingPersonId === activePersonId) {
+      if (people.length > 0) {
+        loadPersonData(people[0].id);
+      } else {
+        // Re-create default
+        activePersonId = null;
+        closetItems = [];
+        savedOutfits = [];
+        localStorage.setItem('outfit-closet', '[]');
+        localStorage.setItem('outfit-saved', '[]');
+        renderCloset();
+        renderOutfits();
+        clearCanvas();
+      }
+    }
+    savePeopleData();
+    renderPeopleMenu();
+    renderEditPeopleList();
+  }
+  closeDeletePersonModal();
+}
+document.getElementById('deletePersonModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeDeletePersonModal();
 });
 
 // ── Hamburger menu ──
@@ -2520,9 +2726,68 @@ function menuSave() {
   showToast('Saved ' + getThemeDiamond());
 }
 
+let pendingImportData = null;
+
 function menuOpen() {
   document.getElementById('hamburgerWrap').classList.remove('open');
   document.getElementById('fileInput').click();
+}
+
+function handleFileOpen(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      let data;
+      try { data = JSON.parse(ev.target.result); } catch(parseErr) { showToast('Invalid file'); return; }
+      if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
+      // Stash the data and open the "Open Wardrobe" person modal
+      pendingImportData = data;
+      openImportPersonModal();
+    } catch(err) { console.error('Import error:', err); showToast('Import error — check console'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function openImportPersonModal() {
+  editingPersonId = null;
+  document.getElementById('personModalTitle').textContent = 'Open Wardrobe';
+  document.getElementById('personSaveBtn').textContent = 'Import';
+  document.getElementById('personNameInput').value = '';
+  document.getElementById('genderFemale').checked = true;
+  document.getElementById('personMoodsSelect').value = '0';
+  document.getElementById('personThemeSelect').value = currentTheme || 'petite';
+  // Show "Import to" row and populate it
+  const row = document.getElementById('importTargetRow');
+  const sel = document.getElementById('importTargetSelect');
+  row.style.display = '';
+  sel.innerHTML = '<option value="__new__">New Person</option>' +
+    people.map(p => `<option value="${p.id}">${p.name || 'Person'}</option>`).join('');
+  sel.value = '__new__';
+  // When importing to existing, hide the name/gender/mood/theme fields
+  function toggleNewPersonFields() {
+    const isNew = sel.value === '__new__';
+    ['personNameInput','personMoodsSelect','personThemeSelect'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.closest('label,select') ? null : null; // handled below
+    });
+    document.querySelectorAll('#personModal label:not([for])').forEach(l => {
+      const text = l.textContent.trim();
+      if (['Name','Gender','Moods','Theme'].includes(text)) {
+        l.style.display = isNew ? '' : 'none';
+      }
+    });
+    document.getElementById('personNameInput').style.display = isNew ? '' : 'none';
+    document.querySelector('.gender-radios').style.display = isNew ? '' : 'none';
+    document.getElementById('personMoodsSelect').style.display = isNew ? '' : 'none';
+    document.getElementById('personThemeSelect').style.display = isNew ? '' : 'none';
+  }
+  sel.onchange = toggleNewPersonFields;
+  toggleNewPersonFields();
+  document.getElementById('personModal').classList.add('open');
+  setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
 
 function migrateImportData(data) {
