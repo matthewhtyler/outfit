@@ -2014,6 +2014,7 @@ function itemDisplaySrc(item) {
 // ── Panel collapse ──
 const panelState = { closet: true, outfits: true };
 let logoCycle = 0; // 0=both, 1=none, 2=closet only, 3=outfits only
+let preCloseCycle = null; // saved cycle before canvas-tap close
 document.body.classList.add('panel-open'); // panels start open
 
 function setPanels(left, right) {
@@ -2047,6 +2048,16 @@ function setPanels(left, right) {
 }
 
 function cyclePanels() {
+  // If panels were closed by canvas-tap, restore to pre-close state
+  if (preCloseCycle !== null) {
+    logoCycle = preCloseCycle;
+    preCloseCycle = null;
+    if      (logoCycle === 0) setPanels(true,  true);
+    else if (logoCycle === 2) setPanels(true,  false);
+    else if (logoCycle === 3) setPanels(false, true);
+    else setPanels(true, true); // fallback to both
+    return;
+  }
   // 0: both → 1: none → 2: closet only → 3: outfits only → back to 0
   logoCycle = (logoCycle + 1) % 4;
   if      (logoCycle === 0) setPanels(true,  true);
@@ -2287,10 +2298,10 @@ function deleteOutfit(id, e) {
 
 document.getElementById('canvas').addEventListener('mousedown', e => {
   if (e.target.id === 'canvas' || e.target.closest('.canvas-drop-hint')) selectItem(null);
-  if (!editMode) setPanels(false, false);
+  if (!editMode) { preCloseCycle = logoCycle; setPanels(false, false); }
 });
 document.getElementById('canvas').addEventListener('touchend', e => {
-  if (!editMode) setPanels(false, false);
+  if (!editMode) { preCloseCycle = logoCycle; setPanels(false, false); }
 }, { passive: true });
 
 document.getElementById('outfitNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveOutfit(); });
