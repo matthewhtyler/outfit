@@ -69,14 +69,19 @@ body.handsome .toolbar-btn { background:#d6cdba; color:#382e1e; }
 body.handsome .toolbar-btn.primary { background:#31342c; color:#d6cdba; }
 body.handsome .toolbar-btn.primary:hover { background:#1e221a; color:#d6cdba; }
 body:not(.night):not(.handsome) .hamburger-btn span { background:var(--rose); }
-body:not(.night):not(.handsome) #cyclePanelsBtn { color:var(--rose); }
+body:not(.night):not(.handsome) #cyclePanelsBtn { color:var(--rose) !important; }
+body:not(.night):not(.handsome) .hamburger-item svg { color:var(--rose) !important; }
+body:not(.night):not(.handsome) .hamburger-item svg path,
+body:not(.night):not(.handsome) .hamburger-item svg polyline,
+body:not(.night):not(.handsome) .hamburger-item svg line,
+body:not(.night):not(.handsome) .hamburger-item svg circle { stroke:var(--rose) !important; }
 body.handsome .closet-item { background:transparent; border-color:transparent; box-shadow:none; }
 body.handsome .empty-state { color:#c3bba7; }
 body.handsome .empty-state .empty-icon span { color:#c3bba7 !important; opacity:1 !important; }
 body.handsome .empty-state .empty-icon svg path,
 body.handsome .empty-state .empty-icon svg circle { fill:#c3bba7 !important; stroke:#c3bba7 !important; }
 body.handsome .btn-add { background:#31342c; color:#d6cdba; }
-body.handsome .btn-add:hover { background:#1e221a; }
+body.handsome .btn-add:hover { background:#232322; }
 body.handsome .add-form { border-top-color:transparent; }
 body.handsome .outfit-card { background:#272824; border-color:#1c1d1a; box-shadow:none; }
 body.handsome .outfit-card:hover { border-color:#3a3b37; box-shadow:none; }
@@ -109,8 +114,17 @@ body.handsome header { background:#30342b; border-bottom-color:#1e221a; }
 body.handsome header .logo { color:#D8CDB8; }
 body.handsome header .hamburger-btn span { background:#D8CDB8; }
 body.handsome header > div button { color:#D8CDB8 !important; }
+body.night .hamburger-item svg { color:var(--rose) !important; stroke:var(--rose) !important; }
+body.night .hamburger-item svg path,
+body.night .hamburger-item svg polyline,
+body.night .hamburger-item svg line,
+body.night .hamburger-item svg circle { stroke:var(--rose) !important; }
 body.handsome .hamburger-item { color:var(--text) !important; }
-body.handsome .hamburger-item svg { color:var(--text) !important; }
+body.handsome .hamburger-item svg { color:#596d45 !important; stroke:#596d45 !important; }
+body.handsome .hamburger-item svg path,
+body.handsome .hamburger-item svg polyline,
+body.handsome .hamburger-item svg line,
+body.handsome .hamburger-item svg circle { stroke:#596d45 !important; }
 /* Layer slider circle */
 body.handsome #layerSlider { accent-color:#30342b; }
 
@@ -506,14 +520,14 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
         <div id="peopleMenuItems"></div>
         <div style="height:1px;background:var(--cream-border);margin:4px 0;"></div>
         <button class="hamburger-item" onclick="menuOpen()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M7 17L17 7"/><polyline points="7,7 17,7 17,17"/></svg>Open…
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M7 17L17 7"/><polyline points="7,7 17,7 17,17"/></svg>Open…
         </button>
         <button class="hamburger-item" onclick="menuSave()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save…
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save…
         </button>
         <div style="height:1px;background:var(--cream-border);margin:4px 0;"></div>
         <button class="hamburger-item" onclick="openSettings()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
         </button>
       </div>
     </div>
@@ -1773,7 +1787,6 @@ function flipItem(id) {
   ci.flipped = !ci.flipped;
   const img = document.getElementById(id)?.querySelector('img');
   if (img) img.style.transform = ci.flipped ? 'scaleX(-1)' : '';
-  persistPlacements();
 }
 
 function startRotate(e, id) {
@@ -1794,7 +1807,6 @@ function startRotate(e, id) {
   const onUp = () => {
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mouseup', onUp);
-    persistPlacements();
   };
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
@@ -1828,7 +1840,6 @@ function startCanvasDrag(e, id) {
     }
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mouseup', onUp);
-    persistPlacements();
   };
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
@@ -1845,7 +1856,7 @@ function startResize(e, id) {
     const fc = document.getElementById('floatingControls');
     if (fc && fc.style.display !== 'none') { fc.style.left = (ci.x + ci.w/2)+'px'; fc.style.top = (ci.y - 34)+'px'; }
   };
-  const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); persistPlacements(); };
+  const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
   document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
 }
 
@@ -1971,9 +1982,16 @@ function renderPhotosOverlay() {
       const doHighlight = () => {
         if (closetEl) {
           closetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          closetEl.style.outline = '2px solid var(--rose)';
-          closetEl.style.outlineOffset = '2px';
-          setTimeout(() => { closetEl.style.outline = ''; closetEl.style.outlineOffset = ''; }, 1500);
+          const isHandsome = document.body.classList.contains('handsome');
+          if (isHandsome) {
+            closetEl.style.boxShadow = '0 0 0 3px #c3bba7';
+            closetEl.style.borderRadius = '10px';
+            setTimeout(() => { closetEl.style.boxShadow = ''; }, 1500);
+          } else {
+            closetEl.style.outline = '2px solid var(--rose)';
+            closetEl.style.outlineOffset = '2px';
+            setTimeout(() => { closetEl.style.outline = ''; closetEl.style.outlineOffset = ''; }, 1500);
+          }
         }
       };
       // If panel was just opened, wait for it + overlay fade before scrolling
@@ -2457,10 +2475,6 @@ function renderPeopleMenu() {
   if (!container) return;
   container.innerHTML = '';
   if (people.length === 0) return;
-
-  const divider = document.createElement('div');
-  divider.style.cssText = 'height:1px;background:var(--cream-border);margin:4px 0;';
-  container.appendChild(divider);
 
   people.forEach(person => {
     const btn = document.createElement('button');
@@ -3337,10 +3351,17 @@ function openCtxMenu(x, y, ciId) {
   const hasSavedPos = !!itemPositions[String(ci.itemId || ci.id)];
   const posSaved = document.getElementById('ctxPosSaved');
   posSaved.style.opacity = hasSavedPos ? '1' : '0.35';
+  posSaved.style.opacity = '1';
   posSaved.style.color = hasSavedPos ? 'var(--text)' : 'var(--text-light)';
+  posSaved.style.cursor = hasSavedPos ? 'default' : 'pointer';
   posSaved.innerHTML = hasSavedPos
     ? `<svg style="display:inline;vertical-align:-2px;margin-right:5px;" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Position saved`
     : `Position saved`;
+  posSaved.onclick = hasSavedPos ? null : () => {
+    persistPlacements();
+    closeCtxMenu();
+    showToast('Position saved');
+  };
   menu.style.display = 'block';
   const mw = 200, mh = 115;
   menu.style.left = Math.min(x, window.innerWidth - mw) + 'px';
@@ -3476,7 +3497,7 @@ window.addEventListener('resize', () => { renderPhotosOverlay(); });
   <div id="ctxSetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
   <div id="ctxResetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
   <div style="height:1px;background:var(--cream-border);margin:3px 8px;"></div>
-  <div id="ctxPosSaved" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;border-radius:7px;white-space:nowrap;cursor:default;pointer-events:none;"></div>
+  <div id="ctxPosSaved" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;border-radius:7px;white-space:nowrap;cursor:pointer;"></div>
 </div>
 
 </body>
