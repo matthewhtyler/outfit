@@ -422,11 +422,11 @@ body.picture-mode .canvas-figure svg {
 .ctrl-btn.rotate-handle { cursor:grab; }
 .ctrl-btn.rotate-handle:active { cursor:grabbing; }
 /* Corner resize grabber on selected canvas items */
-.resize-grabber { display:none; position:absolute; bottom:0; right:0; width:16px; height:16px; cursor:se-resize; z-index:10; }
-.resize-grabber::after { content:''; position:absolute; bottom:2px; right:2px; width:8px; height:8px; border-right:2px solid white; border-bottom:2px solid white; border-radius:1px; opacity:.9; box-shadow:1px 1px 0 rgba(0,0,0,.8), 0 0 4px rgba(0,0,0,.6); }
+.resize-grabber { display:none; position:absolute; bottom:0; right:0; width:16px; height:16px; cursor:se-resize; z-index:10; overflow:hidden; }
+.resize-grabber::after { content:''; position:absolute; bottom:2px; right:2px; width:8px; height:8px; border-right:2px solid white; border-bottom:2px solid white; border-radius:1px; opacity:.9; filter:drop-shadow(1px 1px 1px rgba(0,0,0,.7)); }
 @media (pointer: coarse) {
-  .resize-grabber { width:36px; height:36px; }
-  .resize-grabber::after { bottom:6px; right:6px; }
+  .resize-grabber { width:36px; height:36px; overflow:visible; }
+  .resize-grabber::after { bottom:6px; right:6px; width:10px; height:10px; }
 }
 body.edit-mode .canvas-item.selected .resize-grabber { display:block; }
 body:not(.edit-mode) .closet-item .used-check { display:none; }
