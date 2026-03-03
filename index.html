@@ -198,6 +198,9 @@ body.night .closet-item-duo img { background:#1E1618; }
 .canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(201,123,122,.35)); }
 .canvas-item .item-controls { position:absolute; top:-30px; left:50%; transform:translateX(-50%); display:none; gap:4px; background:white; border-radius:12px; padding:4px 6px; box-shadow:var(--shadow); white-space:nowrap; z-index:999999; }
 .canvas-item.selected .item-controls { display:flex; }
+/* Prevent iOS auto-zoom on focus — all inputs must be ≥16px */
+input, select, textarea { font-size:16px !important; }
+
 body:not(.edit-mode) #fwdBtn,
 body:not(.edit-mode) #backBtn,
 body:not(.edit-mode) #fwdBackSep { display:none !important; }
@@ -396,12 +399,13 @@ body.night .cat-name { color:var(--text-mid); }
   box-shadow: 0 2px 8px rgba(61,46,42,.18);
   cursor: pointer;
   pointer-events: all;
-  border: 1.5px solid var(--cream-border);
+  border: 2px solid var(--rose);
   transition: border-color .15s, transform .15s;
 }
-.photo-thumb:hover { border-color: var(--rose); transform: scale(1.06); }
-.photo-thumb.highlighted { border-color: var(--rose); box-shadow: 0 0 0 2px var(--rose); }
+.photo-thumb:hover { transform: scale(1.06); }
+.photo-thumb.highlighted { box-shadow: 0 0 0 2px var(--rose); }
 .photo-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+#photosOverlay { transition: opacity 0.1s ease; }
 .photo-thumb-dot {
   position: absolute;
   width: 7px; height: 7px;
@@ -1911,29 +1915,28 @@ function renderPhotosOverlay() {
     line.setAttribute('x2', center.x);
     line.setAttribute('y2', center.y);
     line.setAttribute('stroke', 'var(--rose)');
-    line.setAttribute('stroke-width', '1');
-    line.setAttribute('stroke-dasharray', '3 3');
-    line.setAttribute('opacity', '0.5');
+    line.setAttribute('stroke-width', '3');
+    line.setAttribute('opacity', '0.6');
     svg.appendChild(line);
   }
 
-  // Left column — right-aligned near left edge
+  // Left column — positioned just to the left of the stage
   if (leftItems.length > 0) {
     const totalH = colHeight(leftItems);
     let startY = (canvasH - totalH) / 2;
+    const tx = Math.max(MARGIN, stageOffX - THUMB_W - 120);
     leftItems.forEach((ci, i) => {
-      const tx = MARGIN;
       const ty = startY + i * (THUMB_H + THUMB_GAP);
       drawThumb(ci, tx, ty, 'left');
     });
   }
 
-  // Right column — left-aligned near right edge
+  // Right column — positioned just to the right of the stage
   if (rightItems.length > 0) {
     const totalH = colHeight(rightItems);
     let startY = (canvasH - totalH) / 2;
+    const tx = Math.min(canvasRect.width - MARGIN - THUMB_W, stageOffX + stageRect.width + 120);
     rightItems.forEach((ci, i) => {
-      const tx = canvasRect.width - MARGIN - THUMB_W;
       const ty = startY + i * (THUMB_H + THUMB_GAP);
       drawThumb(ci, tx, ty, 'right');
     });
@@ -1972,6 +1975,15 @@ function setPanels(left, right) {
   // Mobile: hide fwd/back when any panel is open
   if (left || right) document.body.classList.add('panel-open');
   else document.body.classList.remove('panel-open');
+  // Fade out overlay, wait for panel transition (250ms), re-render, fade back in
+  const overlay = document.getElementById('photosOverlay');
+  if (overlay && overlay.style.display !== 'none') {
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      renderPhotosOverlay();
+      overlay.style.opacity = '1';
+    }, 270);
+  }
 }
 
 function cyclePanels() {
