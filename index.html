@@ -61,14 +61,19 @@ body.handsome {
   --shadow: 0 2px 12px rgba(30,20,8,0.22);
   --shadow-hover: 0 6px 24px rgba(30,20,8,0.34);
 }
-body.handsome .closet-item img { background:#EDE5D8; }
+body.handsome .closet-item img { background:transparent !important; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.45)); border-radius:4px; }
+body.handsome .closet-item-duo img { background:transparent !important; }
 body.handsome .outfit-preview { background:var(--canvas-bg); }
 body.handsome .mode-btn.active { background:white; color:var(--text); }
 body.handsome .canvas-toolbar { background:#a09784; }
 body.handsome .toolbar-btn { background:#d6cdba; color:#382e1e; }
 body.handsome .toolbar-btn.primary { background:#31342c; color:#d6cdba; }
 body.handsome .toolbar-btn.primary:hover { background:#1e221a; color:#d6cdba; }
-body.handsome .closet-item { background:var(--cream); }
+body.handsome .closet-item { background:transparent; border-color:transparent; box-shadow:none; }
+body.handsome .outfit-card { border-color:#1c1d1a; }
+body.handsome .outfit-card:hover { border-color:#3a3b37; }
+body.handsome .outfit-info { background:#1c1d1a; }
+body.handsome .outfit-info span { color:#d6cdba; }
 body.handsome .logo span { color:#30342b; }
 body.handsome .stage-toggle-pill input:checked + .stage-toggle-track { background:#30342b; }
 body.handsome .vibe-opt.selected { border-color:#30342b; background:var(--blush); }
@@ -80,6 +85,16 @@ body.handsome .resize-handle { background:#30342b; }
 body.handsome .canvas-figure svg { fill:#34342b !important; }
 body.handsome .canvas-figure svg path { fill:#34342b !important; }
 /* Header topbar */
+body.handsome #starFilterBtn,
+body.handsome #moodFilterBtn { background:transparent !important; color:#d6cdba !important; border:none; }
+body.handsome #starFilterBtn:hover,
+body.handsome #moodFilterBtn:hover { background:transparent !important; color:#ffffff !important; }
+body.handsome .panel { background:#272824; border-color:#1e1f1b; }
+body.handsome .panel-header { border-bottom-color:#1e1f1b; }
+body.handsome .panel-title { color:#ffffff; }
+body.handsome .panel-subtitle { color:#c3bba7; }
+body.handsome .category-label,
+body.handsome .closet-section-divider { color:#c3bba7; opacity:1; }
 body.handsome header { background:#30342b; border-bottom-color:#1e221a; }
 body.handsome header .logo { color:#D8CDB8; }
 body.handsome header .hamburger-btn span { background:#D8CDB8; }
@@ -252,7 +267,7 @@ body:not(.edit-mode) .canvas-item .resize-handle { display:none !important; }
 .outfit-card:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
 .outfit-preview { height:90px; background:var(--canvas-bg); display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; overflow:hidden; }
 .outfit-preview img { height:65px; width:50px; object-fit:contain; }
-.outfit-info { padding:6px 10px 8px; display:flex; align-items:center; justify-content:center; gap:8px; position:relative; }
+.outfit-info { padding:8px 10px 10px; min-height:32px; display:flex; align-items:center; justify-content:center; gap:8px; position:relative; }
 .outfit-info .outfit-vibe { font-size:12px; line-height:1; position:absolute; right:8px; bottom:7px; }
 .outfit-actions { display:flex; gap:4px; opacity:0; transition:opacity .2s; position:absolute; top:6px; right:6px; }
 .outfit-card:hover .outfit-actions { opacity:1; }
@@ -340,8 +355,8 @@ body.night .cat-name { color:var(--text-mid); }
 .mood-dropdown-item { display:flex; align-items:center; gap:10px; padding:8px 14px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); transition:background .15s; white-space:nowrap; }
 .mood-dropdown-item:hover { background:var(--cream-dark); }
 .mood-dropdown-item .mood-check { width:14px; font-size:11px; color:var(--rose); }
-#moodFilterBtn { background-color:var(--cream) !important; }
-#starFilterBtn { background-color:var(--cream) !important; }
+body:not(.handsome) #moodFilterBtn { background-color:var(--cream) !important; color:var(--text); }
+body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; color:var(--text); }
 .modal-actions { display:flex; gap:8px; }
 
 .empty-state { text-align:center; padding:30px 16px; color:var(--text-light); }
@@ -452,7 +467,6 @@ body.night .cat-name { color:var(--text-mid); }
   .outfit-preview:has(img:nth-child(4)) img:first-child { margin-left: 0; }
 
   /* Fix outfit info strip height */
-  .outfit-info { padding: 8px 10px 10px; min-height: 32px; }
   .outfit-info .outfit-vibe { bottom: 9px; }
 }
 
@@ -503,7 +517,7 @@ body.night .cat-name { color:var(--text-mid); }
           <div class="panel-subtitle" id="closetSubtitle" style="margin-top:2px;">0 items</div>
         </div>
         <div style="position:relative;">
-          <button id="starFilterBtn" onclick="toggleStarDropdown()" style="background-color:var(--cream);background:var(--cream);border:none;cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;color:var(--text);display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by rating">
+          <button id="starFilterBtn" onclick="toggleStarDropdown()" style="border:none;cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by rating">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
           </button>
@@ -607,7 +621,7 @@ body.night .cat-name { color:var(--text-mid); }
           <div class="panel-subtitle" id="outfitsSubtitle" style="margin-top:2px;">0 saved</div>
         </div>
         <div style="position:relative;">
-          <button id="moodFilterBtn" onclick="toggleMoodDropdown()" style="background-color:var(--cream);background:var(--cream);border:none;cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;color:var(--text);display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by mood">
+          <button id="moodFilterBtn" onclick="toggleMoodDropdown()" style="border:none;cursor:pointer;padding:3px 8px 3px 7px;border-radius:20px;display:flex;align-items:center;gap:4px;transition:background .15s;font-size:12px;-webkit-appearance:none;appearance:none;" title="Filter by mood">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/></svg>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
           </button>
@@ -2013,7 +2027,7 @@ function itemDisplaySrc(item) {
 
 // ── Panel collapse ──
 const panelState = { closet: true, outfits: true };
-let logoCycle = 0; // 0=both, 1=none, 2=closet only, 3=outfits only
+let logoCycle = window.innerWidth <= 600 ? 2 : 0; // 2=closet only (small), 0=both (large)
 let preCloseCycle = null; // saved cycle before canvas-tap close
 document.body.classList.add('panel-open'); // panels start open
 
@@ -2049,15 +2063,16 @@ function setPanels(left, right) {
 
 function cyclePanels() {
   // If panels were closed by canvas-tap, restore to pre-close state
-  if (preCloseCycle !== null) {
+  if (preCloseCycle !== null && !panelState.closet && !panelState.outfits) {
     logoCycle = preCloseCycle;
     preCloseCycle = null;
     if      (logoCycle === 0) setPanels(true,  true);
     else if (logoCycle === 2) setPanels(true,  false);
     else if (logoCycle === 3) setPanels(false, true);
-    else setPanels(true, true); // fallback to both
+    else setPanels(true, true);
     return;
   }
+  preCloseCycle = null;
   // 0: both → 1: none → 2: closet only → 3: outfits only → back to 0
   logoCycle = (logoCycle + 1) % 4;
   if      (logoCycle === 0) setPanels(true,  true);
@@ -2144,6 +2159,9 @@ function saveOutfit() {
   clearCanvas();
   renderCloset();
   showToast(`"${name}" saved ${selectedVibe}`);
+  // Open outfits panel to reveal the saved outfit
+  setPanels(panelState.closet, true);
+  if (!panelState.closet) logoCycle = 3; else logoCycle = 0;
 }
 
 function renderOutfits() {
@@ -2297,11 +2315,20 @@ function deleteOutfit(id, e) {
 }
 
 document.getElementById('canvas').addEventListener('mousedown', e => {
-  if (e.target.id === 'canvas' || e.target.closest('.canvas-drop-hint')) selectItem(null);
-  if (!editMode) { preCloseCycle = logoCycle; setPanels(false, false); }
+  const isBackground = e.target.id === 'canvas' || e.target.id === 'stage' || e.target.closest('.canvas-drop-hint');
+  if (isBackground) selectItem(null);
+  if (!editMode && isBackground) {
+    if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
+    else cyclePanels();
+  }
 });
 document.getElementById('canvas').addEventListener('touchend', e => {
-  if (!editMode) { preCloseCycle = logoCycle; setPanels(false, false); }
+  const t = e.target;
+  const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest('.canvas-drop-hint');
+  if (!editMode && isBackground) {
+    if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
+    else cyclePanels();
+  }
 }, { passive: true });
 
 document.getElementById('outfitNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveOutfit(); });
@@ -3024,8 +3051,12 @@ closetItems = closetItems.filter(i =>
 if (closetItems.length !== before) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
 
 renderCloset(); renderOutfits(); updateDropHint();
-// On small screens, start with both panels closed
-if (window.innerWidth <= 430) setPanels(false, false);
+// Launch panel state: small screens = wardrobe only, large screens = both
+if (window.innerWidth <= 600) {
+  setPanels(true, false); logoCycle = 2; preCloseCycle = null;
+} else {
+  setPanels(true, true); logoCycle = 0; preCloseCycle = null;
+}
 // Load persisted settings
 if (localStorage.getItem('wardrobe-full-buttons')) { fullButtons = true; }
 applyFullButtons();
