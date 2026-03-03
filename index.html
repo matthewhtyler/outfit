@@ -2137,7 +2137,7 @@ function startResize(e, id) {
   const el = document.getElementById(id);
   const pt0 = e.touches ? e.touches[0] : e;
   const sx = pt0.clientX, sy = pt0.clientY, sw = ci.w, sh = ci.h;
-  if (!ci.aspectRatio) ci.aspectRatio = sw / sh;
+  ci.aspectRatio = sw / sh;
   const onMove = me => {
     const p = me.touches ? me.touches[0] : me;
     const dx = p.clientX - sx;
@@ -2405,6 +2405,8 @@ function setPanels(left, right) {
 }
 
 function cyclePanels() {
+  // If edit mode: logo only toggles wardrobe panel
+  if (editMode) { setPanels(!panelState.closet, panelState.outfits); return; }
   // If panels were closed by canvas-tap, restore to pre-close state
   if (preCloseCycle !== null && !panelState.closet && !panelState.outfits) {
     logoCycle = preCloseCycle;
@@ -2701,6 +2703,12 @@ function handleCanvasBgClick(clientX, target) {
   // If edit mode and item selected, just deselect
   if (editMode && selectedId) { selectItem(null); return; }
 
+  // Edit mode: tapping canvas only closes panels, never opens
+  if (editMode) {
+    if (panelState.closet || panelState.outfits) setPanels(false, false);
+    return;
+  }
+
   const isSmall = window.innerWidth <= 600;
 
   // Small screen: if any panel open, close it (don't open the other)
@@ -2738,7 +2746,10 @@ document.getElementById('canvas').addEventListener('touchend', e => {
   }
 }, { passive: false });
 
-// ── Pinch-to-zoom: resize selected canvas item in edit mode ──
+
+
+
+// ── Pinch-to-zoom: intercept all pinches in edit mode, resize selected item ──
 (function() {
   let pinchStartDist = null;
   let pinchStartW = null;
@@ -2750,35 +2761,39 @@ document.getElementById('canvas').addEventListener('touchend', e => {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  document.getElementById('canvas').addEventListener('touchstart', e => {
-    if (!editMode || !selectedId || e.touches.length !== 2) return;
-    const ci = canvasItems.find(c => c.id === selectedId);
-    if (!ci) return;
+  document.addEventListener('touchstart', e => {
+    if (!editMode || e.touches.length !== 2) return;
+    // Intercept all 2-finger touches when in edit mode
     e.preventDefault();
     pinchStartDist = getTouchDist(e.touches);
-    pinchStartW = ci.w;
-    pinchStartH = ci.h;
+    if (selectedId) {
+      const ci = canvasItems.find(c => c.id === selectedId);
+      if (ci) { pinchStartW = ci.w; pinchStartH = ci.h; }
+    }
   }, { passive: false });
 
-  document.getElementById('canvas').addEventListener('touchmove', e => {
-    if (!editMode || !selectedId || e.touches.length !== 2 || pinchStartDist === null) return;
+  document.addEventListener('touchmove', e => {
+    if (!editMode || e.touches.length !== 2) return;
+    e.preventDefault();
+    if (!selectedId || pinchStartDist === null || pinchStartW === null) return;
     const ci = canvasItems.find(c => c.id === selectedId);
     if (!ci) return;
-    e.preventDefault();
     const dist = getTouchDist(e.touches);
     const scale = dist / pinchStartDist;
-    const minSize = 30;
-    ci.w = Math.max(minSize, pinchStartW * scale);
-    ci.h = Math.max(minSize, pinchStartH * scale);
+    ci.w = Math.max(20, pinchStartW * scale);
+    ci.h = Math.max(20, pinchStartH * scale);
+    ci.aspectRatio = ci.w / ci.h;
     const el = document.getElementById(selectedId);
     if (el) { el.style.width = ci.w + 'px'; el.style.height = ci.h + 'px'; }
-    positionFloatingControls(document.getElementById('floatingControls'), ci);
+    const fc = document.getElementById('floatingControls');
+    if (fc && fc.style.display !== 'none') positionFloatingControls(fc, ci);
   }, { passive: false });
 
-  document.getElementById('canvas').addEventListener('touchend', e => {
-    if (pinchStartDist !== null && e.touches.length < 2) {
-      pinchStartDist = null;
-      persistPlacements();
+  document.addEventListener('touchend', e => {
+    if (!editMode) return;
+    if (e.touches.length < 2 && pinchStartDist !== null) {
+      pinchStartDist = null; pinchStartW = null; pinchStartH = null;
+      if (selectedId) persistPlacements();
     }
   }, { passive: true });
 })();
@@ -3750,6 +3765,19 @@ function handleFileOpen(e) {
 function importPeopleAware(importedPeople) {
   // Save current state first
   savePeopleData();
+
+  // If only one blank default person exists, remove them before importing
+  if (people.length === 1) {
+    const only = people[0];
+    const isBlank = only.name.trim() === 'Person' &&
+      (!only.closet || only.closet.length === 0) &&
+      (!only.outfits || only.outfits.length === 0);
+    if (isBlank) {
+      people = [];
+      activePersonId = null;
+    }
+  }
+
   let created = 0, merged = 0;
   importedPeople.forEach(ip => {
     if (!ip || !ip.name) return;
@@ -3786,6 +3814,10 @@ function importPeopleAware(importedPeople) {
     }
   });
   savePeopleData();
+  // Ensure a valid active person
+  if (!activePersonId || !people.find(p => p.id === activePersonId)) {
+    activePersonId = people[0]?.id || null;
+  }
   renderPeopleMenu();
   // Reload active person to reflect any merges, including positions
   const ap = getActivePerson();
