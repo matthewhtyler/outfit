@@ -2684,25 +2684,36 @@ function deleteOutfit(id, e) {
 }
 
 function handleCanvasBgClick(clientX, target) {
-  if (document.body.classList.contains('picture-mode')) return;
   const isBackground = target.id === 'canvas' || target.id === 'stage' || target.closest?.('.canvas-drop-hint');
   if (!isBackground) return;
+
+  // Camera mode: tap anywhere exits it, no panel changes
+  if (document.body.classList.contains('picture-mode')) { exitPictureMode(); return; }
 
   // If edit mode and item selected, just deselect
   if (editMode && selectedId) { selectItem(null); return; }
 
-  // Both panels open → close both
+  const isSmall = window.innerWidth <= 600;
+
+  // Small screen: if any panel open, close it (don't open the other)
+  if (isSmall) {
+    if (panelState.closet || panelState.outfits) { setPanels(false, false); return; }
+    // Both closed on small screen: left/right to open one
+    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+    const isRightSide = clientX > canvasRect.left + canvasRect.width / 2;
+    if (isRightSide) setPanels(false, true);
+    else setPanels(true, false);
+    return;
+  }
+
+  // Large screen: both panels open → close both
   if (panelState.closet && panelState.outfits) { setPanels(false, false); return; }
 
-  // Determine left vs right half of canvas
+  // Large screen: toggle left or right panel based on click side
   const canvasRect = document.getElementById('canvas').getBoundingClientRect();
   const isRightSide = clientX > canvasRect.left + canvasRect.width / 2;
-
-  if (isRightSide) {
-    setPanels(panelState.closet, !panelState.outfits);
-  } else {
-    setPanels(!panelState.closet, panelState.outfits);
-  }
+  if (isRightSide) setPanels(panelState.closet, !panelState.outfits);
+  else setPanels(!panelState.closet, panelState.outfits);
 }
 
 document.getElementById('canvas').addEventListener('mousedown', e => {
@@ -3569,7 +3580,6 @@ function enterPictureMode() {
   stage.style.top = '50%';
   stage.style.left = '50%';
   stage.style.transform = 'translate(-50%, -50%)';
-  setTimeout(() => document.addEventListener('click', exitPictureMode, { once: true }), 100);
 }
 function exitPictureMode() {
   document.body.classList.remove('picture-mode');
