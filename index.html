@@ -3763,19 +3763,19 @@ function handleFileOpen(e) {
 }
 
 function importPeopleAware(importedPeople) {
-  // Save current state first
-  savePeopleData();
+  // Save current live state into current person BEFORE we do anything else
+  // (but only if we're not about to wipe the blank default)
+  const willWipeDefault = people.length === 1 &&
+    people[0].name.trim() === 'Person' &&
+    (!people[0].closet || people[0].closet.length === 0) &&
+    (!people[0].outfits || people[0].outfits.length === 0);
+
+  if (!willWipeDefault) savePeopleData();
 
   // If only one blank default person exists, remove them before importing
-  if (people.length === 1) {
-    const only = people[0];
-    const isBlank = only.name.trim() === 'Person' &&
-      (!only.closet || only.closet.length === 0) &&
-      (!only.outfits || only.outfits.length === 0);
-    if (isBlank) {
-      people = [];
-      activePersonId = null;
-    }
+  if (willWipeDefault) {
+    people = [];
+    activePersonId = null;
   }
 
   let created = 0, merged = 0;
@@ -3795,9 +3795,12 @@ function importPeopleAware(importedPeople) {
       // Merge item positions and category defaults
       if (ip.itemPositions) existing.itemPositions = Object.assign({}, ip.itemPositions, existing.itemPositions || {});
       if (ip.categoryDefaults) existing.categoryDefaults = Object.assign({}, ip.categoryDefaults, existing.categoryDefaults || {});
+      // Restore theme and moodsSpectrum if missing
+      if (!existing.theme && ip.theme) existing.theme = ip.theme;
+      if (ip.moodsSpectrum != null) existing.moodsSpectrum = ip.moodsSpectrum;
       merged++;
     } else {
-      // Create new person
+      // Create new person — copy ALL fields directly from imported data
       const newPerson = {
         id: 'p_' + Date.now() + '_' + Math.floor(Math.random()*10000),
         name: ip.name,
@@ -3808,29 +3811,45 @@ function importPeopleAware(importedPeople) {
         outfits: JSON.parse(JSON.stringify(ip.outfits || [])),
         itemPositions: JSON.parse(JSON.stringify(ip.itemPositions || {})),
         categoryDefaults: JSON.parse(JSON.stringify(ip.categoryDefaults || {})),
+        editMode: ip.editMode || false,
+        showIntimate: ip.showIntimate || false,
       };
       people.push(newPerson);
       created++;
     }
   });
-  savePeopleData();
-  // Ensure a valid active person
-  if (!activePersonId || !people.find(p => p.id === activePersonId)) {
-    activePersonId = people[0]?.id || null;
-  }
-  renderPeopleMenu();
-  // Reload active person to reflect any merges, including positions
-  const ap = getActivePerson();
-  if (ap) {
-    closetItems = JSON.parse(JSON.stringify(ap.closet || []));
-    savedOutfits = JSON.parse(JSON.stringify(ap.outfits || []));
-    itemPositions = JSON.parse(JSON.stringify(ap.itemPositions || {}));
-    categoryDefaults = JSON.parse(JSON.stringify(ap.categoryDefaults || {}));
+
+  // Persist people array directly — do NOT call savePeopleData() here as it
+  // would overwrite imported data with the current empty live state
+  localStorage.setItem('wardrobe-people', JSON.stringify(people));
+
+  // Select and fully load the first person
+  const firstPerson = people[0];
+  if (firstPerson) {
+    activePersonId = firstPerson.id;
+    localStorage.setItem('wardrobe-active-person', activePersonId);
+    // Load all their data into live state
+    closetItems = JSON.parse(JSON.stringify(firstPerson.closet || []));
+    savedOutfits = JSON.parse(JSON.stringify(firstPerson.outfits || []));
+    itemPositions = JSON.parse(JSON.stringify(firstPerson.itemPositions || {}));
+    categoryDefaults = JSON.parse(JSON.stringify(firstPerson.categoryDefaults || {}));
+    localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+    localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
     localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
     localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+    setTheme(firstPerson.theme || 'petite');
+    applyMoodsSpectrum(firstPerson.moodsSpectrum || 0);
+    refreshCatConfig();
+    setSilhouette(firstPerson.gender || 'female');
+    setEditMode(firstPerson.editMode === true);
+    showIntimate = firstPerson.showIntimate === true;
+    clearCanvas();
     renderCloset();
     renderOutfits();
+    updateDropHint();
   }
+
+  renderPeopleMenu();
   const parts = [];
   if (created) parts.push(created + ' new person' + (created > 1 ? 's' : ''));
   if (merged) parts.push(merged + ' merged');
