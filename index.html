@@ -481,7 +481,7 @@ body.night .cat-name { color:var(--text-mid); }
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M7 17L17 7"/><polyline points="7,7 17,7 17,17"/></svg>Open…
         </button>
         <button class="hamburger-item" onclick="menuSave()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save…
         </button>
         <div style="height:1px;background:var(--cream-border);margin:4px 0;"></div>
         <button class="hamburger-item" onclick="openSettings()">
@@ -2953,22 +2953,6 @@ function mergeImportData(data) {
   return changed;
 }
 
-function handleFileOpen(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      let data;
-      try { data = JSON.parse(ev.target.result); } catch(parseErr) { showToast('Invalid file'); return; }
-      if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
-      const changed = mergeImportData(data);
-      showToast(changed ? 'Imported ' + getThemeDiamond() : 'Nothing new to import');
-    } catch(err) { console.error('Import error:', err); showToast('Import error — check console'); }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
 
 // ── Export ──
 function exportData() {
