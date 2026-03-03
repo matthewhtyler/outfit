@@ -1926,6 +1926,18 @@ function renderCanvasItem(ci) {
     e.preventDefault();
     if (editMode) openCtxMenu(e.clientX, e.clientY, ci.id);
   });
+  // Double-tap to open context menu on touch devices
+  let lastTap = 0;
+  el.addEventListener('touchend', e => {
+    if (!editMode) return;
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      openCtxMenu(t.clientX, t.clientY, ci.id);
+    }
+    lastTap = now;
+  });
   stage.appendChild(el);
 }
 
@@ -2793,7 +2805,6 @@ document.getElementById('canvas').addEventListener('touchend', e => {
     if (!editMode) return;
     if (e.touches.length < 2 && pinchStartDist !== null) {
       pinchStartDist = null; pinchStartW = null; pinchStartH = null;
-      if (selectedId) persistPlacements();
     }
   }, { passive: true });
 })();
@@ -2852,7 +2863,6 @@ function ensureDefaultPerson() {
 
 function savePeopleData() {
   // Snapshot current closet/outfits/theme/positions into active person before saving
-  persistPlacements();
   const ap = getActivePerson();
   if (ap) {
     ap.closet = JSON.parse(JSON.stringify(closetItems));
@@ -2873,7 +2883,6 @@ function getActivePerson() {
 
 function loadPersonData(personId) {
   // Save current state into currently active person first
-  persistPlacements();
   const cur = getActivePerson();
   if (cur) {
     cur.closet = JSON.parse(JSON.stringify(closetItems));
