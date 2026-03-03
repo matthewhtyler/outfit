@@ -334,7 +334,7 @@ body.night .closet-item-duo img { background:#1E1618; }
 .canvas-figure svg { position:absolute; bottom:0; left:50%; transform:translateX(-50%); display:block; fill:var(--text-light); }
 
 /* Hair toggle */
-.stage-toggles { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; z-index:10; }
+.stage-toggles { position:absolute; top:24px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; z-index:10; }
 .stage-toggle { display:flex; align-items:center; gap:7px; }
 .stage-toggle-label { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; color:var(--text-mid); user-select:none; }
 .stage-toggle-pill { position:relative; width:32px; height:18px; cursor:pointer; }
@@ -2729,6 +2729,51 @@ document.getElementById('canvas').addEventListener('touchend', e => {
     handleCanvasBgClick(touch.clientX, t);
   }
 }, { passive: false });
+
+// ── Pinch-to-zoom: resize selected canvas item in edit mode ──
+(function() {
+  let pinchStartDist = null;
+  let pinchStartW = null;
+  let pinchStartH = null;
+
+  function getTouchDist(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  document.getElementById('canvas').addEventListener('touchstart', e => {
+    if (!editMode || !selectedId || e.touches.length !== 2) return;
+    const ci = canvasItems.find(c => c.id === selectedId);
+    if (!ci) return;
+    e.preventDefault();
+    pinchStartDist = getTouchDist(e.touches);
+    pinchStartW = ci.w;
+    pinchStartH = ci.h;
+  }, { passive: false });
+
+  document.getElementById('canvas').addEventListener('touchmove', e => {
+    if (!editMode || !selectedId || e.touches.length !== 2 || pinchStartDist === null) return;
+    const ci = canvasItems.find(c => c.id === selectedId);
+    if (!ci) return;
+    e.preventDefault();
+    const dist = getTouchDist(e.touches);
+    const scale = dist / pinchStartDist;
+    const minSize = 30;
+    ci.w = Math.max(minSize, pinchStartW * scale);
+    ci.h = Math.max(minSize, pinchStartH * scale);
+    const el = document.getElementById(selectedId);
+    if (el) { el.style.width = ci.w + 'px'; el.style.height = ci.h + 'px'; }
+    positionFloatingControls(document.getElementById('floatingControls'), ci);
+  }, { passive: false });
+
+  document.getElementById('canvas').addEventListener('touchend', e => {
+    if (pinchStartDist !== null && e.touches.length < 2) {
+      pinchStartDist = null;
+      persistPlacements();
+    }
+  }, { passive: true });
+})();
 
 document.getElementById('outfitNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveOutfit(); });
 document.getElementById('catNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddItem(); });
