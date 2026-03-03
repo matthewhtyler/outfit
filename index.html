@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FAF6F0" id="themeColorMeta">
 <title>Wardrobe</title>
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
@@ -283,7 +286,7 @@ body.sandalwood .closet-item:hover img { filter:drop-shadow(1px 0 0 #d1ac98) dro
 
 body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
 
-header { display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--cream-border); background:var(--cream); flex-shrink:0; z-index:1000; height:56px; position:relative; }
+header { display:flex; align-items:center; justify-content:space-between; padding:0 24px; padding-top:env(safe-area-inset-top); border-bottom:1px solid var(--cream-border); background:var(--cream); flex-shrink:0; z-index:1000; height:calc(56px + env(safe-area-inset-top)); position:relative; }
 .logo { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:26px; letter-spacing:4px; color:var(--text); font-style:italic; }
 .logo span { color:var(--rose); }
 .mode-toggle { display:flex; background:var(--cream-dark); border-radius:24px; padding:3px; gap:2px; }
@@ -1878,7 +1881,7 @@ function renderCanvasItem(ci) {
   el.style.cssText = `left:${ci.x}px;top:${ci.y}px;width:${ci.w}px;height:${ci.h}px;transform:rotate(${ci.rot||0}deg);z-index:${ci.z};cursor:${editMode?'grab':'default'};`;
   const flipTransform = ci.flipped ? 'scaleX(-1)' : '';
   el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform}"/><div class="resize-grabber" data-id="${ci.id}" title="Drag to resize"></div>`;
-  el.addEventListener('mousedown', e => {
+  const handlePointerDown = e => {
     if (e.target.classList.contains('resize-grabber')) {
       selectItem(ci.id);
       if (editMode) startResize(e, ci.id);
@@ -1888,7 +1891,9 @@ function renderCanvasItem(ci) {
     if (e.target.tagName === 'BUTTON') return;
     selectItem(ci.id);
     if (editMode) startCanvasDrag(e, ci.id);
-  });
+  };
+  el.addEventListener('mousedown', handlePointerDown);
+  el.addEventListener('touchstart', handlePointerDown, { passive: false });
   el.addEventListener('contextmenu', e => {
     e.preventDefault();
     if (editMode) openCtxMenu(e.clientX, e.clientY, ci.id);
@@ -2033,19 +2038,21 @@ function startRotate(e, id) {
   const rect = el.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
-  const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+  const pt = e.touches ? e.touches[0] : e;
+  const startAngle = Math.atan2(pt.clientY - cy, pt.clientX - cx) * 180 / Math.PI;
   const startRot = ci.rot || 0;
   const onMove = me => {
-    const angle = Math.atan2(me.clientY - cy, me.clientX - cx) * 180 / Math.PI;
+    const p = me.touches ? me.touches[0] : me;
+    const angle = Math.atan2(p.clientY - cy, p.clientX - cx) * 180 / Math.PI;
     ci.rot = startRot + (angle - startAngle);
     el.style.transform = `rotate(${ci.rot}deg)`;
   };
   const onUp = () => {
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
   };
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
+  document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
 }
 
 function startCanvasDrag(e, id) {
@@ -2058,17 +2065,18 @@ function startCanvasDrag(e, id) {
   const img = el?.querySelector('img');
   if (img) img.style.filter = 'none';
   const rect = document.getElementById('stage').getBoundingClientRect();
-  const offX = e.clientX - ci.x - rect.left, offY = e.clientY - ci.y - rect.top;
+  const pt0 = e.touches ? e.touches[0] : e;
+  const offX = pt0.clientX - ci.x - rect.left, offY = pt0.clientY - ci.y - rect.top;
   const moveAll = e.altKey;
-  // For group-move: capture initial positions of all other items
   const others = moveAll ? canvasItems.filter(i => i.id !== id).map(i => ({
     ci: i, el: document.getElementById(i.id), startX: i.x, startY: i.y
   })) : [];
-  let lastX = e.clientX, lastY = e.clientY;
+  let lastX = pt0.clientX, lastY = pt0.clientY;
   const onMove = me => {
+    const p = me.touches ? me.touches[0] : me;
     const r = document.getElementById('stage').getBoundingClientRect();
-    const newX = me.clientX - r.left - offX;
-    const newY = me.clientY - r.top - offY;
+    const newX = p.clientX - r.left - offX;
+    const newY = p.clientY - r.top - offY;
     const dx = newX - ci.x, dy = newY - ci.y;
     ci.x = newX; ci.y = newY;
     el.style.left = ci.x+'px'; el.style.top = ci.y+'px';
@@ -2083,11 +2091,11 @@ function startCanvasDrag(e, id) {
   };
   const onUp = () => {
     if (img) img.style.filter = '';
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
   };
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
+  document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
 }
 
 function startResize(e, id) {
@@ -2096,11 +2104,13 @@ function startResize(e, id) {
   if (!ci) return;
   if (!ci.hasOwnProperty('lockAspect')) ci.lockAspect = true;
   const el = document.getElementById(id);
-  const sx = e.clientX, sy = e.clientY, sw = ci.w, sh = ci.h;
+  const pt0 = e.touches ? e.touches[0] : e;
+  const sx = pt0.clientX, sy = pt0.clientY, sw = ci.w, sh = ci.h;
   if (!ci.aspectRatio) ci.aspectRatio = sw / sh;
   const onMove = me => {
-    const dx = me.clientX - sx;
-    const dy = me.clientY - sy;
+    const p = me.touches ? me.touches[0] : me;
+    const dx = p.clientX - sx;
+    const dy = p.clientY - sy;
     if (ci.lockAspect === true) {
       const delta = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
       ci.w = Math.max(1, sw + delta);
@@ -2114,9 +2124,12 @@ function startResize(e, id) {
     const fc = document.getElementById('floatingControls');
     if (fc && fc.style.display !== 'none') positionFloatingControls(fc, ci);
   };
-  const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
+  };
+  document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
 }
 
 let viewMode = 'illustrations'; // 'photos' | 'illustrations'
@@ -2141,6 +2154,10 @@ function setTheme(t) {
   if (t === 'night') document.body.classList.add('night');
   if (t === 'handsome') document.body.classList.add('handsome');
   if (t === 'sandalwood') document.body.classList.add('sandalwood');
+  // Update theme-color meta for iOS PWA status bar
+  const themeColors = { petite: '#FAF6F0', night: '#1A1418', handsome: '#272824', sandalwood: '#E8E0D0' };
+  const tc = document.getElementById('themeColorMeta');
+  if (tc) tc.setAttribute('content', themeColors[t] || '#FAF6F0');
   // Update diamond symbols
   updateThemeDiamonds();
   // Update settings dropdown to match
