@@ -23,6 +23,10 @@
   --canvas-bg: #F5EFE8;
   --shadow: 0 2px 12px rgba(180,130,120,0.12);
   --shadow-hover: 0 6px 24px rgba(180,130,120,0.2);
+  --ci-fill: #F4CDCA;
+  --ci-mid: #E8ADAB;
+  --ci-stroke: #C97B7A;
+  --ci-eye: #ffffff;
 }
 
 body.night {
@@ -35,15 +39,31 @@ body.night {
   --text: #F0E8E4;
   --text-mid: #B09090;
   --text-light: #7A6060;
-  --canvas-bg: #14100E;
+  --canvas-bg: #120f13;
   --shadow: 0 2px 12px rgba(0,0,0,0.4);
   --shadow-hover: 0 6px 24px rgba(0,0,0,0.5);
+  --ci-fill: #F4CDCA;
+  --ci-mid: #E8ADAB;
+  --ci-stroke: #C97B7A;
+  --ci-eye: #ffffff;
 }
 body.night .closet-item img { background:#1E1618; }
 body.night .outfit-preview { background:var(--canvas-bg); }
 body.night .mode-btn.active { background:#3A2A2E; color:var(--text); }
-body.night .canvas-toolbar { background:#2A1E22; box-shadow:none; }
+body.night #starFilterBtn,
+body.night #moodFilterBtn { background:transparent !important; color:#7A6060 !important; border:none; }
+body.night #starFilterBtn:hover,
+body.night #moodFilterBtn:hover { background:transparent !important; color:var(--text-mid) !important; }
+/* Hide floating item controls when any modal/popup is open */
+body:has(.modal-overlay.open) #floatingControls,
+body:has(#hamburgerWrap.open) #floatingControls {
+  display: none !important;
+}
 body.night .toolbar-btn { background:#3A2A2E; }
+body.night .canvas-toolbar { background:#131012; }
+body.petite .canvas-toolbar { box-shadow:0 2px 10px rgba(180,130,120,.1), 0 4px 16px rgba(61,46,42,.08); }
+body.night .toolbar-btn.primary { background:#5A2F3A; color:#F0E8E4; }
+body.night .toolbar-btn.primary:hover { background:#7A3F4A; color:#F0E8E4; }
 body.night .closet-item { background:#241D20; }
 
 /* ── Handsome theme ── */
@@ -60,27 +80,31 @@ body.handsome {
   --canvas-bg: #56564f;
   --shadow: 0 2px 12px rgba(30,20,8,0.22);
   --shadow-hover: 0 6px 24px rgba(30,20,8,0.34);
+  --ci-fill: #d6c9a8;
+  --ci-mid: #b8a882;
+  --ci-stroke: #5a5035;
+  --ci-eye: #e8e0d0;
 }
 body.handsome .closet-item-duo img { background:transparent !important; }
 body.handsome .outfit-preview { background:var(--canvas-bg); }
 body.handsome .mode-btn.active { background:white; color:var(--text); }
-body.handsome .canvas-toolbar { background:#a09784; }
-body.handsome .toolbar-btn { background:#d6cdba; color:#382e1e; }
-body.handsome .toolbar-btn.primary { background:#31342c; color:#d6cdba; }
-body.handsome .toolbar-btn.primary:hover { background:#1e221a; color:#d6cdba; }
-body:not(.night):not(.handsome) .hamburger-btn span { background:var(--rose); }
-body:not(.night):not(.handsome) #cyclePanelsBtn { color:var(--rose) !important; }
-body:not(.night):not(.handsome) .hamburger-item svg { color:var(--rose) !important; }
-body:not(.night):not(.handsome) .hamburger-item svg path,
-body:not(.night):not(.handsome) .hamburger-item svg polyline,
-body:not(.night):not(.handsome) .hamburger-item svg line,
-body:not(.night):not(.handsome) .hamburger-item svg circle { stroke:var(--rose) !important; }
+body.handsome .canvas-toolbar { background:#948f87; box-shadow:0 4px 20px rgba(35,42,30,.18), 0 8px 32px rgba(28,34,24,.22), 0 2px 8px rgba(32,38,28,.15); }
+body.handsome .toolbar-btn { background:#cec7bc; color:#2b2826; }
+body.handsome .toolbar-btn.primary { background:#31342c; color:#cec7bc; }
+body.handsome .toolbar-btn.primary:hover { background:#232322; color:#cec7bc; }
+body:not(.night):not(.handsome):not(.sandalwood) .hamburger-btn span { background:var(--rose); }
+body:not(.night):not(.handsome):not(.sandalwood) #cyclePanelsBtn { color:var(--rose) !important; }
+body:not(.night):not(.handsome):not(.sandalwood) .hamburger-item svg { color:var(--rose) !important; }
+body:not(.night):not(.handsome):not(.sandalwood) .hamburger-item svg path,
+body:not(.night):not(.handsome):not(.sandalwood) .hamburger-item svg polyline,
+body:not(.night):not(.handsome):not(.sandalwood) .hamburger-item svg line,
+body:not(.night):not(.handsome):not(.sandalwood) .hamburger-item svg circle { stroke:var(--rose) !important; }
 body.handsome .closet-item { background:transparent; border-color:transparent; box-shadow:none; }
 body.handsome .empty-state { color:#c3bba7; }
 body.handsome .empty-state .empty-icon span { color:#c3bba7 !important; opacity:1 !important; }
 body.handsome .empty-state .empty-icon svg path,
 body.handsome .empty-state .empty-icon svg circle { fill:#c3bba7 !important; stroke:#c3bba7 !important; }
-body.handsome .btn-add { background:#31342c; color:#d6cdba; }
+body.handsome .btn-add { background:#31342c; color:#cec7bc; }
 body.handsome .btn-add:hover { background:#232322; }
 body.handsome .add-form { border-top-color:transparent; }
 body.handsome .outfit-card { background:#272824; border-color:#1c1d1a; box-shadow:none; }
@@ -93,15 +117,14 @@ body.handsome .logo span { color:#30342b; }
 body.handsome .stage-toggle-pill input:checked + .stage-toggle-track { background:#30342b; }
 body.handsome .vibe-opt.selected { border-color:#30342b; background:var(--blush); }
 body.handsome .cat-opt.selected { border-color:#30342b; background:var(--blush); }
-body.handsome .canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(48,52,43,.4)); }
-body.handsome .resize-handle { background:#30342b; }
+body.handsome .canvas-item.selected { filter:drop-shadow(0 0 6px rgba(196,187,168,.45)) drop-shadow(0 4px 14px rgba(196,187,168,.3)); }
 /* Save button: light bg swapped with other buttons */
 /* Silhouette: very desaturated warm grey */
 body.handsome .canvas-figure svg { fill:#34342b !important; }
 body.handsome .canvas-figure svg path { fill:#34342b !important; }
 /* Header topbar */
 body.handsome #starFilterBtn,
-body.handsome #moodFilterBtn { background:transparent !important; color:#d6cdba !important; border:none; }
+body.handsome #moodFilterBtn { background:transparent !important; color:#c3bba7 !important; border:none; }
 body.handsome #starFilterBtn:hover,
 body.handsome #moodFilterBtn:hover { background:transparent !important; color:#ffffff !important; }
 body.handsome .panel { background:#272824; border-color:#1e1f1b; }
@@ -111,15 +134,17 @@ body.handsome .panel-subtitle { color:#c3bba7; }
 body.handsome .category-label,
 body.handsome .closet-section-divider { color:#c3bba7; opacity:1; }
 body.handsome header { background:#30342b; border-bottom-color:#1e221a; }
-body.handsome header .logo { color:#D8CDB8; }
-body.handsome header .hamburger-btn span { background:#D8CDB8; }
-body.handsome header > div button { color:#D8CDB8 !important; }
+body.handsome header .logo { color:#c3bba7; }
+body.handsome header .hamburger-btn span { background:#c3bba7; }
+body.handsome header > div button { color:#c3bba7 !important; }
 body.night .hamburger-item svg { color:var(--rose) !important; stroke:var(--rose) !important; }
 body.night .hamburger-item svg path,
 body.night .hamburger-item svg polyline,
 body.night .hamburger-item svg line,
 body.night .hamburger-item svg circle { stroke:var(--rose) !important; }
 body.handsome .hamburger-item { color:var(--text) !important; }
+body.handsome .hamburger-item:hover { background:#F2EBE0 !important; }
+body.handsome .hamburger-item.person-item.active-person { background:#F2EBE0 !important; color:var(--text) !important; }
 body.handsome .hamburger-item svg { color:#596d45 !important; stroke:#596d45 !important; }
 body.handsome .hamburger-item svg path,
 body.handsome .hamburger-item svg polyline,
@@ -128,13 +153,13 @@ body.handsome .hamburger-item svg circle { stroke:#596d45 !important; }
 /* Layer slider circle */
 body.handsome #layerSlider { accent-color:#30342b; }
 
-body.handsome .stage-toggle-label { color:#D8CDB8; }
-body.handsome #shareBtn { background:#30342b; color:#D8CDB8; }
-body.handsome #shareBtn:hover { background:#1e221a; color:#D8CDB8; }
+body.handsome .stage-toggle-label { color:#c3bba7; }
+body.handsome #shareBtn { background:#30342b; color:#c3bba7; }
+body.handsome #shareBtn:hover { background:#1e221a; color:#c3bba7; }
 /* Handsome: all highlighted/confirm buttons match canvas Save button */
-body.handsome .btn-confirm { background:#30342b; color:#D8CDB8; }
-body.handsome .btn-confirm:hover { background:#1e221a; color:#D8CDB8; }
-body.handsome .gender-radio input:checked + label { background:#30342b; border-color:#30342b; color:#D8CDB8; }
+body.handsome .btn-confirm { background:#30342b; color:#c3bba7; }
+body.handsome .btn-confirm:hover { background:#1e221a; color:#c3bba7; }
+body.handsome .gender-radio input:checked + label { background:#30342b; border-color:#30342b; color:#c3bba7; }
 /* Popup titles: not italic */
 body.handsome .save-modal h2,
 body.handsome .person-modal h2,
@@ -143,6 +168,96 @@ body.handsome .logo-diamond::before { content:'◆'; }
 body.handsome .theme-diamond { display:none; }
 body.handsome .theme-diamond-h { display:inline !important; }
 
+/* ── Sandalwood theme (Handsome with warm browns instead of greens) ── */
+body.sandalwood {
+  --cream: #E8E0D0;
+  --cream-dark: #D4CBBC;
+  --cream-border: #A89880;
+  --blush: #c4bba8;
+  --blush-mid: #b0a690;
+  --rose: #2b2826;
+  --text: #160F08;
+  --text-mid: #3A2E1C;
+  --text-light: #6A5A40;
+  --canvas-bg: #3a3530;
+  --shadow: 0 2px 12px rgba(30,20,8,0.22);
+  --shadow-hover: 0 6px 24px rgba(30,20,8,0.34);
+  --ci-fill: #c9b8a0;
+  --ci-mid: #a8927a;
+  --ci-stroke: #4a3828;
+  --ci-eye: #e0d5c8;
+}
+body.sandalwood .closet-item-duo img { background:transparent !important; }
+body.sandalwood .outfit-preview { background:var(--canvas-bg); }
+body.sandalwood .mode-btn.active { background:white; color:var(--text); }
+body.sandalwood .canvas-toolbar { background:#7e6d64; }
+body.sandalwood .toolbar-btn { background:#d1ac98; color:#2b2826; }
+body.sandalwood .toolbar-btn:hover { background:#c49e8a; color:#1e1d1c; }
+body.sandalwood .toolbar-btn.primary { background:#2b2826; color:#cec7bc; }
+body.sandalwood .toolbar-btn.primary:hover { background:#1a1714; color:#cec7bc; }
+body.sandalwood .closet-item { background:transparent; border-color:transparent; box-shadow:none; }
+body.sandalwood .empty-state { color:#d1ac98; }
+body.sandalwood .empty-state .empty-icon span { color:#d1ac98 !important; opacity:1 !important; }
+body.sandalwood .empty-state .empty-icon svg path,
+body.sandalwood .empty-state .empty-icon svg circle { fill:#d1ac98 !important; stroke:#d1ac98 !important; }
+body.sandalwood .btn-add { background:#2b2826; color:#cec7bc; }
+body.sandalwood .btn-add:hover { background:#1a1714; }
+body.sandalwood .add-form { border-top-color:transparent; }
+body.sandalwood .outfit-card { background:#1e1d1c; border-color:#141312; box-shadow:none; }
+body.sandalwood .outfit-card:hover { border-color:#2a2820; box-shadow:none; }
+body.sandalwood .outfit-info { background:#141312; }
+body.sandalwood .outfit-info span { color:#d1ac98; }
+body.sandalwood .outfit-info .outfit-title { color:#ffffff; }
+body.sandalwood .logo span { color:#2b2826; }
+body.sandalwood .stage-toggle-pill input:checked + .stage-toggle-track { background:#2b2826; }
+body.sandalwood .vibe-opt.selected { border-color:#2b2826; background:var(--blush); }
+body.sandalwood .cat-opt.selected { border-color:#2b2826; background:var(--blush); }
+body.sandalwood .canvas-item.selected { filter:drop-shadow(0 0 6px rgba(209,172,152,.45)) drop-shadow(0 4px 14px rgba(209,172,152,.3)); }
+body.sandalwood .canvas-figure svg { fill:#1e1b18 !important; }
+body.sandalwood .canvas-figure svg path { fill:#1e1b18 !important; }
+body.sandalwood #layerSlider { opacity:.9; }
+body.sandalwood #clearBtn, body.sandalwood #fwdBtn, body.sandalwood #backBtn { background:#ceb9ac; color:#2b2826; }
+body.sandalwood .stage-toggle-track { background:#d1ac98; }
+body.sandalwood #starFilterBtn,
+body.sandalwood #moodFilterBtn { background:transparent !important; color:#d1ac98 !important; border:none; }
+body.sandalwood #starFilterBtn:hover,
+body.sandalwood #moodFilterBtn:hover { background:transparent !important; color:#ffffff !important; }
+body.sandalwood .panel { background:#1e1d1c; border-color:#141312; }
+body.sandalwood .panel-header { border-bottom-color:#141312; }
+body.sandalwood .panel-title { color:#ffffff; }
+body.sandalwood .panel-subtitle { color:#d1ac98; }
+body.sandalwood .category-label,
+body.sandalwood .closet-section-divider { color:#d1ac98; opacity:1; }
+body.sandalwood .category-label::after { background:#d1ac98; opacity:0.4; }
+body.sandalwood header { background:#2b2826; border-bottom-color:#1a1714; }
+body.sandalwood header .logo { color:#d1ac98; }
+body.sandalwood header .hamburger-btn span { background:#d1ac98; }
+body.sandalwood header > div button { color:#d1ac98 !important; }
+body.sandalwood .hamburger-item { color:var(--text) !important; }
+body.sandalwood .hamburger-item:hover { background:#F2EBE0 !important; }
+body.sandalwood .hamburger-item.person-item.active-person { background:#F2EBE0 !important; color:var(--text) !important; }
+body.sandalwood .hamburger-item svg { color:#4a4438 !important; stroke:#4a4438 !important; }
+body.sandalwood .hamburger-item svg path,
+body.sandalwood .hamburger-item svg polyline,
+body.sandalwood .hamburger-item svg line,
+body.sandalwood .hamburger-item svg circle { stroke:#4a4438 !important; }
+body.sandalwood #layerSlider { accent-color:#2b2826; }
+body.sandalwood .stage-toggle-label { color:#d1ac98; }
+body.sandalwood #shareBtn { background:#2b2826; color:#d1ac98; }
+body.sandalwood #shareBtn:hover { background:#1a1714; color:#d1ac98; }
+body.sandalwood .btn-confirm { background:#2b2826; color:#d1ac98; }
+body.sandalwood .btn-confirm:hover { background:#1a1714; color:#d1ac98; }
+body.sandalwood .gender-radio input:checked + label { background:#2b2826; border-color:#2b2826; color:#d1ac98; }
+body.sandalwood .save-modal h2,
+body.sandalwood .person-modal h2,
+body.sandalwood .cat-picker-header h2 { font-style:normal; }
+body.sandalwood .logo-diamond::before { content:'◆'; }
+body.sandalwood .theme-diamond { display:none; }
+body.sandalwood .theme-diamond-h { display:inline !important; }
+body.sandalwood .closet-item img { background:transparent !important; filter:drop-shadow(1px 0 0 #d1ac98) drop-shadow(-1px 0 0 #d1ac98) drop-shadow(0 1px 0 #d1ac98) drop-shadow(0 -1px 0 #d1ac98); border-radius:4px; }
+body.sandalwood .closet-item:hover img { filter:drop-shadow(1px 0 0 #d1ac98) drop-shadow(-1px 0 0 #d1ac98) drop-shadow(0 1px 0 #d1ac98) drop-shadow(0 -1px 0 #d1ac98) drop-shadow(0 6px 8px rgba(0,0,0,0.7)) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
+/* ── Sandalwood theme (Handsome with warm browns instead of greens) ── */
 /* Panel collapse buttons - on canvas edges */
 .panel-collapse-btn { position:absolute; top:50%; transform:translateY(-50%); width:22px; height:56px; background:var(--cream-dark); border:1px solid var(--cream-border); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-light); z-index:20; transition:background .2s, opacity .2s, transform .2s; padding:0; overflow:visible; }
 .panel-collapse-btn:hover { background:var(--blush); }
@@ -205,7 +320,7 @@ body.night .closet-item-duo img { background:#1E1618; }
 .add-form { padding:12px; border-top:1px solid var(--cream-border); flex-shrink:0; }
 .add-form input { width:100%; padding:8px 12px; border:1.5px solid var(--cream-border); border-radius:20px; background:white; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--text); outline:none; transition:border-color .2s; margin-bottom:6px; }
 .add-form input:focus { border-color:var(--blush-mid); }
-.add-form input::placeholder { color:var(--text-light); }
+.add-form input::placeholder { color:var(--text-light); opacity:0.6; }
 .btn-add { width:100%; padding:9px 16px; background:var(--blush); border:none; border-radius:20px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--text); cursor:pointer; transition:all .2s; }
 .btn-add:hover { background:var(--blush-mid); transform:translateY(-1px); }
 
@@ -234,15 +349,19 @@ body.night .closet-item-duo img { background:#1E1618; }
 .canvas-drop-hint .hint-icon { font-size:40px; margin-bottom:12px; opacity:.5; color:var(--text-light); }
 .canvas-drop-hint p { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--text-light); font-style:italic; }
 
-.canvas-item { position:absolute; user-select:none; cursor:move; -webkit-user-drag:none; }
-.canvas-item img { width:100%; height:100%; object-fit:contain; display:block; pointer-events:none; filter:drop-shadow(0 4px 12px rgba(61,46,42,.15)); -webkit-user-drag:none; }
-.canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(201,123,122,.35)); }
+.canvas-item { position:absolute; user-select:none; cursor:move; -webkit-user-drag:none; overflow:visible; }
+.canvas-item img { width:100%; height:100%; object-fit:fill; display:block; pointer-events:none; filter:drop-shadow(0 4px 12px rgba(61,46,42,.15)); -webkit-user-drag:none; }
+.canvas-item.selected { filter:drop-shadow(0 0 10px rgba(201,123,122,.55)) drop-shadow(0 4px 20px rgba(201,123,122,.35)); }
+.canvas-item.selected img { filter:none; }
 .canvas-item .item-controls { display:none !important; }
-body:not(.edit-mode) #floatingControls { display:none !important; }
+body:not(.edit-mode) #floatingControls { display:none !important;  z-index:50;}
 /* Photos overlay: use dark olive in petite (same as handsome) */
-body:not(.night) .photo-thumb { border-color: #30342b; }
-body:not(.night) .photo-thumb-dot { background: #30342b; }
+body:not(.night):not(.sandalwood) .photo-thumb { border-color: #30342b; }
+body:not(.night):not(.sandalwood) .photo-thumb-dot { background: #30342b; }
+body.sandalwood .photo-thumb { border-color: #2b2826; }
+body.sandalwood .photo-thumb-dot { background: #2b2826; }
 input, select, textarea { font-size:16px !important; }
+input::placeholder, textarea::placeholder { color:var(--text-light); opacity:0.6; }
 
 body:not(.edit-mode) #fwdBtn,
 body:not(.edit-mode) #backBtn,
@@ -255,8 +374,8 @@ body.picture-mode .stage-toggles,
 body.picture-mode #layerSliderWrap,
 body.picture-mode .canvas-toolbar,
 body.picture-mode .panel-collapse-btn,
+body.picture-mode #floatingControls,
 body.picture-mode .item-controls,
-body.picture-mode .resize-handle,
 body.picture-mode #pictureModeBtn,
 body.picture-mode .canvas-drop-hint { display:none !important; }
 body.picture-mode #canvas { border:none; }
@@ -276,22 +395,25 @@ body.picture-mode #canvas {
 .ctrl-btn:hover { background:var(--cream-dark); }
 .ctrl-btn.rotate-handle { cursor:grab; }
 .ctrl-btn.rotate-handle:active { cursor:grabbing; }
-.resize-handle { position:absolute; bottom:-6px; right:-6px; width:14px; height:14px; background:var(--rose); border:2px solid white; border-radius:50%; cursor:se-resize; display:none; box-shadow:0 1px 4px rgba(180,130,120,.3); }
-.canvas-item.selected .resize-handle { display:block; }
+/* Corner resize grabber on selected canvas items */
+.resize-grabber { display:none; position:absolute; bottom:0; right:0; width:16px; height:16px; cursor:se-resize; z-index:10; }
+.resize-grabber::after { content:''; position:absolute; bottom:2px; right:2px; width:8px; height:8px; border-right:2px solid white; border-bottom:2px solid white; border-radius:1px; opacity:.9; box-shadow:1px 1px 0 rgba(0,0,0,.8), 0 0 4px rgba(0,0,0,.6); }
+body.edit-mode .canvas-item.selected .resize-grabber { display:block; }
 body:not(.edit-mode) .closet-item .used-check { display:none; }
-body:not(.edit-mode) .canvas-item .resize-handle { display:none !important; }
 
-.canvas-toolbar { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:white; border-radius:24px; padding:8px 14px; box-shadow:0 4px 20px rgba(180,130,120,.2); z-index:10; white-space:nowrap; flex-wrap:nowrap; }
+.canvas-toolbar { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:white; border-radius:24px; padding:8px 14px; box-shadow:0 4px 20px rgba(180,130,120,.2), 0 8px 32px rgba(61,46,42,.22), 0 2px 8px rgba(61,46,42,.15); z-index:10; white-space:nowrap; flex-wrap:nowrap; }
 .toolbar-btn { padding:6px 16px; border:none; border-radius:16px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .2s; background:var(--cream-dark); color:var(--text-mid); white-space:nowrap; flex-shrink:0; }
 .toolbar-btn:hover { background:var(--blush); color:var(--text); }
 .toolbar-btn.primary { background:var(--blush); color:var(--text); }
 .toolbar-btn.primary:hover { background:var(--blush-mid); }
-.toolbar-sep { width:1px; background:var(--cream-border); margin:4px 0; }
+.toolbar-sep { display:none; }
 
 .outfit-card { background:var(--cream); border-radius:12px; overflow:hidden; margin-bottom:10px; border:1.5px solid var(--cream-border); box-shadow:var(--shadow); cursor:pointer; transition:all .2s; }
 .outfit-card:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
 .outfit-preview { height:90px; background:var(--canvas-bg); display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; overflow:hidden; }
-.outfit-preview img { height:65px; width:50px; object-fit:contain; filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); }
+.outfit-preview img { height:65px; width:50px; object-fit:contain; filter:drop-shadow(1px 0 0 var(--text-light)) drop-shadow(-1px 0 0 var(--text-light)) drop-shadow(0 1px 0 var(--text-light)) drop-shadow(0 -1px 0 var(--text-light)); }
+body.handsome .outfit-preview img { filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); }
+body.sandalwood .outfit-preview img { filter:drop-shadow(1px 0 0 #d1ac98) drop-shadow(-1px 0 0 #d1ac98) drop-shadow(0 1px 0 #d1ac98) drop-shadow(0 -1px 0 #d1ac98); }
 body.handsome .closet-item img { background:transparent !important; filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); border-radius:4px; }
 .outfit-num { position:absolute; bottom:8px; left:10px; font-size:10px; color:var(--text-light); font-family:'DM Sans',sans-serif; }
 .outfit-title { font-family:'Cormorant Garamond',serif; font-size:13px; color:var(--text-mid); font-style:italic; }
@@ -308,11 +430,11 @@ body.handsome .closet-item img { background:transparent !important; filter:drop-
 .modal-overlay.open { opacity:1; pointer-events:all; }
 
 /* Category picker */
-.cat-modal { background:var(--cream); border-radius:24px; width:760px; max-width:96vw; max-height:92vh; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(61,46,42,.3); transform:translateY(28px) scale(.97); transition:transform .32s cubic-bezier(.34,1.56,.64,1); overflow:hidden; }
+.cat-modal { background:var(--cream); border-radius:24px; width:760px; max-width:96vw; max-height:72vh; height:72vh; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(61,46,42,.3); transform:translateY(28px) scale(.97); transition:transform .32s cubic-bezier(.34,1.56,.64,1); overflow:hidden; }
 .modal-overlay.open .cat-modal { transform:translateY(0) scale(1); }
-.cat-modal-top { display:flex; flex:1; overflow:hidden; }
+.cat-modal-top { display:flex; flex:1; overflow:hidden; min-height:0; }
 
-.cat-preview-col { width:200px; flex-shrink:0; background:var(--cream-dark); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 16px; border-right:1px solid var(--cream-border); gap:12px; }
+.cat-preview-col { width:200px; flex-shrink:0; background:var(--cream-dark); display:flex; flex-direction:column; align-items:center; padding:24px 16px; border-right:1px solid var(--cream-border); gap:12px; overflow:hidden; min-height:0; }
 .cat-preview-img { width:150px; height:150px; object-fit:contain; border-radius:12px; background:var(--cream-dark); padding:8px; box-shadow:var(--shadow); }
 .cat-preview-name { width:100%; padding:7px 12px; border:1.5px solid var(--cream-border); border-radius:20px; background:var(--cream-dark); font-family:'DM Sans',sans-serif; font-size:12px; color:var(--text); outline:none; text-align:center; }
 .cat-preview-name:focus { border-color:var(--blush-mid); }
@@ -328,27 +450,33 @@ body.handsome .closet-item img { background:transparent !important; filter:drop-
 #catIllustrPreviewImg { opacity:0.4; }
 #catIllustrPreviewImg[src]:not([src=""]) { opacity:1; }
 
-.cat-preview-name::placeholder { color:var(--text-light); }
+.cat-preview-name::placeholder { color:var(--text-light); opacity:0.6; }
 
-.cat-picker-col { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-.cat-picker-header { padding:20px 24px 14px; border-bottom:1px solid var(--cream-border); }
-.cat-picker-header h2 { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; font-style:italic; margin-bottom:3px; }
-.cat-picker-header p { font-size:11px; color:var(--text-light); }
+.cat-picker-col { flex:1; display:flex; flex-direction:column; overflow:hidden; max-height:100%; }
+.cat-picker-header { padding:14px 18px 10px; border-bottom:1px solid var(--cream-border); flex-shrink:0; }
+.cat-picker-header h2 { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; font-style:italic; margin-bottom:2px; }
+.cat-picker-header p { font-size:10px; color:var(--text-light); margin:0; }
 
-.cat-picker-body { flex:1; display:flex; overflow:hidden; padding:16px 20px; align-items:stretch; }
+.cat-picker-body { flex:1; overflow-y:auto; padding:12px 14px; }
 
 /* Options list */
-.cat-options-col { flex:1; display:flex; flex-direction:column; gap:6px; justify-content:center; }
-.cat-opt { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1.5px solid var(--cream-border); border-radius:12px; cursor:pointer; background:var(--cream); transition:all .18s; }
-.cat-opt:hover { border-color:var(--blush-mid); background:var(--cream-dark); transform:translateX(4px); }
-.cat-opt.selected { border-color:var(--rose); background:var(--blush); transform:translateX(4px); }
-.cat-icon { width:44px; height:44px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-.cat-icon svg { width:44px; height:44px; }
+.cat-options-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.cat-opt { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:8px 4px 7px; border:1.5px solid var(--cream-border); border-radius:10px; cursor:pointer; background:var(--cream); transition:all .15s; text-align:center; }
+.cat-opt:hover { border-color:var(--blush-mid); background:var(--cream-dark); }
+.cat-opt.selected { border-color:var(--rose); background:var(--blush); }
+.cat-icon { width:32px; height:32px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.cat-icon svg { width:32px; height:32px; }
 .cat-text { flex:1; }
-.cat-name { font-size:13px; font-weight:500; color:var(--text); line-height:1.1; }
+.cat-name { font-size:11px; font-weight:500; color:var(--text); line-height:1.2; }
 body.night .cat-name { color:var(--text-mid); }
 .cat-desc { font-size:10px; color:var(--text-light); margin-top:1px; }
 .cat-check { display:none; }
+@media (max-width: 480px) {
+  .cat-options-grid { grid-template-columns:1fr; gap:4px; }
+  .cat-opt { flex-direction:row; gap:10px; padding:8px 12px; text-align:left; justify-content:flex-start; }
+  .cat-icon { width:28px; height:28px; flex-shrink:0; }
+  .cat-icon svg { width:28px; height:28px; }
+}
 
 .cat-modal-footer { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-top:1px solid var(--cream-border); }
 .btn-cancel { padding:9px 20px; border:1.5px solid var(--cream-border); border-radius:10px; background:var(--cream); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; color:var(--text-mid); transition:all .2s; }
@@ -383,8 +511,8 @@ body.night .cat-name { color:var(--text-mid); }
 .mood-dropdown-item { display:flex; align-items:center; gap:10px; padding:8px 14px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); transition:background .15s; white-space:nowrap; }
 .mood-dropdown-item:hover { background:var(--cream-dark); }
 .mood-dropdown-item .mood-check { width:14px; font-size:11px; color:var(--rose); }
-body:not(.handsome) #moodFilterBtn { background-color:var(--cream) !important; color:var(--text); }
-body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; color:var(--text); }
+body:not(.handsome) #moodFilterBtn { background-color:transparent !important; color:var(--text); }
+body:not(.handsome) #starFilterBtn { background-color:transparent !important; color:var(--text); }
 .modal-actions { display:flex; gap:8px; }
 
 .empty-state { text-align:center; padding:30px 16px; color:var(--text-light); }
@@ -497,6 +625,33 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
   /* Fix outfit info strip height */
   .outfit-info .outfit-vibe { bottom: 9px; }
 }
+
+/* Person checkboxes in Edit People */
+.person-checkbox-wrap { display:flex !important; align-items:center !important; align-self:center !important; cursor:pointer; flex-shrink:0; margin-top:0 !important; }
+.edit-person-row .person-checkbox-wrap,
+.edit-person-row label.person-checkbox-wrap { margin-top:0 !important; margin-bottom:0 !important; }
+.person-checkbox-box { width:16px; height:16px; border:1.5px solid var(--cream-border); border-radius:4px; background:var(--cream); display:flex !important; align-items:center !important; justify-content:center !important; transition:all .15s; flex-shrink:0; }
+.person-checkbox-box.checked { background:var(--rose); border-color:var(--rose); color:white; }
+.person-checkbox-check { display:none; color:white; }
+.person-checkbox-box.checked .person-checkbox-check { display:block; }
+
+/* Person modal theme preview */
+#personModal.preview-petite .person-modal { background:#FAF6F0; }
+#personModal.preview-handsome .person-modal { background:#f0ece0; }
+#personModal.preview-sandalwood .person-modal { background:#E8E0D0; }
+#personModal.preview-night .person-modal { background:#221e28; }
+#personModal.preview-petite { --cream:#FAF6F0; --cream-dark:#F2EBE0; --cream-border:#E8DDD0; --blush:#F0C4C0; --blush-mid:#E8ADAB; --rose:#C97B7A; --text:#3D2E2A; --text-mid:#7A5E58; --text-light:#B09990; }
+#personModal.preview-handsome { --cream:#f5f0e8; --cream-dark:#e8e0d0; --cream-border:#30342b; --blush:#d6cdba; --blush-mid:#c4bba8; --rose:#30342b; --text:#1a1e18; --text-mid:#3a3e30; --text-light:#6a7060; }
+#personModal.preview-sandalwood { --cream:#E8E0D0; --cream-dark:#D4CBBC; --cream-border:#9A9080; --blush:#bfb8ad; --blush-mid:#a89f93; --rose:#2b2826; --text:#160F08; --text-mid:#3A2E1C; --text-light:#6A5A40; }
+#personModal.preview-night { --cream:#2a2530; --cream-dark:#221e28; --cream-border:#3d3848; --blush:#352f40; --blush-mid:#3d3848; --rose:#c9797a; --text:#f0eaf8; --text-mid:#c0b8d0; --text-light:#907890; }
+#personModal[class*="preview-"] .person-modal input,
+#personModal[class*="preview-"] .person-modal select { background:var(--cream-dark); color:var(--text); border-color:var(--cream-border); }
+#personModal[class*="preview-"] .person-modal label { color:var(--text-mid); }
+#personModal[class*="preview-"] h2 { color:var(--text); }
+#personModal[class*="preview-"] .gender-radio label { background:var(--cream-dark); border-color:var(--cream-border); color:var(--text-mid); }
+#personModal[class*="preview-"] .gender-radio input:checked + label { background:var(--blush); border-color:var(--rose); color:var(--text); }
+#personModal[class*="preview-"] .btn-cancel { background:var(--cream-dark) !important; color:var(--text) !important; border-color:var(--cream-border) !important; }
+#personModal[class*="preview-"] .btn-confirm { background:var(--rose) !important; color:var(--cream) !important; }
 
 </style>
 </head>
@@ -615,6 +770,14 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
       <button class="ctrl-btn" id="fctrlRemove">−</button>
       <button class="ctrl-btn" id="fctrlFlip">↔</button>
       <button class="ctrl-btn rotate-handle" id="fctrlRotate" title="Drag to rotate">↻</button>
+      <button class="ctrl-btn" id="fctrlResetHandle" title="Drag to resize" style="cursor:se-resize;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
+      <button class="ctrl-btn" id="fctrlAspect" title="Lock aspect ratio" style="opacity:1;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Photos mode thumbnail overlay -->
@@ -627,11 +790,11 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
 
     <!-- Picture mode / share button -->
     <button id="shareBtn" onclick="enterPictureMode()" title="Picture mode">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <svg width="15" height="15" viewBox="1 2 22 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     </button>
 
     <div class="canvas-toolbar">
-      <button class="toolbar-btn" onclick="clearCanvas()">✕ Clear</button>
+      <button class="toolbar-btn" id="clearBtn" onclick="clearCanvas()">✕ Clear</button>
       <div class="toolbar-sep" id="fwdBackSep"></div>
       <button class="toolbar-btn" id="fwdBtn" onclick="bringForward()">↑ Forward</button>
       <button class="toolbar-btn" id="backBtn" onclick="sendBack()">↓ Back</button>
@@ -685,222 +848,40 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
       <div class="cat-preview-col">
         <img class="cat-preview-img" id="catPreviewImg" src="" alt="preview" />
         <input class="cat-preview-name" id="catPhotoUrlInput" placeholder="Photo URL…" oninput="updatePhotoPreview(this.value)" />
+        <input class="cat-preview-name" id="catProductUrlInput" placeholder="Product URL…" />
         <input class="cat-preview-name" id="catNameInput" placeholder="Item name…" />
-        <div style="font-size:10px;color:var(--text-light);text-align:center;line-height:1.5;margin-bottom:12px;">Edit photo URL or name above.</div>
-        <div style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
-          <span>Illustration</span>
-          <button onclick="addIllustrSlot()" style="background:none;border:none;cursor:pointer;color:var(--rose);font-size:16px;line-height:1;padding:0 2px;" title="Add another illustration piece">+</button>
+        <div style="flex:1;overflow-y:auto;width:100%;display:flex;flex-direction:column;gap:6px;min-height:0;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-mid);margin-bottom:2px;margin-top:40px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <span style="line-height:1;">Illustration</span>
+            <button onclick="addIllustrSlot()" style="background:none;border:none;cursor:pointer;color:var(--rose);font-size:16px;line-height:1;padding:0 2px;display:flex;align-items:center;" title="Add another illustration piece">+</button>
+          </div>
+          <div id="illustrSlots" style="display:flex;flex-direction:column;gap:6px;width:100%;"></div>
         </div>
-        <div id="illustrSlots" style="display:flex;flex-direction:column;gap:6px;width:100%;"></div>
-        <div style="font-size:10px;color:var(--text-light);text-align:center;line-height:1.5;margin-top:4px;">⌘V anywhere to paste.</div>
       </div>
 
       <!-- Picker side -->
       <div class="cat-picker-col">
         <div class="cat-picker-header">
-          <h2>What kind of item is this?</h2>
-          <p>Select the category that best describes your item</p>
+          <h2>Edit Item</h2>
+          <p>Select the clothing category</p>
         </div>
         <div class="cat-picker-body">
 
           <!-- Category list -->
-          <div class="cat-options-col">
-
-            <div class="cat-opt" data-cat="Bra" onclick="selectCategory('Bra')" onmouseenter="hoverZone('Bra')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 30" fill="none">
-                  <!-- Left strap -->
-                  <path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-                  <!-- Right strap -->
-                  <path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-                  <!-- Underwire band -->
-                  <path d="M6 18 Q22 22 38 18" stroke="#C97B7A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-                  <!-- Left cup -->
-                  <path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
-                  <!-- Right cup -->
-                  <path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
-                  <!-- Cup seam detail — left -->
-                  <path d="M10 9 Q14 14 14 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
-                  <!-- Cup seam detail — right -->
-                  <path d="M34 9 Q30 14 30 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
-                  <!-- Centre gore -->
-                  <rect x="20.5" y="13" width="3" height="5" rx="1" fill="#E8ADAB" stroke="#C97B7A" stroke-width="0.7"/>
-                  <!-- Tiny centre bow -->
-                  <path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="#C97B7A" opacity=".7"/>
-                  <!-- Side bands -->
-                  <path d="M6 18 L4 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
-                  <path d="M38 18 L40 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Bra</div><div class="cat-desc">bra, bralette, bandeau, bustier</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="Panties" onclick="selectCategory('Panties')" onmouseenter="hoverZone('Panties')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 28" fill="none">
-                  <!-- Waistband -->
-                  <line x1="6" y1="5" x2="38" y2="5" stroke="#C97B7A" stroke-width="2.2" stroke-linecap="round"/>
-                  <!-- Curved triangle -->
-                  <path d="M6 5 Q16 10 22 18 Q28 10 38 5 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3" stroke-linejoin="round"/>
-                  <!-- Waistband bow -->
-                  <path d="M20.2 4.8 Q18.6 3.2 19.8 2.4 Q21 4.2 22 4.2 Q23 4.2 24.2 2.4 Q25.4 3.2 23.8 4.8" fill="#C97B7A" opacity=".75"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Panties</div><div class="cat-desc">briefs, thong, boyshorts, g-string</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="Lingerie" onclick="selectCategory('Lingerie')" onmouseenter="hoverZone('Lingerie')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 52" fill="none">
-                  <!-- ── BRA ── -->
-                  <!-- Left strap -->
-                  <path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-                  <!-- Right strap -->
-                  <path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-                  <!-- Underwire -->
-                  <path d="M6 18 Q22 22 38 18" stroke="#C97B7A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-                  <!-- Left cup -->
-                  <path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
-                  <!-- Right cup -->
-                  <path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
-                  <!-- Cup seams -->
-                  <path d="M10 9 Q14 14 14 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
-                  <path d="M34 9 Q30 14 30 18" stroke="#C97B7A" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/>
-                  <!-- Centre gore -->
-                  <rect x="20.5" y="13" width="3" height="5" rx="1" fill="#E8ADAB" stroke="#C97B7A" stroke-width="0.7"/>
-                  <!-- Centre bow -->
-                  <path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="#C97B7A" opacity=".7"/>
-                  <!-- Side bands -->
-                  <path d="M6 18 L4 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
-                  <path d="M38 18 L40 20" stroke="#C97B7A" stroke-width="1.3" stroke-linecap="round"/>
-
-                  <!-- ── THONG (shifted down 26px) ── -->
-                  <!-- Waistband -->
-                  <line x1="6" y1="29" x2="38" y2="29" stroke="#C97B7A" stroke-width="2.2" stroke-linecap="round"/>
-                  <!-- Curved triangle -->
-                  <path d="M6 29 Q16 34 22 42 Q28 34 38 29 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3" stroke-linejoin="round"/>
-                  <!-- Waistband bow -->
-                  <path d="M20.2 28.8 Q18.6 27.2 19.8 26.4 Q21 28.2 22 28.2 Q23 28.2 24.2 26.4 Q25.4 27.2 23.8 28.8" fill="#C97B7A" opacity=".75"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Lingerie</div><div class="cat-desc">matching bra &amp; panties set</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="Costume" onclick="selectCategory('Costume')" onmouseenter="hoverZone('Costume')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 36" fill="none">
-                  <!-- Mask / masquerade shape -->
-                  <path d="M4 16 Q4 8 12 8 Q17 8 20 13 Q22 16 22 16 Q22 16 24 13 Q27 8 32 8 Q40 8 40 16 Q40 22 36 23 Q32 24 28 20 Q25 17 22 17 Q19 17 16 20 Q12 24 8 23 Q4 22 4 16 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3"/>
-                  <!-- Eye holes -->
-                  <ellipse cx="13" cy="16" rx="4" ry="3.5" fill="white" stroke="#C97B7A" stroke-width="1"/>
-                  <ellipse cx="31" cy="16" rx="4" ry="3.5" fill="white" stroke="#C97B7A" stroke-width="1"/>
-                  <!-- Ribbons -->
-                  <path d="M4 16 Q2 18 1 22" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-                  <path d="M40 16 Q42 18 43 22" stroke="#C97B7A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-                  <!-- Star detail -->
-                  <path d="M22 6 L22.6 4 L23.2 6 L25 6 L23.6 7 L24.2 9 L22 8 L19.8 9 L20.4 7 L19 6 L20.8 6 Z" fill="#C97B7A" opacity=".6"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Costume</div><div class="cat-desc">cosplay, roleplay, fantasy wear</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="DressBabydoll" onclick="selectCategory('DressBabydoll')" onmouseenter="hoverZone('DressBabydoll')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 36 32" fill="none">
-                  <path d="M13 2 L9 9 L4 30 L32 30 L27 9 L23 2Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
-                  <path d="M13 2 Q18 7 23 2" stroke="#C97B7A" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-                  <path d="M9 9 Q7 9 4 11" stroke="#C97B7A" stroke-width=".9" fill="none"/>
-                  <path d="M27 9 Q29 9 32 11" stroke="#C97B7A" stroke-width=".9" fill="none"/>
-                  <line x1="4" y1="17" x2="32" y2="17" stroke="#C97B7A" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Dress</div><div class="cat-desc">full dress, chemise, babydoll</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="Top" onclick="selectCategory('Top')" onmouseenter="hoverZone('Top')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 36 28" fill="none">
-                  <path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Top</div><div class="cat-desc">shirt, blouse, sweater, jacket, coat</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="Shorts" onclick="selectCategory('Shorts')" onmouseenter="hoverZone('Shorts')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 28" fill="none">
-                  <!-- Waistband -->
-                  <rect x="6" y="3" width="32" height="5" rx="2" fill="#E8ADAB" stroke="#C97B7A" stroke-width="1.1"/>
-                  <!-- Left leg -->
-                  <path d="M6 8 L6 22 Q6 25 10 25 L19 25 L22 14 L22 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2" stroke-linejoin="round"/>
-                  <!-- Right leg -->
-                  <path d="M38 8 L38 22 Q38 25 34 25 L25 25 L22 14 L22 8 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2" stroke-linejoin="round"/>
-                  <!-- Centre seam -->
-                  <line x1="22" y1="8" x2="22" y2="14" stroke="#C97B7A" stroke-width="0.8" opacity=".5"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Shorts</div><div class="cat-desc">shorts, hot pants, boyshorts</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="Skirt" onclick="selectCategory('Skirt')" onmouseenter="hoverZone('Skirt')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 28" fill="none">
-                  <!-- Waistband -->
-                  <rect x="10" y="3" width="24" height="4" rx="2" fill="#E8ADAB" stroke="#C97B7A" stroke-width="1.1"/>
-                  <!-- Skirt flare -->
-                  <path d="M10 7 L4 25 L40 25 L34 7 Z" fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.2" stroke-linejoin="round"/>
-                  <!-- Pleat lines -->
-                  <line x1="18" y1="7" x2="14" y2="25" stroke="#C97B7A" stroke-width="0.7" opacity=".35"/>
-                  <line x1="26" y1="7" x2="30" y2="25" stroke="#C97B7A" stroke-width="0.7" opacity=".35"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Skirt</div><div class="cat-desc">mini, midi, maxi, wrap</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-            <div class="cat-opt" data-cat="SocksStockings" onclick="selectCategory('SocksStockings')" onmouseenter="hoverZone('SocksStockings')" onmouseleave="clearHover()">
-              <div class="cat-icon">
-                <svg viewBox="0 0 44 36" fill="none">
-                  <path d="
-                    M13 2
-                    L21 2
-                    L21 22
-                    C21 26 24 28 28 28
-                    L32 28
-                    C35 28 37 27 37 30
-                    C37 33 34 34 31 34
-                    L18 34
-                    C14 34 11 31 11 27
-                    L11 6
-                    C11 4 12 2 13 2
-                    Z
-                  " fill="#F4CDCA" stroke="#C97B7A" stroke-width="1.3" stroke-linejoin="round"/>
-                  <!-- Cuff band -->
-                  <rect x="11" y="2" width="10" height="4" rx="1.5" fill="#E8ADAB" stroke="#C97B7A" stroke-width="1" opacity=".85"/>
-                  <!-- Cuff ribs -->
-                  <line x1="14.5" y1="2" x2="14.5" y2="6" stroke="#C97B7A" stroke-width="0.7" opacity=".5"/>
-                  <line x1="17.5" y1="2" x2="17.5" y2="6" stroke="#C97B7A" stroke-width="0.7" opacity=".5"/>
-                </svg>
-              </div>
-              <div class="cat-text"><div class="cat-name">Socks</div><div class="cat-desc">knee-highs, tights, thigh-highs, hosiery</div></div>
-              <div class="cat-check">✓</div>
-            </div>
-
-          </div>
+          <div class="cat-options-grid" id="catOptionsGrid"></div>
         </div>
       </div>
     </div>
 
-    <div class="cat-modal-footer" style="justify-content:center;">
-      <button class="btn-cancel" onclick="closeCatModal()">Cancel</button>
-      <button class="btn-confirm" onclick="confirmSaveCatModal()">Save</button>
+    <div class="cat-modal-footer" style="justify-content:space-between;align-items:center;">
+      <label id="intimateToggleWrap" style="display:none;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:var(--text-mid);font-family:'DM Sans',sans-serif;user-select:none;">
+        <input type="checkbox" id="intimateCheckbox" style="accent-color:var(--rose);width:14px;height:14px;cursor:pointer;" onchange="setShowIntimate(this.checked)">
+        Show intimate categories
+      </label>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn-cancel" onclick="closeCatModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmSaveCatModal()">Save</button>
+      </div>
     </div>
   </div>
 </div>
@@ -927,7 +908,7 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
       </div>
       <div class="gender-radio">
         <input type="radio" name="personGender" id="genderOther" value="other">
-        <label for="genderOther">⚧ Other</label>
+        <label for="genderOther"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px;transform:translateY(-1px)"><circle cx="12" cy="12" r="9"/></svg>Other</label>
       </div>
     </div>
     <label>Moods</label>
@@ -937,7 +918,8 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
     <select id="personThemeSelect">
       <option value="petite">Petite</option>
       <option value="handsome">Handsome</option>
-      <option value="night">Night</option>
+      <option value="sandalwood">Sandalwood</option>
+      <option value="night">Dark Cherry</option>
     </select>
     <div class="modal-actions" style="margin-top:20px;">
       <button class="btn-cancel" onclick="closePersonModal()" style="flex:1;">Cancel</button>
@@ -952,7 +934,7 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
     <h2>Edit People</h2>
     <div id="editPeopleList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;min-height:40px;"></div>
     <div class="modal-actions" style="gap:8px;">
-      <button class="btn-cancel" onclick="closeEditPeopleModal();openNewPersonModal();" style="flex:1;">+ New Person</button>
+      <button class="btn-cancel" id="editPeopleNewBtn" onclick="closeEditPeopleModal();openNewPersonModal();" style="flex:1;">+ New Person</button>
       <button class="btn-confirm" onclick="closeEditPeopleModal();" style="flex:1;">Done</button>
     </div>
   </div>
@@ -964,7 +946,7 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
     <h2>Edit Moods</h2>
     <div id="editMoodsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;min-height:40px;"></div>
     <div class="modal-actions" style="gap:8px;">
-      <button class="btn-cancel" onclick="openNewSpectrumModal();" style="flex:1;">+ New Mood Spectrum</button>
+      <button class="btn-cancel" onclick="openNewSpectrumModal();" style="flex:1;">+ New Moods</button>
       <button class="btn-confirm" onclick="closeEditMoodsModal();" style="flex:1;">Done</button>
     </div>
   </div>
@@ -1015,7 +997,8 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
           <select id="themeSelect" onchange="setTheme(this.value)" style="padding:5px 10px;border:1.5px solid var(--cream-border);border-radius:10px;background:var(--cream-dark);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);outline:none;cursor:pointer;">
             <option value="petite">Petite</option>
             <option value="handsome">Handsome</option>
-            <option value="night">Night</option>
+            <option value="sandalwood">Sandalwood</option>
+            <option value="night">Dark Cherry</option>
           </select>
         </div>
       </div>
@@ -1050,7 +1033,7 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
     <div class="mood-label" style="font-size:11px;color:var(--text-mid);margin-bottom:8px;font-family:'DM Sans',sans-serif;">Mood</div>
     <div class="vibe-picker" id="saveMoodPicker"></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeSaveModal()">Cancel</button>
+      <button class="btn-cancel" onclick="closeSaveModal()" style="flex:1;">Cancel</button>
       <button class="btn-confirm" onclick="saveOutfit()" style="flex:1;">Save</button>
     </div>
   </div>
@@ -1070,6 +1053,50 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
   </div>
 </div>
 
+<!-- Delete Closet Item Modal -->
+<div class="modal-overlay" id="deleteClosetItemModal" style="z-index:103;">
+  <div class="person-modal" style="width:300px;max-width:95vw;text-align:center;">
+    <h2 style="margin-bottom:6px;">Delete item?</h2>
+    <p style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;">This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" id="deleteClosetCancelBtn" style="flex:1;" onclick="closeDeleteClosetItemModal()">Cancel</button>
+      <button class="btn-cancel" id="deleteClosetConfirmBtn" style="flex:1;border-color:var(--rose);color:var(--rose);">Erase</button>
+    </div>
+  </div>
+</div>
+<!-- Gender Merge Warning Modal -->
+<div class="modal-overlay" id="mergeGenderWarningModal" style="z-index:104;">
+  <div class="person-modal" style="width:320px;max-width:95vw;text-align:center;">
+    <h2 style="margin-bottom:6px;">Merge people?</h2>
+    <p id="mergeGenderWarningSub" style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;">The selected people have different genders. Merge their wardrobes?</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" style="flex:1;" onclick="closeMergeGenderWarningModal()">Cancel</button>
+      <button class="btn-cancel" id="mergeGenderWarningConfirmBtn" style="flex:1;border-color:var(--rose);color:var(--rose);">Merge</button>
+    </div>
+  </div>
+</div>
+<!-- Delete Closet Item Modal -->
+<div class="modal-overlay" id="deleteClosetItemModal" style="z-index:103;">
+  <div class="person-modal" style="width:300px;max-width:95vw;text-align:center;">
+    <h2 style="margin-bottom:6px;">Delete item?</h2>
+    <p style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;">This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" id="deleteClosetCancelBtn" style="flex:1;" onclick="closeDeleteClosetItemModal()">Cancel</button>
+      <button class="btn-cancel" id="deleteClosetConfirmBtn" style="flex:1;border-color:var(--rose);color:var(--rose);">Erase</button>
+    </div>
+  </div>
+</div>
+<!-- Gender Merge Warning Modal -->
+<div class="modal-overlay" id="mergeGenderWarningModal" style="z-index:104;">
+  <div class="person-modal" style="width:320px;max-width:95vw;text-align:center;">
+    <h2 style="margin-bottom:6px;">Merge people?</h2>
+    <p id="mergeGenderWarningSub" style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;">The selected people have different genders. Merge their wardrobes?</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" style="flex:1;" onclick="closeMergeGenderWarningModal()">Cancel</button>
+      <button class="btn-cancel" id="mergeGenderWarningConfirmBtn" style="flex:1;border-color:var(--rose);color:var(--rose);">Merge</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <div class="drag-ghost" id="dragGhost" style="display:none;"><img id="dragGhostImg" style="width:80px;height:80px;object-fit:contain;" /></div>
 
@@ -1119,31 +1146,54 @@ let pendingCategory = null;
 
 // ── Category configs per gender ──
 const CAT_CONFIG_FEMALE = {
-  Bra:            { label: 'Bra' },
-  Panties:        { label: 'Panties' },
-  Lingerie:       { label: 'Lingerie' },
-  Costume:        { label: 'Costume' },
-  DressBabydoll:  { label: 'Dress' },
+  Bra:            { label: 'Bra',       intimate: true },
+  Panties:        { label: 'Panties',   intimate: true },
+  Lingerie:       { label: 'Lingerie',  intimate: true },
+  Babydoll:       { label: 'Babydoll',  intimate: true },
+  Dress:          { label: 'Dress' },
   Top:            { label: 'Top' },
   Sweater:        { label: 'Sweater' },
-  Sweatshirt:     { label: 'Sweatshirt' },
-  Jacket:         { label: 'Jacket' },
-  Shorts:         { label: 'Shorts' },
   Skirt:          { label: 'Skirt' },
+  Shorts:         { label: 'Shorts' },
+  Jeans:          { label: 'Jeans' },
+  Pants:          { label: 'Pants' },
   SocksStockings: { label: 'Socks' },
   Shoes:          { label: 'Shoes' },
   Accessory:      { label: 'Accessory' },
+  Jacket:         { label: 'Jacket' },
 };
 const CAT_CONFIG_MALE = {
   TShirt:         { label: 'T-Shirt' },
   ButtonShirt:    { label: 'Button Shirt' },
   Sweater:        { label: 'Sweater' },
   Sweatshirt:     { label: 'Sweatshirt' },
-  Jacket:         { label: 'Jacket' },
-  Pants:          { label: 'Pants' },
   Shorts:         { label: 'Shorts' },
+  Jeans:          { label: 'Jeans' },
+  Pants:          { label: 'Pants' },
   Shoes:          { label: 'Shoes' },
   Accessory:      { label: 'Accessory' },
+  Jacket:         { label: 'Jacket' },
+};
+const CAT_CONFIG_OTHER = {
+  Dress:          { label: 'Dress' },
+  Top:            { label: 'Top' },
+  TShirt:         { label: 'T-Shirt' },
+  ButtonShirt:    { label: 'Button Shirt' },
+  Sweater:        { label: 'Sweater' },
+  Sweatshirt:     { label: 'Sweatshirt' },
+  Shorts:         { label: 'Shorts' },
+  Skirt:          { label: 'Skirt' },
+  Jeans:          { label: 'Jeans' },
+  Pants:          { label: 'Pants' },
+  SocksStockings: { label: 'Socks' },
+  Shoes:          { label: 'Shoes' },
+  Accessory:      { label: 'Accessory' },
+  Lingerie:       { label: 'Lingerie',  intimate: true },
+  Costume:        { label: 'Costume',   intimate: true },
+  Babydoll:       { label: 'Babydoll',  intimate: true },
+  Bra:            { label: 'Bra',       intimate: true },
+  Panties:        { label: 'Panties',   intimate: true },
+  Jacket:         { label: 'Jacket' },
 };
 
 function getActivePerson_local() {
@@ -1159,9 +1209,36 @@ function isMalePerson() { return currentGender() === 'male'; }
 let CAT_CONFIG = CAT_CONFIG_FEMALE;
 let CAT_ORDER = Object.keys(CAT_CONFIG_FEMALE);
 
+let showIntimate = false;
+
 function refreshCatConfig() {
-  CAT_CONFIG = isMalePerson() ? CAT_CONFIG_MALE : CAT_CONFIG_FEMALE;
+  const g = currentGender();
+  CAT_CONFIG = g === 'male' ? CAT_CONFIG_MALE : g === 'other' ? CAT_CONFIG_OTHER : CAT_CONFIG_FEMALE;
   CAT_ORDER = Object.keys(CAT_CONFIG);
+}
+
+function getIntimateCategories() {
+  return Object.entries(CAT_CONFIG).filter(([k,v]) => v.intimate).map(([k]) => k);
+}
+
+function showIntimateToggle() {
+  const wrap = document.getElementById('intimateToggleWrap');
+  const cb = document.getElementById('intimateCheckbox');
+  if (!wrap || !cb) return;
+  const g = currentGender();
+  const show = g === 'female' || g === 'other';
+  wrap.style.display = show ? 'flex' : 'none';
+  cb.checked = showIntimate;
+}
+
+function setShowIntimate(val) {
+  showIntimate = !!val;
+  const ap = getActivePerson();
+  if (ap) { ap.showIntimate = showIntimate; savePeopleData(); }
+  renderCatGrid();
+  // update checkbox if visible
+  const cb = document.getElementById('intimateCheckbox');
+  if (cb) cb.checked = showIntimate;
 }
 
 // ── Add modal ──
@@ -1187,9 +1264,10 @@ function openAddModal() {
     recategorizeId = null;
     document.getElementById('catPreviewImg').src = text;
     document.getElementById('catPhotoUrlInput').value = text;
+    document.getElementById('catProductUrlInput').value = '';
     document.getElementById('catNameInput').value = '';
     setIllustrSlots([]);
-    document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+    refreshCatConfig(); renderCatGrid(); showIntimateToggle(); document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
     document.getElementById('catModal').classList.add('open');
   };
   document.addEventListener('paste', pasteHandler);
@@ -1210,6 +1288,44 @@ function clearHover() {}
 
 let recategorizeId = null; // id of item being recategorized, or null for new
 
+const CAT_ICONS = {
+  Bra: `<svg viewBox="0 0 44 30" fill="none"><path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M6 18 Q22 22 38 18" stroke="var(--ci-stroke)" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M10 9 Q14 14 14 18" stroke="var(--ci-stroke)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/><path d="M34 9 Q30 14 30 18" stroke="var(--ci-stroke)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/><rect x="20.5" y="13" width="3" height="5" rx="1" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="0.7"/><path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="var(--ci-stroke)" opacity=".7"/><path d="M6 18 L4 20" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linecap="round"/><path d="M38 18 L40 20" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  Panties: `<svg viewBox="0 0 44 28" fill="none"><line x1="6" y1="5" x2="38" y2="5" stroke="var(--ci-stroke)" stroke-width="2.2" stroke-linecap="round"/><path d="M6 5 Q16 10 22 18 Q28 10 38 5 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linejoin="round"/><path d="M20.2 4.8 Q18.6 3.2 19.8 2.4 Q21 4.2 22 4.2 Q23 4.2 24.2 2.4 Q25.4 3.2 23.8 4.8" fill="var(--ci-stroke)" opacity=".75"/></svg>`,
+  Lingerie: `<svg viewBox="0 0 44 52" fill="none"><path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M6 18 Q22 22 38 18" stroke="var(--ci-stroke)" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M10 9 Q14 14 14 18" stroke="var(--ci-stroke)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/><path d="M34 9 Q30 14 30 18" stroke="var(--ci-stroke)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/><rect x="20.5" y="13" width="3" height="5" rx="1" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="0.7"/><path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="var(--ci-stroke)" opacity=".7"/><path d="M6 18 L4 20" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linecap="round"/><path d="M38 18 L40 20" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="29" x2="38" y2="29" stroke="var(--ci-stroke)" stroke-width="2.2" stroke-linecap="round"/><path d="M6 29 Q16 34 22 42 Q28 34 38 29 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linejoin="round"/><path d="M20.2 28.8 Q18.6 27.2 19.8 26.4 Q21 28.2 22 28.2 Q23 28.2 24.2 26.4 Q25.4 27.2 23.8 28.8" fill="var(--ci-stroke)" opacity=".75"/></svg>`,
+  Costume: `<svg viewBox="0 0 44 36" fill="none"><path d="M4 16 Q4 8 12 8 Q17 8 20 13 Q22 16 22 16 Q22 16 24 13 Q27 8 32 8 Q40 8 40 16 Q40 22 36 23 Q32 24 28 20 Q25 17 22 17 Q19 17 16 20 Q12 24 8 23 Q4 22 4 16 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3"/><ellipse cx="13" cy="16" rx="4" ry="3.5" fill="var(--ci-eye)" stroke="var(--ci-stroke)" stroke-width="1"/><ellipse cx="31" cy="16" rx="4" ry="3.5" fill="var(--ci-eye)" stroke="var(--ci-stroke)" stroke-width="1"/><path d="M4 16 Q2 18 1 22" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M40 16 Q42 18 43 22" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M22 6 L22.6 4 L23.2 6 L25 6 L23.6 7 L24.2 9 L22 8 L19.8 9 L20.4 7 L19 6 L20.8 6 Z" fill="var(--ci-stroke)" opacity=".6"/></svg>`,
+  Dress: `<svg viewBox="0 0 36 34" fill="none"><path d="M15 5 Q18 9 21 5 L24 11 L28 33 L8 33 L12 11 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M15 5 Q16.5 2 18 1 Q19.5 2 21 5" stroke="var(--ci-stroke)" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M12 11 Q10 11 8 13" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><path d="M24 11 Q26 11 28 13" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><line x1="8" y1="19" x2="28" y2="19" stroke="var(--ci-stroke)" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/></svg>`,
+  Babydoll: `<svg viewBox="0 0 36 32" fill="none"><path d="M13 2 L9 9 L4 30 L32 30 L27 9 L23 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M13 2 Q18 7 23 2" stroke="var(--ci-stroke)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M9 9 Q7 9 4 11" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><path d="M27 9 Q29 9 32 11" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><line x1="4" y1="17" x2="32" y2="17" stroke="var(--ci-stroke)" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/></svg>`,
+  Top: `<svg viewBox="0 0 36 28" fill="none"><path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/></svg>`,
+  TShirt: `<svg viewBox="0 0 36 28" fill="none"><path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/></svg>`,
+  ButtonShirt: `<svg viewBox="0 0 36 38" fill="none"><path d="M11 2 L3 10 L3 28 L9 28 L9 34 L9 28 L9 11 L27 11 L27 28 L27 34 L27 28 L33 28 L33 10 L25 2 Q22 6 18 6 Q14 6 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="11" width="18" height="25" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><line x1="18" y1="6" x2="18" y2="36" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><circle cx="18" cy="14" r="1" fill="var(--ci-stroke)" opacity=".6"/><circle cx="18" cy="20" r="1" fill="var(--ci-stroke)" opacity=".6"/><circle cx="18" cy="26" r="1" fill="var(--ci-stroke)" opacity=".6"/></svg>`,
+  Sweater: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q21 6 18 6 Q15 6 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="10" width="18" height="28" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><path d="M9 19 Q18 23 27 19" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".45" fill="none"/><path d="M9 26 Q18 30 27 26" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".45" fill="none"/></svg>`,
+  Sweatshirt: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="10" width="18" height="25" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><rect x="9" y="35" width="18" height="3" rx="1.5" fill="var(--ci-mid)" opacity=".6"/></svg>`,
+  Jacket: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q22 7 18 7 Q14 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="10" width="18" height="28" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><path d="M14 2 Q16 5 18 7 Q20 5 22 2" stroke="var(--ci-stroke)" stroke-width="0.9" fill="none"/><path d="M18 7 L18 38" stroke="var(--ci-stroke)" stroke-width="1" opacity=".4"/></svg>`,
+  Pants: `<svg viewBox="0 0 44 42" fill="none"><rect x="6" y="3" width="32" height="5" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M6 8 L6 38 Q6 40 9 40 L18 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M38 8 L38 38 Q38 40 35 40 L26 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/></svg>`,
+  Jeans: `<svg viewBox="0 0 44 42" fill="none"><rect x="6" y="3" width="32" height="5" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M6 8 L6 38 Q6 40 9 40 L18 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M38 8 L38 38 Q38 40 35 40 L26 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M13 8 L13 18" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><path d="M31 8 L31 18" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><path d="M9 8 Q11 6 14 7 Q16 8 14 10 Q11 11 9 8Z" fill="var(--ci-mid)" opacity=".7"/></svg>`,
+  Shorts: `<svg viewBox="0 0 44 28" fill="none"><rect x="6" y="3" width="32" height="5" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M6 8 L6 22 Q6 25 10 25 L19 25 L22 14 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M38 8 L38 22 Q38 25 34 25 L25 25 L22 14 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><line x1="22" y1="8" x2="22" y2="14" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/></svg>`,
+  Skirt: `<svg viewBox="0 0 44 28" fill="none"><rect x="10" y="3" width="24" height="4" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M10 7 L4 25 L40 25 L34 7 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><line x1="18" y1="7" x2="14" y2="25" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".35"/><line x1="26" y1="7" x2="30" y2="25" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".35"/></svg>`,
+  SocksStockings: `<svg viewBox="0 0 44 36" fill="none"><path d="M13 2 L21 2 L21 22 C21 26 24 28 28 28 L32 28 C35 28 37 27 37 30 C37 33 34 34 31 34 L18 34 C14 34 11 31 11 27 L11 6 C11 4 12 2 13 2 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linejoin="round"/><rect x="11" y="2" width="10" height="4" rx="1.5" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1" opacity=".85"/><line x1="14.5" y1="2" x2="14.5" y2="6" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".5"/><line x1="17.5" y1="2" x2="17.5" y2="6" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".5"/></svg>`,
+  Shoes: `<svg viewBox="0 0 44 30" fill="none"><path d="M7 22 L7 13 Q7 9 12 8 L21 7 Q27 7 32 10 L39 15 L40 19 Q41 23 37 24 L9 24 Q5 24 7 22 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M7 15 L7 22" stroke="var(--ci-stroke)" stroke-width="1.8" stroke-linecap="round"/><path d="M21 7 Q23 4 26 4 Q29 4 30 7" stroke="var(--ci-stroke)" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M23 5 Q21 3 19 4 Q20 6 23 5Z" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="0.6"/><path d="M27 5 Q29 3 31 4 Q30 6 27 5Z" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="0.6"/><circle cx="25" cy="5.5" r="1" fill="var(--ci-stroke)" opacity=".7"/></svg>`,
+  Accessory: `<svg viewBox="0 0 44 36" fill="none"><rect x="13" y="10" width="18" height="16" rx="3" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3"/><rect x="16" y="13" width="12" height="10" rx="2" fill="var(--ci-eye)" stroke="var(--ci-stroke)" stroke-width="0.8"/><path d="M13 14 L7 14 L7 22 L13 22" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M31 14 L37 14 L37 22 L31 22" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="22" y1="13" x2="22" y2="18" stroke="var(--ci-stroke)" stroke-width="1" stroke-linecap="round" opacity=".7"/><line x1="22" y1="18" x2="25" y2="18" stroke="var(--ci-stroke)" stroke-width="1" stroke-linecap="round" opacity=".7"/></svg>`,
+};
+
+function renderCatGrid() {
+  const grid = document.getElementById('catOptionsGrid');
+  if (!grid) return;
+  const config = CAT_CONFIG;
+  const selected = grid.querySelector('.cat-opt.selected')?.dataset?.cat;
+  const entries = Object.entries(config).filter(([k, v]) => !v.intimate || showIntimate);
+  grid.innerHTML = entries.map(([key, val]) => {
+    const isSel = key === (selected || pendingCategory);
+    const iconSvg = CAT_ICONS[key] || '';
+    return `<div class="cat-opt${isSel ? ' selected' : ''}" data-cat="${key}" onclick="selectCategory('${key}')" onmouseenter="hoverZone('${key}')" onmouseleave="clearHover()">
+      ${iconSvg ? `<div class="cat-icon">${iconSvg}</div>` : ''}
+      <div class="cat-text"><div class="cat-name">${val.label}</div></div>
+    </div>`;
+  }).join('');
+}
+
 function selectCategory(cat) {
   pendingCategory = cat;
   document.querySelectorAll('.cat-opt').forEach(el => el.classList.remove('selected'));
@@ -1222,7 +1338,11 @@ function selectCategory(cat) {
     if (isBarePrefix) illustSlots[i].src = prefix;
   });
   renderIllustrSlots();
-  confirmAddItem();
+  // Update the photo URL placeholder to reflect selected category
+  const urlInput = document.getElementById('catPhotoUrlInput');
+  if (urlInput && !urlInput.value.trim()) {
+    urlInput.placeholder = prefix + '…';
+  }
 }
 
 function closeCatModal() {
@@ -1239,6 +1359,7 @@ function confirmAddItem() {
       item.category = pendingCategory; item.name = name;
       const photoSrc = document.getElementById('catPhotoUrlInput').value.trim();
       if (photoSrc) item.src = photoSrc;
+      item.productUrl = document.getElementById('catProductUrlInput').value.trim();
       const illSrcs = getIllustrSrcs();
       item.illustrationSrcs = illSrcs;
       item.illustrationSrc = illSrcs[0] || '';
@@ -1263,7 +1384,8 @@ function confirmAddItem() {
   } else {
     const illustrationSrcs = getIllustrSrcs();
     const photoSrc = document.getElementById('catPhotoUrlInput').value.trim() || pendingItem.src;
-    const newItem = { id: Date.now() + Math.random(), src: photoSrc, illustrationSrcs, illustrationSrc: illustrationSrcs[0] || '', name, category: pendingCategory };
+    const productUrl = document.getElementById('catProductUrlInput').value.trim();
+    const newItem = { id: Date.now() + Math.random(), src: photoSrc, illustrationSrcs, illustrationSrc: illustrationSrcs[0] || '', name, category: pendingCategory, productUrl };
     closetItems.push(newItem);
     renderCloset();
     // Log entry in add modal
@@ -1308,6 +1430,9 @@ function renderIllustrSlots() {
         ${illustSlots.length > 1 ? `<button class="illust-slot-remove" onclick="removeIllustrSlot(${i})">−</button>` : ''}
       </div>`;
     container.appendChild(div);
+    div.querySelector('.illust-slot-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); confirmAddItem(); }
+    });
   });
 }
 
@@ -1424,14 +1549,8 @@ function makeClosetEl(item, outfitSrcs) {
   }
   el.innerHTML = `${imgHtml}<div class="item-name">${item.name}</div>${checkBadge}${starBadge}<button class="remove-btn" onclick="removeClosetItem('${item.id}',event)">−</button>`;
   el.addEventListener('dragstart', e => startClosetDrag(e, item));
-  el.addEventListener('dblclick', () => addToCanvasCenter(item));
-  // iOS single-tap fix: use touchend to bypass hover-then-click delay
-  el.addEventListener('touchend', e => {
-    if (e.cancelable) e.preventDefault();
-    el.classList.add('touch-active');
-    setTimeout(() => el.classList.remove('touch-active'), 400);
-    if (!editMode) addToCanvasCenter(item);
-  }, { passive: false });
+  // Click handling: in edit mode single=add, double=category picker; outside edit mode single=add
+  let clickTimer = null;
   el.addEventListener('click', e => {
     if (e.altKey) {
       e.preventDefault();
@@ -1440,6 +1559,7 @@ function makeClosetEl(item, outfitSrcs) {
       pendingCategory = item.category;
       document.getElementById('catPreviewImg').src = item.src;
       document.getElementById('catPhotoUrlInput').value = item.src;
+      document.getElementById('catProductUrlInput').value = item.productUrl || '';
       document.getElementById('catNameInput').value = item.name;
       setIllustrSlots(item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []));
       if (!item.illustrationSrcs?.length && !item.illustrationSrc) {
@@ -1447,16 +1567,50 @@ function makeClosetEl(item, outfitSrcs) {
         illustSlots.forEach((slot, i) => { if (!slot.src) illustSlots[i].src = prefix; });
         renderIllustrSlots();
       }
-      document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+      refreshCatConfig(); renderCatGrid(); showIntimateToggle(); document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
       document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
       document.getElementById('catModal').classList.add('open');
-    } else if (e.metaKey || e.ctrlKey) {
-      e.preventDefault();
-      openRatingModal(item);
-    } else if (!editMode) {
-      addToCanvasCenter(item);
+      return;
+    }
+    if (e.metaKey || e.ctrlKey) { e.preventDefault(); openRatingModal(item); return; }
+    if (clickTimer) {
+      // Double click → open category picker (any mode)
+      clearTimeout(clickTimer); clickTimer = null;
+      recategorizeId = item.id;
+      pendingItem = { src: item.src, name: item.name };
+      pendingCategory = item.category;
+      document.getElementById('catPreviewImg').src = item.src;
+      document.getElementById('catPhotoUrlInput').value = item.src;
+      document.getElementById('catProductUrlInput').value = item.productUrl || '';
+      document.getElementById('catNameInput').value = item.name;
+      setIllustrSlots(item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []));
+      if (!item.illustrationSrcs?.length && !item.illustrationSrc) {
+        const prefix = catPrefix(item.category);
+        illustSlots.forEach((slot, i) => { if (!slot.src) illustSlots[i].src = prefix; });
+        renderIllustrSlots();
+      }
+      refreshCatConfig(); renderCatGrid(); showIntimateToggle(); document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+      document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
+      document.getElementById('catModal').classList.add('open');
+    } else {
+      // Single click → in photos mode with productUrl: open product page; else add to canvas
+      clickTimer = setTimeout(() => {
+        clickTimer = null;
+        if (viewMode === 'photos' && item.productUrl) {
+          window.open(item.productUrl, '_blank');
+        } else {
+          addToCanvasCenter(item);
+        }
+      }, 220);
     }
   });
+  // iOS single-tap fix: use touchend to bypass hover-then-click delay
+  el.addEventListener('touchend', e => {
+    if (e.cancelable) e.preventDefault();
+    el.classList.add('touch-active');
+    setTimeout(() => el.classList.remove('touch-active'), 400);
+    if (!editMode) addToCanvasCenter(item);
+  }, { passive: false });
   return el;
 }
 
@@ -1566,11 +1720,27 @@ function renderCloset() {
   document.getElementById('closetSubtitle').textContent = `${n} item${n === 1 ? '' : 's'}`;
 }
 
+let pendingDeleteClosetItemId = null;
 function removeClosetItem(id, e) {
   e.stopPropagation();
-  closetItems = closetItems.filter(i => String(i.id) !== String(id));
+  pendingDeleteClosetItemId = String(id);
+  document.getElementById('deleteClosetItemModal').classList.add('open');
+  document.getElementById('deleteClosetConfirmBtn').onclick = confirmDeleteClosetItem;
+}
+function closeDeleteClosetItemModal() {
+  document.getElementById('deleteClosetItemModal').classList.remove('open');
+  pendingDeleteClosetItemId = null;
+}
+function confirmDeleteClosetItem() {
+  if (!pendingDeleteClosetItemId) return;
+  closetItems = closetItems.filter(i => String(i.id) !== pendingDeleteClosetItemId);
+  closeDeleteClosetItemModal();
   renderCloset();
 }
+document.addEventListener('DOMContentLoaded', () => {
+  const dcim = document.getElementById('deleteClosetItemModal');
+  if (dcim) dcim.addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteClosetItemModal(); });
+});
 
 // ── Drag ──
 let closetDragItem = null;
@@ -1613,6 +1783,8 @@ function addToCanvas(item, x, y, forceSize) {
       ? ci => ci.category === 'Skirt' || ci.category === 'Shorts'
       : LINGERIE_COSTUME_SWAP.has(item.category)
       ? ci => LINGERIE_COSTUME_SWAP.has(ci.category)
+      : (item.category === 'Jeans' || item.category === 'Pants')
+      ? ci => ci.category === 'Jeans' || ci.category === 'Pants'
       : ci => ci.category === item.category;
     const toRemove = canvasItems.filter(swapGroup);
     toRemove.forEach(ci => document.getElementById(ci.id)?.remove());
@@ -1705,9 +1877,13 @@ function renderCanvasItem(ci) {
   el.className = 'canvas-item'; el.id = ci.id; el.draggable = false;
   el.style.cssText = `left:${ci.x}px;top:${ci.y}px;width:${ci.w}px;height:${ci.h}px;transform:rotate(${ci.rot||0}deg);z-index:${ci.z};cursor:${editMode?'grab':'default'};`;
   const flipTransform = ci.flipped ? 'scaleX(-1)' : '';
-  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform}"/><div class="resize-handle"></div>`;
+  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform}"/><div class="resize-grabber" data-id="${ci.id}" title="Drag to resize"></div>`;
   el.addEventListener('mousedown', e => {
-    if (e.target.classList.contains('resize-handle')) { if (editMode) startResize(e, ci.id); return; }
+    if (e.target.classList.contains('resize-grabber')) {
+      selectItem(ci.id);
+      if (editMode) startResize(e, ci.id);
+      return;
+    }
     if (e.target.classList.contains('rotate-handle')) { if (editMode) startRotate(e, ci.id); return; }
     if (e.target.tagName === 'BUTTON') return;
     selectItem(ci.id);
@@ -1718,6 +1894,17 @@ function renderCanvasItem(ci) {
     if (editMode) openCtxMenu(e.clientX, e.clientY, ci.id);
   });
   stage.appendChild(el);
+}
+
+function positionFloatingControls(fc, ci) {
+  const canvas = document.getElementById('canvas');
+  const stage = document.getElementById('stage');
+  const canvasRect = canvas.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+  const stageLeft = stageRect.left - canvasRect.left;
+  const stageTop  = stageRect.top  - canvasRect.top;
+  fc.style.left = (stageLeft + ci.x + ci.w / 2) + 'px';
+  fc.style.top  = (stageTop  + ci.y - 34) + 'px';
 }
 
 function selectItem(id) {
@@ -1734,14 +1921,40 @@ function selectItem(id) {
       el.classList.add('selected');
       const ci = canvasItems.find(c => c.id === id);
       if (ci) {
-        const cx = ci.x + ci.w / 2;
-        const ty = ci.y - 34;
-        fc.style.left = cx + 'px';
-        fc.style.top = ty + 'px';
+        positionFloatingControls(fc, ci);
         fc.style.display = 'flex';
         document.getElementById('fctrlRemove').onclick = () => removeCanvasItem(id);
         document.getElementById('fctrlFlip').onclick = () => flipItem(id);
         document.getElementById('fctrlRotate').dataset.id = id;
+        // Aspect ratio lock button
+        const aspectBtn = document.getElementById('fctrlAspect');
+        const ciRef = canvasItems.find(c => c.id === id);
+        if (ciRef && !ciRef.hasOwnProperty('lockAspect')) ciRef.lockAspect = true;
+        aspectBtn.style.opacity = (ciRef && ciRef.lockAspect !== false) ? '1' : '0.3';
+        aspectBtn.onclick = (e) => {
+          const ci2 = canvasItems.find(c => c.id === id);
+          if (!ci2) return;
+          if (e.altKey) {
+            const imgEl = document.getElementById(ci2.id)?.querySelector('img');
+            if (imgEl && imgEl.naturalWidth && imgEl.naturalHeight) {
+              const naturalRatio = imgEl.naturalWidth / imgEl.naturalHeight;
+              ci2.aspectRatio = naturalRatio;
+              // Keep width, adjust height to match natural ratio immediately
+              ci2.h = Math.round(ci2.w / naturalRatio);
+              const domEl = document.getElementById(ci2.id);
+              if (domEl) { domEl.style.width = ci2.w + 'px'; domEl.style.height = ci2.h + 'px'; }
+              const fc = document.getElementById('floatingControls');
+              if (fc && fc.style.display !== 'none') positionFloatingControls(fc, ci2);
+            }
+            return;
+          }
+          ci2.lockAspect = !ci2.lockAspect;
+          aspectBtn.style.opacity = ci2.lockAspect ? '1' : '0.3';
+        };
+        // Resize button in toolbar — drag to resize, same as grabber
+        document.getElementById('fctrlResetHandle').onmousedown = (e) => {
+          if (editMode) startResize(e, id);
+        };
       }
     }
   } else {
@@ -1760,6 +1973,7 @@ function removeCanvasItem(id) {
 function clearCanvas() {
   canvasItems = []; document.querySelectorAll('.canvas-item').forEach(el => el.remove());
   selectedId = null; activeOutfitId = null; updateDropHint();
+  selectItem(null);
   resetLayerSlider();
   renderPhotosOverlay();
 }
@@ -1845,18 +2059,30 @@ function startCanvasDrag(e, id) {
   if (img) img.style.filter = 'none';
   const rect = document.getElementById('stage').getBoundingClientRect();
   const offX = e.clientX - ci.x - rect.left, offY = e.clientY - ci.y - rect.top;
+  const moveAll = e.altKey;
+  // For group-move: capture initial positions of all other items
+  const others = moveAll ? canvasItems.filter(i => i.id !== id).map(i => ({
+    ci: i, el: document.getElementById(i.id), startX: i.x, startY: i.y
+  })) : [];
+  let lastX = e.clientX, lastY = e.clientY;
   const onMove = me => {
     const r = document.getElementById('stage').getBoundingClientRect();
-    ci.x = me.clientX - r.left - offX;
-    ci.y = me.clientY - r.top - offY;
+    const newX = me.clientX - r.left - offX;
+    const newY = me.clientY - r.top - offY;
+    const dx = newX - ci.x, dy = newY - ci.y;
+    ci.x = newX; ci.y = newY;
     el.style.left = ci.x+'px'; el.style.top = ci.y+'px';
+    if (moveAll) {
+      others.forEach(o => {
+        o.ci.x += dx; o.ci.y += dy;
+        o.el.style.left = o.ci.x+'px'; o.el.style.top = o.ci.y+'px';
+      });
+    }
     const fc = document.getElementById('floatingControls');
-    if (fc && fc.style.display !== 'none') { fc.style.left = (ci.x + ci.w/2)+'px'; fc.style.top = (ci.y - 34)+'px'; }
+    if (fc && fc.style.display !== 'none') positionFloatingControls(fc, ci);
   };
   const onUp = () => {
-    if (img) img.style.filter = el.classList.contains('selected')
-      ? 'drop-shadow(0 4px 16px rgba(201,123,122,.35))'
-      : '';
+    if (img) img.style.filter = '';
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mouseup', onUp);
   };
@@ -1868,15 +2094,29 @@ function startResize(e, id) {
   e.preventDefault(); e.stopPropagation();
   const ci = canvasItems.find(i => i.id === id);
   if (!ci) return;
+  if (!ci.hasOwnProperty('lockAspect')) ci.lockAspect = true;
+  const el = document.getElementById(id);
   const sx = e.clientX, sy = e.clientY, sw = ci.w, sh = ci.h;
+  if (!ci.aspectRatio) ci.aspectRatio = sw / sh;
   const onMove = me => {
-    ci.w = Math.max(40, sw + me.clientX - sx); ci.h = Math.max(40, sh + me.clientY - sy);
-    const el = document.getElementById(id); el.style.width = ci.w+'px'; el.style.height = ci.h+'px';
+    const dx = me.clientX - sx;
+    const dy = me.clientY - sy;
+    if (ci.lockAspect === true) {
+      const delta = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
+      ci.w = Math.max(1, sw + delta);
+      ci.h = Math.max(1, ci.w / ci.aspectRatio);
+    } else {
+      ci.w = Math.max(1, sw + dx);
+      ci.h = Math.max(1, sh + dy);
+      ci.aspectRatio = ci.w / ci.h;
+    }
+    el.style.width = ci.w + 'px'; el.style.height = ci.h + 'px';
     const fc = document.getElementById('floatingControls');
-    if (fc && fc.style.display !== 'none') { fc.style.left = (ci.x + ci.w/2)+'px'; fc.style.top = (ci.y - 34)+'px'; }
+    if (fc && fc.style.display !== 'none') positionFloatingControls(fc, ci);
   };
   const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
-  document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
 }
 
 let viewMode = 'illustrations'; // 'photos' | 'illustrations'
@@ -1890,14 +2130,17 @@ function setEditMode(on) {
     el.style.cursor = editMode ? 'grab' : 'default';
   });
   if (!editMode) selectItem(null);
+  const ap = getActivePerson();
+  if (ap) { ap.editMode = editMode; savePeopleData(); }
 }
 
 let currentTheme = 'petite';
 function setTheme(t) {
   currentTheme = t;
-  document.body.classList.remove('night', 'handsome');
+  document.body.classList.remove('night', 'handsome', 'sandalwood');
   if (t === 'night') document.body.classList.add('night');
   if (t === 'handsome') document.body.classList.add('handsome');
+  if (t === 'sandalwood') document.body.classList.add('sandalwood');
   // Update diamond symbols
   updateThemeDiamonds();
   // Update settings dropdown to match
@@ -1909,7 +2152,7 @@ function setTheme(t) {
   if (ap) { ap.theme = t; localStorage.setItem('wardrobe-people', JSON.stringify(people)); }
 }
 function updateThemeDiamonds() {
-  const isHandsome = document.body.classList.contains('handsome');
+  const isHandsome = document.body.classList.contains('handsome') || document.body.classList.contains('sandalwood');
   document.querySelectorAll('.theme-diamond').forEach(el => el.style.display = isHandsome ? 'none' : '');
   document.querySelectorAll('.theme-diamond-h').forEach(el => el.style.display = isHandsome ? '' : 'none');
 }
@@ -2001,9 +2244,9 @@ function renderPhotosOverlay() {
       const doHighlight = () => {
         if (closetEl) {
           closetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          const isHandsome = document.body.classList.contains('handsome');
+          const isHandsome = document.body.classList.contains('handsome') || document.body.classList.contains('sandalwood');
           if (isHandsome) {
-            closetEl.style.boxShadow = '0 0 0 3px #c3bba7';
+            closetEl.style.boxShadow = '0 0 0 3px #d1ac98';
             closetEl.style.borderRadius = '10px';
             setTimeout(() => { closetEl.style.boxShadow = ''; }, 1500);
           } else {
@@ -2038,7 +2281,8 @@ function renderPhotosOverlay() {
     line.setAttribute('x2', center.x);
     line.setAttribute('y2', center.y);
     const isNight = document.body.classList.contains('night');
-    const lineColor = isNight ? 'var(--rose)' : '#30342b';
+    const isSandalwood = document.body.classList.contains('sandalwood');
+    const lineColor = isNight ? 'var(--rose)' : (isSandalwood ? '#2b2826' : '#30342b');
     line.setAttribute('stroke', lineColor);
     line.setAttribute('stroke-width', '3');
     line.setAttribute('opacity', '0.6');
@@ -2153,7 +2397,9 @@ function openSaveModal() {
       outfit.items = JSON.parse(JSON.stringify(canvasItems));
       outfit.timestamp = new Date().toLocaleDateString();
       localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+      refreshCatConfig();
       renderOutfits();
+      selectItem(null);
       showToast(`Updated ${outfit.vibe}`);
     }
     return;
@@ -2208,6 +2454,7 @@ function saveOutfit() {
   renderOutfits(); closeSaveModal();
   document.getElementById('outfitNameInput').value = '';
   clearCanvas();
+  refreshCatConfig();
   renderCloset();
   showToast(`"${name}" saved ${selectedVibe}`);
   // Open outfits panel to reveal the saved outfit
@@ -2228,6 +2475,7 @@ function renderOutfits() {
     const card = document.createElement('div');
     const faded = vibeFilter && outfit.vibe !== vibeFilter ? ' vibe-faded' : '';
     card.className = 'outfit-card' + faded;
+    if (vibeFilter && outfit.vibe !== vibeFilter) { card.style.display = 'none'; } else { card.style.display = ''; }
     card.dataset.src = outfit.items.map(i => i.src).join('||');
     const seenSrcs = new Set();
     const dedupedItems = outfit.items.filter(i => {
@@ -2268,7 +2516,13 @@ function loadOutfit(id, e) {
   if (!outfit) return;
   clearCanvas();
   activeOutfitId = id;
-  outfit.items.forEach(ci => { canvasItems.push({...ci}); renderCanvasItem({...ci}); });
+  outfit.items.forEach(ci => {
+    const copy = {...ci};
+    // Ensure z is above current max to preserve relative order
+    copy.z = ++zCounter;
+    canvasItems.push(copy);
+    renderCanvasItem(copy);
+  });
   updateDropHint();
   if (editMode) setHair('down');
   pinLingerieToBack();
@@ -2401,10 +2655,12 @@ document.getElementById('canvas').addEventListener('touchend', e => {
   const t = e.target;
   const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest('.canvas-drop-hint');
   if (!editMode && !document.body.classList.contains('picture-mode') && isBackground) {
+    // Prevent the touchend from immediately re-triggering via a subsequent click event
+    e.preventDefault();
     if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
     else cyclePanels();
   }
-}, { passive: true });
+}, { passive: false });
 
 document.getElementById('outfitNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveOutfit(); });
 document.getElementById('catNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddItem(); });
@@ -2464,6 +2720,8 @@ function savePeopleData() {
   if (ap) {
     ap.closet = JSON.parse(JSON.stringify(closetItems));
     ap.outfits = JSON.parse(JSON.stringify(savedOutfits));
+    ap.editMode = editMode;
+    ap.showIntimate = showIntimate;
   }
   localStorage.setItem('wardrobe-people', JSON.stringify(people));
   localStorage.setItem('wardrobe-active-person', activePersonId);
@@ -2504,6 +2762,10 @@ function loadPersonData(personId) {
   setSilhouette(person.gender || 'female');
 
   clearCanvas();
+  // Force closetItems re-read before rendering (fixes male wardrobe display bug)
+  closetItems = JSON.parse(JSON.stringify(person.closet || []));
+  setEditMode(person.editMode === true);
+  showIntimate = person.showIntimate === true;
   renderCloset();
   renderOutfits();
   updateDropHint();
@@ -2573,6 +2835,7 @@ function openNewPersonModal() {
   document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
   document.querySelector('.gender-radios').style.display = '';
   document.getElementById('personModal').classList.add('open');
+  applyPersonModalTheme(document.getElementById('personThemeSelect')?.value || 'petite');
   setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
 
@@ -2598,11 +2861,18 @@ function openEditPersonModal(personId) {
   document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
   document.querySelector('.gender-radios').style.display = '';
   document.getElementById('personModal').classList.add('open');
+  applyPersonModalTheme(document.getElementById('personThemeSelect')?.value || 'petite');
   setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
 
+function applyPersonModalTheme(theme) {
+  const m = document.getElementById('personModal');
+  m.classList.remove('preview-petite','preview-handsome','preview-sandalwood','preview-night');
+  m.classList.add('preview-' + (theme || 'petite'));
+}
+
 function closePersonModal() {
-  document.getElementById('personModal').classList.remove('open');
+  document.getElementById('personModal').classList.remove('open','preview-petite','preview-handsome','preview-sandalwood','preview-night');
   editingPersonId = null;
   pendingImportData = null;
   document.getElementById('importTargetRow').style.display = 'none';
@@ -2616,6 +2886,74 @@ function closePersonModal() {
 
 function savePerson() {
   // Handle import flow
+  if (document.getElementById('personModalTitle').textContent === 'Merge People') {
+    // Execute merge
+    const ids = mergingPeopleIds;
+    const persons = ids.map(id => people.find(p => p.id === id)).filter(Boolean);
+    const name = document.getElementById('personNameInput').value.trim() || 'Merged Person';
+    const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
+    const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
+    const theme = document.getElementById('personThemeSelect').value || 'petite';
+    // Combine closets and outfits
+    const allCloset = [];
+    const seenClosetIds = new Set();
+    const allOutfits = [];
+    const seenOutfitIds = new Set();
+    persons.forEach(p => {
+      (p.closet || []).forEach(item => {
+        if (!seenClosetIds.has(String(item.id))) { seenClosetIds.add(String(item.id)); allCloset.push(JSON.parse(JSON.stringify(item))); }
+      });
+      (p.outfits || []).forEach(o => {
+        if (!seenOutfitIds.has(String(o.id))) { seenOutfitIds.add(String(o.id)); allOutfits.push(JSON.parse(JSON.stringify(o))); }
+      });
+    });
+    const newPerson = { id: 'p_' + Date.now(), name, gender, moodsSpectrum, theme, closet: allCloset, outfits: allOutfits };
+    // Remove merged people
+    const wasActive = ids.includes(activePersonId);
+    people = people.filter(p => !ids.includes(p.id));
+    people.push(newPerson);
+    savePeopleData();
+    renderPeopleMenu();
+    mergingPeopleIds = [];
+    closePersonModal();
+    loadPersonData(newPerson.id);
+    showToast('Merged into ' + name);
+    return;
+  }
+  if (document.getElementById('personModalTitle').textContent === 'Merge People') {
+    // Execute merge
+    const ids = mergingPeopleIds;
+    const persons = ids.map(id => people.find(p => p.id === id)).filter(Boolean);
+    const name = document.getElementById('personNameInput').value.trim() || 'Merged Person';
+    const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
+    const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
+    const theme = document.getElementById('personThemeSelect').value || 'petite';
+    // Combine closets and outfits
+    const allCloset = [];
+    const seenClosetIds = new Set();
+    const allOutfits = [];
+    const seenOutfitIds = new Set();
+    persons.forEach(p => {
+      (p.closet || []).forEach(item => {
+        if (!seenClosetIds.has(String(item.id))) { seenClosetIds.add(String(item.id)); allCloset.push(JSON.parse(JSON.stringify(item))); }
+      });
+      (p.outfits || []).forEach(o => {
+        if (!seenOutfitIds.has(String(o.id))) { seenOutfitIds.add(String(o.id)); allOutfits.push(JSON.parse(JSON.stringify(o))); }
+      });
+    });
+    const newPerson = { id: 'p_' + Date.now(), name, gender, moodsSpectrum, theme, closet: allCloset, outfits: allOutfits };
+    // Remove merged people
+    const wasActive = ids.includes(activePersonId);
+    people = people.filter(p => !ids.includes(p.id));
+    people.push(newPerson);
+    savePeopleData();
+    renderPeopleMenu();
+    mergingPeopleIds = [];
+    closePersonModal();
+    loadPersonData(newPerson.id);
+    showToast('Merged into ' + name);
+    return;
+  }
   if (document.getElementById('personModalTitle').textContent === 'Open Wardrobe') {
     const targetId = document.getElementById('importTargetSelect').value;
     if (targetId === '__new__') {
@@ -2710,6 +3048,9 @@ document.getElementById('personModal').addEventListener('click', e => {
 });
 document.getElementById('personNameInput')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') savePerson();
+});
+document.getElementById('personThemeSelect')?.addEventListener('change', e => {
+  applyPersonModalTheme(e.target.value);
 });
 
 // ── Edit Moods Modal ──
@@ -2902,10 +3243,18 @@ function confirmDeleteSpectrum() {
 document.getElementById('deleteSpectrumModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeDeleteSpectrumModal();
 });
+document.getElementById('mergeGenderWarningModal')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeMergeGenderWarningModal();
+});
+document.getElementById('mergeGenderWarningModal')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeMergeGenderWarningModal();
+});
 
 // ── Edit People Modal ──
 function openEditPeopleModal() {
+  checkedPeopleIds = new Set();
   renderEditPeopleList();
+  setTimeout(updateMergeBtn, 0);
   document.getElementById('editPeopleModal').classList.add('open');
 }
 function closeEditPeopleModal() {
@@ -2915,7 +3264,67 @@ document.getElementById('editPeopleModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeEditPeopleModal();
 });
 
+let checkedPeopleIds = new Set();
+
+function updateMergeBtn() {
+  const btn = document.getElementById('editPeopleNewBtn');
+  if (!btn) return;
+  const count = checkedPeopleIds.size;
+  if (count >= 2) {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle;"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>Merge (' + count + ')';
+    btn.onclick = openMergePeopleModal;
+  } else {
+    btn.innerHTML = '+ New Person';
+    btn.onclick = function() { closeEditPeopleModal(); openNewPersonModal(); };
+  }
+}
+
+function openMergePeopleModal() {
+  const ids = [...checkedPeopleIds];
+  const persons = ids.map(id => people.find(p => p.id === id)).filter(Boolean);
+  if (persons.length < 2) return;
+  const genders = [...new Set(persons.map(p => p.gender || 'female'))];
+  if (genders.length > 1) {
+    // Different genders — show warning first
+    document.getElementById('mergeGenderWarningConfirmBtn').onclick = () => {
+      closeMergeGenderWarningModal();
+      openMergePersonModal(ids);
+    };
+    document.getElementById('mergeGenderWarningModal').classList.add('open');
+  } else {
+    openMergePersonModal(ids);
+  }
+}
+
+function openMergePersonModal(ids) {
+  mergingPeopleIds = ids;
+  const persons = ids.map(id => people.find(p => p.id === id)).filter(Boolean);
+  // Pre-fill name with combined names
+  document.getElementById('personModalTitle').textContent = 'Merge People';
+  document.getElementById('personSaveBtn').textContent = 'Merge';
+  document.getElementById('personNameInput').value = persons.map(p => p.name).join(' & ');
+  document.getElementById('genderFemale').checked = true;
+  renderMoodsSelect();
+  document.getElementById('personMoodsSelect').value = '0';
+  document.getElementById('personThemeSelect').value = currentTheme || 'petite';
+  document.getElementById('importTargetRow').style.display = 'none';
+  ['personNameInput','personMoodsSelect','personThemeSelect'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = '';
+  });
+  document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
+  document.querySelector('.gender-radios').style.display = '';
+  document.getElementById('personModal').classList.add('open');
+  setTimeout(() => document.getElementById('personNameInput').focus(), 100);
+}
+
+function closeMergeGenderWarningModal() {
+  document.getElementById('mergeGenderWarningModal').classList.remove('open');
+}
+
+let mergingPeopleIds = [];
+
 function renderEditPeopleList() {
+  checkedPeopleIds.clear();
   const list = document.getElementById('editPeopleList');
   list.innerHTML = '';
   people.forEach((person, idx) => {
@@ -2941,6 +3350,25 @@ function renderEditPeopleList() {
     });
     nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') nameInput.blur(); });
 
+    // Checkbox
+    const chkWrap = document.createElement('label');
+    chkWrap.className = 'person-checkbox-wrap';
+    chkWrap.title = 'Select to merge';
+    chkWrap.innerHTML = '<input type="checkbox" class="person-checkbox" style="position:absolute;opacity:0;width:0;height:0;"><span class="person-checkbox-box"><svg class="person-checkbox-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    const chkInput = chkWrap.querySelector('input');
+    chkInput.addEventListener('change', () => {
+      if (chkInput.checked) checkedPeopleIds.add(person.id);
+      else checkedPeopleIds.delete(person.id);
+      chkWrap.querySelector('.person-checkbox-box').classList.toggle('checked', chkInput.checked);
+      updateMergeBtn();
+    });
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-person-trash';
+    editBtn.title = 'Edit person';
+    editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    editBtn.addEventListener('click', () => openEditPersonModal(person.id));
+
     const trash = document.createElement('button');
     trash.className = 'edit-person-trash';
     trash.title = 'Delete person';
@@ -2949,7 +3377,9 @@ function renderEditPeopleList() {
 
     row.appendChild(handle);
     row.appendChild(nameInput);
+    row.appendChild(editBtn);
     row.appendChild(trash);
+    row.appendChild(chkWrap);
     list.appendChild(row);
 
     // Drag-to-reorder
@@ -3075,10 +3505,24 @@ function enterPictureMode() {
   stage.style.left = cx + 'px';
   stage.style.transform = 'translate(-50%, -50%)';
   document.body.classList.add('picture-mode');
+  // Hide photos overlay thumbnails/lines when in camera mode
+  const photosOvl = document.getElementById('photosOverlay');
+  if (photosOvl) { photosOvl.style.opacity = '0'; photosOvl.style.pointerEvents = 'none'; }
+  // Center silhouette as if all panels closed (ignore any open panel state)
+  stage.style.top = '50%';
+  stage.style.left = '50%';
+  stage.style.transform = 'translate(-50%, -50%)';
   setTimeout(() => document.addEventListener('click', exitPictureMode, { once: true }), 100);
 }
 function exitPictureMode() {
   document.body.classList.remove('picture-mode');
+  // Restore photos overlay
+  const photosOvl = document.getElementById('photosOverlay');
+  if (photosOvl && document.getElementById('photosToggle')?.checked) {
+    photosOvl.style.opacity = '1';
+    photosOvl.style.pointerEvents = '';
+    renderPhotosOverlay();
+  }
   // Restore stage positioning
   const stage = document.getElementById('stage');
   if (stage._pictureModeStyle !== undefined) {
@@ -3113,8 +3557,11 @@ function fetchRemoteData() {
 
 function menuSave() {
   document.getElementById('hamburgerWrap').classList.remove('open');
+  // Save current state into active person before exporting
+  savePeopleData();
   const data = {
     exportedAt: new Date().toISOString(),
+    people: people,
     closet: closetItems,
     savedOutfits: savedOutfits,
     canvas: canvasItems,
@@ -3145,13 +3592,67 @@ function handleFileOpen(e) {
       let data;
       try { data = JSON.parse(ev.target.result); } catch(parseErr) { showToast('Invalid file'); return; }
       if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
-      // Stash the data and open the "Open Wardrobe" person modal
-      pendingImportData = data;
-      openImportPersonModal();
+      // New people-aware import: if data has a 'people' array, merge each person
+      if (Array.isArray(data.people) && data.people.length > 0) {
+        importPeopleAware(data.people);
+      } else {
+        // Legacy format: merge into active person
+        const changed = mergeImportData(data);
+        showToast(changed ? 'Imported ' + getThemeDiamond() : 'Nothing new');
+      }
     } catch(err) { console.error('Import error:', err); showToast('Import error — check console'); }
   };
   reader.readAsText(file);
   e.target.value = '';
+}
+
+function importPeopleAware(importedPeople) {
+  // Save current state first
+  savePeopleData();
+  let created = 0, merged = 0;
+  importedPeople.forEach(ip => {
+    if (!ip || !ip.name) return;
+    // Find existing person by name (case-insensitive)
+    const existing = people.find(p => p.name.trim().toLowerCase() === ip.name.trim().toLowerCase());
+    if (existing) {
+      // Merge closet items not already present
+      const existingIds = new Set((existing.closet || []).map(i => String(i.id)));
+      const newItems = (ip.closet || []).filter(i => !existingIds.has(String(i.id)));
+      if (newItems.length) { existing.closet = (existing.closet || []).concat(newItems); }
+      // Merge outfits not already present
+      const existingOIds = new Set((existing.outfits || []).map(o => String(o.id)));
+      const newOutfits = (ip.outfits || []).filter(o => !existingOIds.has(String(o.id)));
+      if (newOutfits.length) { existing.outfits = (existing.outfits || []).concat(newOutfits); }
+      merged++;
+    } else {
+      // Create new person
+      const newPerson = {
+        id: 'p_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+        name: ip.name,
+        gender: ip.gender || 'female',
+        moodsSpectrum: ip.moodsSpectrum || 0,
+        theme: ip.theme || 'petite',
+        closet: JSON.parse(JSON.stringify(ip.closet || [])),
+        outfits: JSON.parse(JSON.stringify(ip.outfits || []))
+      };
+      people.push(newPerson);
+      created++;
+    }
+  });
+  savePeopleData();
+  renderPeopleMenu();
+  // Reload active person to reflect any merges
+  const ap = getActivePerson();
+  if (ap) {
+    closetItems = JSON.parse(JSON.stringify(ap.closet || []));
+    savedOutfits = JSON.parse(JSON.stringify(ap.outfits || []));
+    renderCloset();
+    renderOutfits();
+  }
+  const parts = [];
+  if (created) parts.push(created + ' new person' + (created > 1 ? 's' : ''));
+  if (merged) parts.push(merged + ' merged');
+  showToast(parts.length ? 'Imported: ' + parts.join(', ') : 'Nothing new');
 }
 
 function openImportPersonModal() {
@@ -3198,7 +3699,7 @@ function migrateImportData(data) {
   if (!data.closet && data.closetItems) data.closet = data.closetItems;
   if (!data.savedOutfits && data.outfits) data.savedOutfits = data.outfits;
 
-  const VALID_CATS = new Set([...Object.keys(CAT_CONFIG_FEMALE), ...Object.keys(CAT_CONFIG_MALE)]);
+  const VALID_CATS = new Set([...Object.keys(CAT_CONFIG_FEMALE), ...Object.keys(CAT_CONFIG_MALE), ...Object.keys(CAT_CONFIG_OTHER)]);
   const VALID_STATUS = new Set(['return', 'exchange']);
 
   function migrateItem(item) {
@@ -3295,7 +3796,7 @@ function exportData() {
   showToast('Data exported ♡');
 }
 
-function getThemeDiamond() { return document.body.classList.contains('handsome') ? '◆' : '✦'; }
+function getThemeDiamond() { return (document.body.classList.contains('handsome') || document.body.classList.contains('sandalwood')) ? '◆' : '✦'; }
 function showToast(msg) {
   const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2300);
@@ -3324,7 +3825,7 @@ const SAMPLE_SRCS = [
   'https://images.unsplash.com/photo-1541099649105-f69ad21f3246',
   'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa',
 ];
-const VALID_CATS = new Set([...Object.keys(CAT_CONFIG_FEMALE), ...Object.keys(CAT_CONFIG_MALE)]);
+const VALID_CATS = new Set([...Object.keys(CAT_CONFIG_FEMALE), ...Object.keys(CAT_CONFIG_MALE), ...Object.keys(CAT_CONFIG_OTHER)]);
 const before = closetItems.length;
 closetItems = closetItems.filter(i =>
   !SAMPLE_SRCS.some(s => i.src && i.src.startsWith(s)) &&
@@ -3377,7 +3878,7 @@ const Z_TIERS = [
   new Set(['Bra']),
   new Set(['Lingerie']),
   new Set(['Shoes']),
-  new Set(['Shorts', 'Skirt', 'Pants']),
+  new Set(['Shorts', 'Skirt', 'Pants', 'Jeans']),
   new Set(['Top', 'TShirt', 'ButtonShirt', 'Sweater', 'Sweatshirt']),
   new Set(['Jacket']),
 ];
@@ -3616,11 +4117,13 @@ function openCtxMenu(x, y, ciId) {
   }
   const posSaved = document.getElementById('ctxPosSaved');
   posSaved.style.opacity = '1';
-  posSaved.style.color = isAtSavedPos ? 'var(--text)' : 'var(--text-light)';
+  posSaved.style.color = 'var(--text)';
   posSaved.style.cursor = isAtSavedPos ? 'default' : 'pointer';
+  posSaved.onmouseenter = isAtSavedPos ? null : function() { this.style.background = 'var(--blush)'; };
+  posSaved.onmouseleave = isAtSavedPos ? null : function() { this.style.background = ''; };
   posSaved.innerHTML = isAtSavedPos
     ? `<svg style="display:inline;vertical-align:-2px;margin-right:5px;" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Position saved`
-    : `Position saved`;
+    : `Save position`;
   posSaved.onclick = isAtSavedPos ? null : () => {
     persistPlacements();
     closeCtxMenu();
@@ -3709,6 +4212,8 @@ const MAN_VIEWBOX = "0 0 328.47 1183.74";
 let hairMode = 'down';
 
 function setSilhouette(gender) {
+  if (gender === 'other') gender = 'male'; // Other uses male silhouette
+  if (gender === 'other') gender = 'male'; // Other uses male silhouette
   const fig = document.getElementById('canvasFigure');
   if (!fig) return;
   const svg = fig.querySelector('svg');
@@ -3723,8 +4228,8 @@ function setSilhouette(gender) {
     document.body.classList.add('male-person');
     // Man is taller — scale to ~580px height, same bottom anchor
     svg.setAttribute('viewBox', MAN_VIEWBOX);
-    svg.setAttribute('width', '143');
-    svg.setAttribute('height', '580');
+    svg.setAttribute('width', '144');
+    svg.setAttribute('height', '520');
     path.setAttribute('d', MAN_PATH);
     svg.style.transform = 'translateX(-50%)';
     // Reset hair to down
@@ -3784,11 +4289,11 @@ window.addEventListener('resize', () => { renderPhotosOverlay(); });
 
 </script>
 <div id="ctxMenu" style="display:none;position:fixed;z-index:9999;background:white;border-radius:10px;padding:4px;box-shadow:0 4px 20px rgba(61,46,42,.18);min-width:190px;">
-  <div id="ctxSetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
-  <div id="ctxResetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
-  <div style="height:1px;background:var(--cream-border);margin:3px 8px;"></div>
   <div id="ctxPosSaved" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;border-radius:7px;white-space:nowrap;cursor:pointer;"></div>
   <div id="ctxResetSaved" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;border-radius:7px;white-space:nowrap;cursor:pointer;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''">Reset to saved</div>
+  <div style="height:1px;background:var(--cream-border);margin:3px 8px;"></div>
+  <div id="ctxSetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
+  <div id="ctxResetDefault" style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);cursor:pointer;border-radius:7px;white-space:nowrap;" onmouseenter="this.style.background='var(--blush)'" onmouseleave="this.style.background=''"></div>
 </div>
 
 </body>
