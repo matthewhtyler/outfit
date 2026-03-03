@@ -197,8 +197,8 @@ body.night .closet-item-duo img { background:#1E1618; }
 .canvas-item { position:absolute; user-select:none; cursor:move; -webkit-user-drag:none; }
 .canvas-item img { width:100%; height:100%; object-fit:contain; display:block; pointer-events:none; filter:drop-shadow(0 4px 12px rgba(61,46,42,.15)); -webkit-user-drag:none; }
 .canvas-item.selected img { filter:drop-shadow(0 4px 16px rgba(201,123,122,.35)); }
-.canvas-item .item-controls { position:absolute; top:-30px; left:50%; transform:translateX(-50%); display:none; gap:4px; background:white; border-radius:12px; padding:4px 6px; box-shadow:var(--shadow); white-space:nowrap; z-index:999999; }
-.canvas-item.selected .item-controls { display:flex; }
+.canvas-item .item-controls { display:none !important; }
+body:not(.edit-mode) #floatingControls { display:none !important; }
 /* Photos overlay: use dark olive in petite (same as handsome) */
 body:not(.night) .photo-thumb { border-color: #30342b; }
 body:not(.night) .photo-thumb-dot { background: #30342b; }
@@ -567,6 +567,13 @@ body.night .cat-name { color:var(--text-mid); }
     </div>
 
     <div class="canvas-drop-hint" id="dropHint"></div>
+
+    <!-- Floating item controls — lives outside canvas-item stacking context -->
+    <div id="floatingControls" style="display:none;position:absolute;z-index:99999;transform:translateX(-50%);background:white;border-radius:12px;padding:4px 6px;box-shadow:var(--shadow);white-space:nowrap;gap:4px;pointer-events:all;">
+      <button class="ctrl-btn" id="fctrlRemove">−</button>
+      <button class="ctrl-btn" id="fctrlFlip">↔</button>
+      <button class="ctrl-btn rotate-handle" id="fctrlRotate" title="Drag to rotate">↻</button>
+    </div>
 
     <!-- Photos mode thumbnail overlay -->
     <div id="photosOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;z-index:15;"></div>
@@ -1650,7 +1657,29 @@ function renderCanvasItem(ci) {
 function selectItem(id) {
   document.querySelectorAll('.canvas-item').forEach(el => el.classList.remove('selected'));
   selectedId = id;
-  if (id) document.getElementById(id)?.classList.add('selected');
+  const fc = document.getElementById('floatingControls');
+  if (id && editMode) {
+    const el = document.getElementById(id);
+    if (el && fc) {
+      el.classList.add('selected');
+      const ci = canvasItems.find(c => c.id === id);
+      if (ci) {
+        // Center of item + offset above it
+        const cx = ci.x + ci.w / 2;
+        const ty = ci.y - 34;
+        fc.style.left = cx + 'px';
+        fc.style.top = ty + 'px';
+        fc.style.display = 'flex';
+        // Wire buttons to this item
+        document.getElementById('fctrlRemove').onclick = () => removeCanvasItem(id);
+        document.getElementById('fctrlFlip').onclick = () => flipItem(id);
+        document.getElementById('fctrlRotate').dataset.id = id;
+      }
+    }
+  } else {
+    if (fc) fc.style.display = 'none';
+    if (id) document.getElementById(id)?.classList.add('selected');
+  }
 }
 
 function updateDropHint() { document.getElementById('dropHint').style.opacity = canvasItems.length ? '0' : '1'; }
@@ -1756,6 +1785,8 @@ function startCanvasDrag(e, id) {
     ci.x = me.clientX - r.left - offX;
     ci.y = me.clientY - r.top - offY;
     el.style.left = ci.x+'px'; el.style.top = ci.y+'px';
+    const fc = document.getElementById('floatingControls');
+    if (fc && fc.style.display !== 'none') { fc.style.left = (ci.x + ci.w/2)+'px'; fc.style.top = (ci.y - 34)+'px'; }
   };
   const onUp = () => {
     // Restore drop shadow — use selected filter if item is still selected, else default
@@ -1780,6 +1811,8 @@ function startResize(e, id) {
   const onMove = me => {
     ci.w = Math.max(40, sw + me.clientX - sx); ci.h = Math.max(40, sh + me.clientY - sy);
     const el = document.getElementById(id); el.style.width = ci.w+'px'; el.style.height = ci.h+'px';
+    const fc = document.getElementById('floatingControls');
+    if (fc && fc.style.display !== 'none') { fc.style.left = (ci.x + ci.w/2)+'px'; fc.style.top = (ci.y - 34)+'px'; }
   };
   const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); persistPlacements(); };
   document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
@@ -3231,6 +3264,10 @@ function applyLayerSlider(pct) {
     if (el) el.style.visibility = ci.z <= threshold ? 'visible' : 'hidden';
   });
 }
+document.getElementById('fctrlRotate').addEventListener('mousedown', e => {
+  const id = e.currentTarget.dataset.id;
+  if (id && editMode) startRotate(e, id);
+});
 document.getElementById('layerSlider').addEventListener('input', function() {
   applyLayerSlider(Number(this.value));
 });
