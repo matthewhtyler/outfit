@@ -989,7 +989,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
     </div>
   </div>
 </div>
-<div class="modal-overlay" id="deletePersonModal">
+<div class="modal-overlay" id="deletePersonModal" style="z-index:103;background:rgba(61,46,42,0.35)">
   <div class="person-modal" style="width:300px;max-width:95vw;text-align:center;">
     <h2 id="deletePersonTitle" style="margin-bottom:6px;">Delete Person?</h2>
     <p id="deletePersonSub" style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;">This will erase their entire wardrobe.</p>
@@ -1001,7 +1001,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
 </div>
 
 <!-- Delete Spectrum Confirm Modal -->
-<div class="modal-overlay" id="deleteSpectrumModal" style="background:rgba(61,46,42,0.35);z-index:102;">
+<div class="modal-overlay" id="deleteSpectrumModal" style="background:rgba(61,46,42,0.35);z-index:103;">
   <div class="person-modal" style="width:300px;max-width:95vw;text-align:center;">
     <h2 style="margin-bottom:6px;">Delete Spectrum?</h2>
     <p id="deleteSpectrumSub" style="font-size:12px;color:var(--text-light);margin-bottom:20px;font-family:'DM Sans',sans-serif;"></p>
@@ -2755,13 +2755,14 @@ function ensureDefaultPerson() {
 }
 
 function savePeopleData() {
-  // Snapshot current closet/outfits into active person before saving
+  // Snapshot current closet/outfits/theme into active person before saving
   const ap = getActivePerson();
   if (ap) {
     ap.closet = JSON.parse(JSON.stringify(closetItems));
     ap.outfits = JSON.parse(JSON.stringify(savedOutfits));
     ap.editMode = editMode;
     ap.showIntimate = showIntimate;
+    ap.theme = currentTheme;
   }
   localStorage.setItem('wardrobe-people', JSON.stringify(people));
   localStorage.setItem('wardrobe-active-person', activePersonId);
@@ -3820,8 +3821,12 @@ function mergeImportData(data) {
 
 // ── Export ──
 function exportData() {
+  // Sync active person's live state before exporting
+  savePeopleData();
   const data = {
     exportedAt: new Date().toISOString(),
+    people: JSON.parse(JSON.stringify(people)),
+    // Legacy fields for backwards compat
     closet: closetItems,
     savedOutfits: savedOutfits,
     canvas: canvasItems,
