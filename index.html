@@ -914,7 +914,10 @@ body.night .cat-name { color:var(--text-mid); }
   <div class="person-modal" style="width:340px;max-width:95vw;">
     <h2>Edit People</h2>
     <div id="editPeopleList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;min-height:40px;"></div>
-    <button class="btn-confirm" onclick="closeEditPeopleModal();openNewPersonModal();" style="width:100%;">+ New Person</button>
+    <div class="modal-actions" style="gap:8px;">
+      <button class="btn-cancel" onclick="closeEditPeopleModal();openNewPersonModal();" style="flex:1;">+ New Person</button>
+      <button class="btn-confirm" onclick="closeEditPeopleModal();" style="flex:1;">Done</button>
+    </div>
   </div>
 </div>
 
