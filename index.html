@@ -2684,11 +2684,11 @@ function deleteOutfit(id, e) {
 }
 
 function handleCanvasBgClick(clientX, target) {
+  // Camera mode: tap anywhere on canvas exits it, no panel changes
+  if (document.body.classList.contains('picture-mode')) { exitPictureMode(); return; }
+
   const isBackground = target.id === 'canvas' || target.id === 'stage' || target.closest?.('.canvas-drop-hint');
   if (!isBackground) return;
-
-  // Camera mode: tap anywhere exits it, no panel changes
-  if (document.body.classList.contains('picture-mode')) { exitPictureMode(); return; }
 
   // If edit mode and item selected, just deselect
   if (editMode && selectedId) { selectItem(null); return; }
@@ -2721,8 +2721,9 @@ document.getElementById('canvas').addEventListener('mousedown', e => {
 });
 document.getElementById('canvas').addEventListener('touchend', e => {
   const t = e.target;
+  const isPictureMode = document.body.classList.contains('picture-mode');
   const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest?.('.canvas-drop-hint');
-  if (isBackground) {
+  if (isPictureMode || isBackground) {
     e.preventDefault();
     const touch = e.changedTouches[0];
     handleCanvasBgClick(touch.clientX, t);
