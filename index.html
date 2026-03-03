@@ -1175,7 +1175,7 @@ const CAT_CONFIG_FEMALE = {
   Bra:            { label: 'Bra',       intimate: true },
   Panties:        { label: 'Panties',   intimate: true },
   Lingerie:       { label: 'Lingerie',  intimate: true },
-  Babydoll:       { label: 'Babydoll',  intimate: true },
+  Nightie:       { label: 'Nightie',  intimate: true },
   Dress:          { label: 'Dress' },
   Top:            { label: 'Top' },
   Sweater:        { label: 'Sweater' },
@@ -1216,7 +1216,7 @@ const CAT_CONFIG_OTHER = {
   Accessory:      { label: 'Accessory' },
   Lingerie:       { label: 'Lingerie',  intimate: true },
   Costume:        { label: 'Costume',   intimate: true },
-  Babydoll:       { label: 'Babydoll',  intimate: true },
+  Nightie:       { label: 'Nightie',  intimate: true },
   Bra:            { label: 'Bra',       intimate: true },
   Panties:        { label: 'Panties',   intimate: true },
   Jacket:         { label: 'Jacket' },
@@ -1320,13 +1320,13 @@ const CAT_ICONS = {
   Lingerie: `<svg viewBox="0 0 44 52" fill="none"><path d="M10 3 Q8 1 6 2 Q5 5 8 8" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M34 3 Q36 1 38 2 Q39 5 36 8" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M6 18 Q22 22 38 18" stroke="var(--ci-stroke)" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M8 8 C5 10 4 14 6 18 Q14 20 22 16 C22 16 18 8 10 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M36 8 C39 10 40 14 38 18 Q30 20 22 16 C22 16 26 8 34 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M10 9 Q14 14 14 18" stroke="var(--ci-stroke)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/><path d="M34 9 Q30 14 30 18" stroke="var(--ci-stroke)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity=".55"/><rect x="20.5" y="13" width="3" height="5" rx="1" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="0.7"/><path d="M20.5 15.5 Q19 14 20 13.5 Q21 15 22 15.5 Q23 15 24 13.5 Q25 14 23.5 15.5" fill="var(--ci-stroke)" opacity=".7"/><path d="M6 18 L4 20" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linecap="round"/><path d="M38 18 L40 20" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="29" x2="38" y2="29" stroke="var(--ci-stroke)" stroke-width="2.2" stroke-linecap="round"/><path d="M6 29 Q16 34 22 42 Q28 34 38 29 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3" stroke-linejoin="round"/><path d="M20.2 28.8 Q18.6 27.2 19.8 26.4 Q21 28.2 22 28.2 Q23 28.2 24.2 26.4 Q25.4 27.2 23.8 28.8" fill="var(--ci-stroke)" opacity=".75"/></svg>`,
   Costume: `<svg viewBox="0 0 44 36" fill="none"><path d="M4 16 Q4 8 12 8 Q17 8 20 13 Q22 16 22 16 Q22 16 24 13 Q27 8 32 8 Q40 8 40 16 Q40 22 36 23 Q32 24 28 20 Q25 17 22 17 Q19 17 16 20 Q12 24 8 23 Q4 22 4 16 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.3"/><ellipse cx="13" cy="16" rx="4" ry="3.5" fill="var(--ci-eye)" stroke="var(--ci-stroke)" stroke-width="1"/><ellipse cx="31" cy="16" rx="4" ry="3.5" fill="var(--ci-eye)" stroke="var(--ci-stroke)" stroke-width="1"/><path d="M4 16 Q2 18 1 22" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M40 16 Q42 18 43 22" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M22 6 L22.6 4 L23.2 6 L25 6 L23.6 7 L24.2 9 L22 8 L19.8 9 L20.4 7 L19 6 L20.8 6 Z" fill="var(--ci-stroke)" opacity=".6"/></svg>`,
   Dress: `<svg viewBox="0 0 36 34" fill="none"><path d="M15 5 Q18 9 21 5 L24 11 L28 33 L8 33 L12 11 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M15 5 Q16.5 2 18 1 Q19.5 2 21 5" stroke="var(--ci-stroke)" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M12 11 Q10 11 8 13" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><path d="M24 11 Q26 11 28 13" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><line x1="8" y1="19" x2="28" y2="19" stroke="var(--ci-stroke)" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/></svg>`,
-  Babydoll: `<svg viewBox="0 0 36 32" fill="none"><path d="M13 2 L9 9 L4 30 L32 30 L27 9 L23 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M13 2 Q18 7 23 2" stroke="var(--ci-stroke)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M9 9 Q7 9 4 11" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><path d="M27 9 Q29 9 32 11" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><line x1="4" y1="17" x2="32" y2="17" stroke="var(--ci-stroke)" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/></svg>`,
+  Nightie: `<svg viewBox="0 0 36 32" fill="none"><path d="M13 2 L9 9 L4 30 L32 30 L27 9 L23 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M13 2 Q18 7 23 2" stroke="var(--ci-stroke)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M9 9 Q7 9 4 11" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><path d="M27 9 Q29 9 32 11" stroke="var(--ci-stroke)" stroke-width=".9" fill="none"/><line x1="4" y1="17" x2="32" y2="17" stroke="var(--ci-stroke)" stroke-width=".8" opacity=".4" stroke-dasharray="2 2"/></svg>`,
   Top: `<svg viewBox="0 0 36 28" fill="none"><path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/></svg>`,
   TShirt: `<svg viewBox="0 0 36 28" fill="none"><path d="M11 2 L5 9 L9 11 L9 26 L27 26 L27 11 L31 9 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/></svg>`,
-  ButtonShirt: `<svg viewBox="0 0 36 38" fill="none"><path d="M11 2 L3 10 L3 28 L9 28 L9 34 L9 28 L9 11 L27 11 L27 28 L27 34 L27 28 L33 28 L33 10 L25 2 Q22 6 18 6 Q14 6 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="11" width="18" height="25" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><line x1="18" y1="6" x2="18" y2="36" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><circle cx="18" cy="14" r="1" fill="var(--ci-stroke)" opacity=".6"/><circle cx="18" cy="20" r="1" fill="var(--ci-stroke)" opacity=".6"/><circle cx="18" cy="26" r="1" fill="var(--ci-stroke)" opacity=".6"/></svg>`,
-  Sweater: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q21 6 18 6 Q15 6 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="10" width="18" height="28" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><path d="M9 19 Q18 23 27 19" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".45" fill="none"/><path d="M9 26 Q18 30 27 26" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".45" fill="none"/></svg>`,
-  Sweatshirt: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="10" width="18" height="25" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><rect x="9" y="35" width="18" height="3" rx="1.5" fill="var(--ci-mid)" opacity=".6"/></svg>`,
-  Jacket: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q22 7 18 7 Q14 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><rect x="9" y="10" width="18" height="28" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1"/><path d="M14 2 Q16 5 18 7 Q20 5 22 2" stroke="var(--ci-stroke)" stroke-width="0.9" fill="none"/><path d="M18 7 L18 38" stroke="var(--ci-stroke)" stroke-width="1" opacity=".4"/></svg>`,
+  ButtonShirt: `<svg viewBox="0 0 36 38" fill="none"><path d="M11 2 L3 10 L3 28 L9 28 L9 34 L9 28 L9 11 L27 11 L27 28 L27 34 L27 28 L33 28 L33 10 L25 2 Q22 6 18 6 Q14 6 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M9 11 L9 36 L27 36 L27 11" fill="var(--ci-fill)" stroke="none"/><line x1="18" y1="6" x2="18" y2="36" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><circle cx="18" cy="14" r="1" fill="var(--ci-stroke)" opacity=".6"/><circle cx="18" cy="20" r="1" fill="var(--ci-stroke)" opacity=".6"/><circle cx="18" cy="26" r="1" fill="var(--ci-stroke)" opacity=".6"/></svg>`,
+  Sweater: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q21 6 18 6 Q15 6 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M9 10 L9 38 L27 38 L27 10" fill="var(--ci-fill)" stroke="none"/><path d="M9 19 Q18 23 27 19" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".45" fill="none"/><path d="M9 26 Q18 30 27 26" stroke="var(--ci-stroke)" stroke-width="0.7" opacity=".45" fill="none"/></svg>`,
+  Sweatshirt: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q21 7 18 7 Q15 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M9 10 L9 35 L27 35 L27 10" fill="var(--ci-fill)" stroke="none"/><rect x="9" y="35" width="18" height="3" rx="1.5" fill="var(--ci-mid)" opacity=".6"/></svg>`,
+  Jacket: `<svg viewBox="0 0 36 40" fill="none"><path d="M11 2 L3 10 L3 32 L9 32 L9 10 L27 10 L27 32 L33 32 L33 10 L25 2 Q22 7 18 7 Q14 7 11 2Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2"/><path d="M9 10 L9 38 L27 38 L27 10" fill="var(--ci-fill)" stroke="none"/><path d="M14 2 Q16 5 18 7 Q20 5 22 2" stroke="var(--ci-stroke)" stroke-width="0.9" fill="none"/><path d="M18 7 L18 38" stroke="var(--ci-stroke)" stroke-width="1" opacity=".4"/></svg>`,
   Pants: `<svg viewBox="0 0 44 42" fill="none"><rect x="6" y="3" width="32" height="5" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M6 8 L6 38 Q6 40 9 40 L18 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M38 8 L38 38 Q38 40 35 40 L26 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/></svg>`,
   Jeans: `<svg viewBox="0 0 44 42" fill="none"><rect x="6" y="3" width="32" height="5" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M6 8 L6 38 Q6 40 9 40 L18 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M38 8 L38 38 Q38 40 35 40 L26 40 L22 28 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M13 8 L13 18" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><path d="M31 8 L31 18" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/><path d="M9 8 Q11 6 14 7 Q16 8 14 10 Q11 11 9 8Z" fill="var(--ci-mid)" opacity=".7"/></svg>`,
   Shorts: `<svg viewBox="0 0 44 28" fill="none"><rect x="6" y="3" width="32" height="5" rx="2" fill="var(--ci-mid)" stroke="var(--ci-stroke)" stroke-width="1.1"/><path d="M6 8 L6 22 Q6 25 10 25 L19 25 L22 14 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><path d="M38 8 L38 22 Q38 25 34 25 L25 25 L22 14 L22 8 Z" fill="var(--ci-fill)" stroke="var(--ci-stroke)" stroke-width="1.2" stroke-linejoin="round"/><line x1="22" y1="8" x2="22" y2="14" stroke="var(--ci-stroke)" stroke-width="0.8" opacity=".5"/></svg>`,
@@ -2683,22 +2683,38 @@ function deleteOutfit(id, e) {
   renderOutfits();
 }
 
-document.getElementById('canvas').addEventListener('mousedown', e => {
-  const isBackground = e.target.id === 'canvas' || e.target.id === 'stage' || e.target.closest('.canvas-drop-hint');
-  if (isBackground) selectItem(null);
-  if (!editMode && !document.body.classList.contains('picture-mode') && isBackground) {
-    if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
-    else cyclePanels();
+function handleCanvasBgClick(clientX, target) {
+  if (document.body.classList.contains('picture-mode')) return;
+  const isBackground = target.id === 'canvas' || target.id === 'stage' || target.closest?.('.canvas-drop-hint');
+  if (!isBackground) return;
+
+  // If edit mode and item selected, just deselect
+  if (editMode && selectedId) { selectItem(null); return; }
+
+  // Both panels open → close both
+  if (panelState.closet && panelState.outfits) { setPanels(false, false); return; }
+
+  // Determine left vs right half of canvas
+  const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+  const isRightSide = clientX > canvasRect.left + canvasRect.width / 2;
+
+  if (isRightSide) {
+    setPanels(panelState.closet, !panelState.outfits);
+  } else {
+    setPanels(!panelState.closet, panelState.outfits);
   }
+}
+
+document.getElementById('canvas').addEventListener('mousedown', e => {
+  handleCanvasBgClick(e.clientX, e.target);
 });
 document.getElementById('canvas').addEventListener('touchend', e => {
   const t = e.target;
-  const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest('.canvas-drop-hint');
-  if (!editMode && !document.body.classList.contains('picture-mode') && isBackground) {
-    // Prevent the touchend from immediately re-triggering via a subsequent click event
+  const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest?.('.canvas-drop-hint');
+  if (isBackground) {
     e.preventDefault();
-    if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
-    else cyclePanels();
+    const touch = e.changedTouches[0];
+    handleCanvasBgClick(touch.clientX, t);
   }
 }, { passive: false });
 
@@ -3635,9 +3651,28 @@ function handleFileOpen(e) {
       if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
       // New people-aware import: if data has a 'people' array, merge each person
       if (Array.isArray(data.people) && data.people.length > 0) {
+        // Restore item positions if present
+        if (data.itemPositions && typeof data.itemPositions === 'object') {
+          Object.assign(itemPositions, data.itemPositions);
+          localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+        }
+        // Restore category defaults if present
+        if (data.categoryDefaults && typeof data.categoryDefaults === 'object') {
+          Object.assign(categoryDefaults, data.categoryDefaults);
+          localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+        }
         importPeopleAware(data.people);
       } else {
         // Legacy format: merge into active person
+        if (data.itemPositions && typeof data.itemPositions === 'object') {
+          Object.assign(itemPositions, data.itemPositions);
+          localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+        }
+        // Restore category defaults if present
+        if (data.categoryDefaults && typeof data.categoryDefaults === 'object') {
+          Object.assign(categoryDefaults, data.categoryDefaults);
+          localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+        }
         const changed = mergeImportData(data);
         showToast(changed ? 'Imported ' + getThemeDiamond() : 'Nothing new');
       }
@@ -3826,6 +3861,8 @@ function exportData() {
   const data = {
     exportedAt: new Date().toISOString(),
     people: JSON.parse(JSON.stringify(people)),
+    itemPositions: itemPositions,
+    categoryDefaults: categoryDefaults,
     // Legacy fields for backwards compat
     closet: closetItems,
     savedOutfits: savedOutfits,
