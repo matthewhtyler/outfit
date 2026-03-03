@@ -124,7 +124,8 @@ body.handsome .theme-diamond-h { display:inline !important; }
 .vibe-count-btn { cursor:pointer; padding:2px 6px; border-radius:10px; transition:all .2s; user-select:none; }
 .vibe-count-btn:hover { background:var(--cream-dark); }
 .vibe-count-btn.active { background:var(--blush); }
-.outfit-card.vibe-faded { opacity:0.3; }
+.outfit-card.touch-active { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
+.closet-item.touch-active { background:var(--blush); }
 
 body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
 
@@ -441,10 +442,16 @@ body.night .cat-name { color:var(--text-mid); }
   body.panel-open #backBtn,
   body.panel-open #fwdBackSep { display: none; }
 
-  /* Outfit preview: overlap items so they fit in narrow panel */
-  .outfit-preview { gap: 0; padding: 6px 4px; justify-content: center; }
-  .outfit-preview img { margin-left: -14px; width: 40px; height: 55px; }
-  .outfit-preview img:first-child { margin-left: 0; }
+  /* Outfit preview: only overlap when needed — let items breathe if they fit */
+  .outfit-preview { gap: 4px; padding: 6px 4px; justify-content: center; flex-wrap: nowrap; }
+  .outfit-preview img { width: 40px; height: 55px; flex-shrink: 1; }
+  /* When 4+ items, overlap to fit */
+  .outfit-preview:has(img:nth-child(4)) img { margin-left: -10px; }
+  .outfit-preview:has(img:nth-child(4)) img:first-child { margin-left: 0; }
+
+  /* Fix outfit info strip height */
+  .outfit-info { padding: 8px 10px 10px; min-height: 32px; }
+  .outfit-info .outfit-vibe { bottom: 9px; }
 }
 
 </style>
@@ -1343,6 +1350,13 @@ function makeClosetEl(item, outfitSrcs) {
   el.innerHTML = `${imgHtml}<div class="item-name">${item.name}</div>${checkBadge}${starBadge}<button class="remove-btn" onclick="removeClosetItem('${item.id}',event)">−</button>`;
   el.addEventListener('dragstart', e => startClosetDrag(e, item));
   el.addEventListener('dblclick', () => addToCanvasCenter(item));
+  // iOS single-tap fix: use touchend to bypass hover-then-click delay
+  el.addEventListener('touchend', e => {
+    if (e.cancelable) e.preventDefault();
+    el.classList.add('touch-active');
+    setTimeout(() => el.classList.remove('touch-active'), 400);
+    if (!editMode) addToCanvasCenter(item);
+  }, { passive: false });
   el.addEventListener('click', e => {
     if (e.altKey) {
       e.preventDefault();
@@ -1848,7 +1862,8 @@ function renderPhotosOverlay() {
 
   // Thumb dimensions
   const THUMB_W = 52, THUMB_H = 52, THUMB_GAP = 10;
-  const MARGIN = 10; // from canvas edge
+  const MARGIN = 10;
+  const SIDE_GAP = window.innerWidth <= 600 ? 100 : 120;
 
   // Helper: get item center in canvas coords
   function itemCenter(ci) {
@@ -1883,16 +1898,21 @@ function renderPhotosOverlay() {
     img.alt = ci.name || '';
     thumb.appendChild(img);
 
-    // Highlight matching closet item on click
+    // Highlight matching closet item on click — open wardrobe panel first if needed
     thumb.addEventListener('click', () => {
-      // Scroll closet panel to this item
+      if (!panelState.closet) setPanels(true, panelState.outfits);
       const closetEl = document.querySelector(`.closet-item[data-id="${ci.itemId}"]`);
-      if (closetEl) {
-        closetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        closetEl.style.outline = '2px solid var(--rose)';
-        closetEl.style.outlineOffset = '2px';
-        setTimeout(() => { closetEl.style.outline = ''; closetEl.style.outlineOffset = ''; }, 1500);
-      }
+      const doHighlight = () => {
+        if (closetEl) {
+          closetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          closetEl.style.outline = '2px solid var(--rose)';
+          closetEl.style.outlineOffset = '2px';
+          setTimeout(() => { closetEl.style.outline = ''; closetEl.style.outlineOffset = ''; }, 1500);
+        }
+      };
+      // If panel was just opened, wait for it + overlay fade before scrolling
+      if (!panelState.closet) setTimeout(doHighlight, 350);
+      else doHighlight();
     });
 
     overlay.appendChild(thumb);
@@ -1924,7 +1944,7 @@ function renderPhotosOverlay() {
   if (leftItems.length > 0) {
     const totalH = colHeight(leftItems);
     let startY = (canvasH - totalH) / 2;
-    const tx = Math.max(MARGIN, stageOffX - THUMB_W - 120);
+    const tx = Math.max(MARGIN, stageOffX - THUMB_W - SIDE_GAP);
     leftItems.forEach((ci, i) => {
       const ty = startY + i * (THUMB_H + THUMB_GAP);
       drawThumb(ci, tx, ty, 'left');
@@ -1935,7 +1955,7 @@ function renderPhotosOverlay() {
   if (rightItems.length > 0) {
     const totalH = colHeight(rightItems);
     let startY = (canvasH - totalH) / 2;
-    const tx = Math.min(canvasRect.width - MARGIN - THUMB_W, stageOffX + stageRect.width + 120);
+    const tx = Math.min(canvasRect.width - MARGIN - THUMB_W, stageOffX + stageRect.width + SIDE_GAP);
     rightItems.forEach((ci, i) => {
       const ty = startY + i * (THUMB_H + THUMB_GAP);
       drawThumb(ci, tx, ty, 'right');
@@ -2101,10 +2121,15 @@ function renderOutfits() {
         ${outfit.name && outfit.name !== 'My Outfit' ? `<span style="font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-mid);font-style:italic;">${outfit.name}</span>` : ''}
       </div>
       <div class="outfit-actions">
-        <button class="outfit-action-btn" title="Load" onclick="loadOutfit(${outfit.id},event)">↩</button>
         <button class="outfit-action-btn" title="Delete" onclick="deleteOutfit(${outfit.id},event)">✕</button>
       </div>`;
     let clickTimer;
+    card.addEventListener('touchend', e => {
+      if (e.cancelable) e.preventDefault();
+      card.classList.add('touch-active');
+      setTimeout(() => card.classList.remove('touch-active'), 400);
+      loadOutfit(outfit.id);
+    }, { passive: false });
     card.addEventListener('click', () => { clickTimer = setTimeout(() => loadOutfit(outfit.id), 220); });
     card.addEventListener('dblclick', () => { clearTimeout(clickTimer); openEditOutfitModal(outfit.id); });
     body.appendChild(card);
@@ -2222,7 +2247,11 @@ function deleteOutfit(id, e) {
 
 document.getElementById('canvas').addEventListener('mousedown', e => {
   if (e.target.id === 'canvas' || e.target.closest('.canvas-drop-hint')) selectItem(null);
+  if (!editMode) setPanels(false, false);
 });
+document.getElementById('canvas').addEventListener('touchend', e => {
+  if (!editMode) setPanels(false, false);
+}, { passive: true });
 
 document.getElementById('outfitNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveOutfit(); });
 document.getElementById('catNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddItem(); });
