@@ -42,7 +42,7 @@ body.night {
 body.night .closet-item img { background:#1E1618; }
 body.night .outfit-preview { background:var(--canvas-bg); }
 body.night .mode-btn.active { background:#3A2A2E; color:var(--text); }
-body.night .canvas-toolbar { background:#2A1E22; }
+body.night .canvas-toolbar { background:#2A1E22; box-shadow:none; }
 body.night .toolbar-btn { background:#3A2A2E; }
 body.night .closet-item { background:#241D20; }
 
@@ -61,7 +61,6 @@ body.handsome {
   --shadow: 0 2px 12px rgba(30,20,8,0.22);
   --shadow-hover: 0 6px 24px rgba(30,20,8,0.34);
 }
-body.handsome .closet-item img { background:transparent !important; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.45)); border-radius:4px; }
 body.handsome .closet-item-duo img { background:transparent !important; }
 body.handsome .outfit-preview { background:var(--canvas-bg); }
 body.handsome .mode-btn.active { background:white; color:var(--text); }
@@ -69,11 +68,22 @@ body.handsome .canvas-toolbar { background:#a09784; }
 body.handsome .toolbar-btn { background:#d6cdba; color:#382e1e; }
 body.handsome .toolbar-btn.primary { background:#31342c; color:#d6cdba; }
 body.handsome .toolbar-btn.primary:hover { background:#1e221a; color:#d6cdba; }
+body:not(.night):not(.handsome) .hamburger-btn span { background:var(--rose); }
+body:not(.night):not(.handsome) #cyclePanelsBtn { color:var(--rose); }
 body.handsome .closet-item { background:transparent; border-color:transparent; box-shadow:none; }
-body.handsome .outfit-card { border-color:#1c1d1a; }
-body.handsome .outfit-card:hover { border-color:#3a3b37; }
+body.handsome .empty-state { color:#c3bba7; }
+body.handsome .empty-state .empty-icon span { color:#c3bba7 !important; opacity:1 !important; }
+body.handsome .empty-state .empty-icon svg path,
+body.handsome .empty-state .empty-icon svg circle { fill:#c3bba7 !important; stroke:#c3bba7 !important; }
+body.handsome .btn-add { background:#31342c; color:#d6cdba; }
+body.handsome .btn-add:hover { background:#1e221a; }
+body.handsome .add-form { border-top-color:transparent; }
+body.handsome .outfit-card { background:#272824; border-color:#1c1d1a; box-shadow:none; }
+body.handsome .outfit-card:hover { border-color:#3a3b37; box-shadow:none; }
+body.handsome .outfit-preview { background:#1c1d1a; }
 body.handsome .outfit-info { background:#1c1d1a; }
-body.handsome .outfit-info span { color:#d6cdba; }
+body.handsome .outfit-info span { color:#c3bba7; }
+body.handsome .outfit-info .outfit-title { color:#ffffff; }
 body.handsome .logo span { color:#30342b; }
 body.handsome .stage-toggle-pill input:checked + .stage-toggle-track { background:#30342b; }
 body.handsome .vibe-opt.selected { border-color:#30342b; background:var(--blush); }
@@ -166,8 +176,9 @@ header { display:flex; align-items:center; justify-content:space-between; paddin
 .category-label::after { content:''; flex:1; height:1px; background:var(--cream-border); }
 
 .closet-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.closet-item { position:relative; background:white; border-radius:10px; overflow:hidden; cursor:grab; border:1.5px solid transparent; transition:all .2s; box-shadow:var(--shadow); aspect-ratio:1; }
-.closet-item:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+.closet-item { position:relative; background:white; border-radius:10px; overflow:hidden; cursor:pointer; border:1.5px solid transparent; transition:all .2s; box-shadow:var(--shadow); aspect-ratio:1; }
+.closet-item:hover { border-color:var(--blush-mid); box-shadow:0 12px 28px rgba(61,46,42,.22), 0 4px 8px rgba(61,46,42,.12); transform:translateY(-4px); }
+body.handsome .closet-item:hover img { filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7) drop-shadow(0 6px 8px rgba(0,0,0,0.7)) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 .closet-item:active { cursor:grabbing; }
 .closet-item img { width:100%; height:100%; object-fit:contain; padding:6px; background:#FDFAF7; }
 .closet-item .item-name { display:none; }
@@ -266,7 +277,10 @@ body:not(.edit-mode) .canvas-item .resize-handle { display:none !important; }
 .outfit-card { background:var(--cream); border-radius:12px; overflow:hidden; margin-bottom:10px; border:1.5px solid var(--cream-border); box-shadow:var(--shadow); cursor:pointer; transition:all .2s; }
 .outfit-card:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
 .outfit-preview { height:90px; background:var(--canvas-bg); display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; overflow:hidden; }
-.outfit-preview img { height:65px; width:50px; object-fit:contain; }
+.outfit-preview img { height:65px; width:50px; object-fit:contain; filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); }
+body.handsome .closet-item img { background:transparent !important; filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); border-radius:4px; }
+.outfit-num { position:absolute; bottom:8px; left:10px; font-size:10px; color:var(--text-light); font-family:'DM Sans',sans-serif; }
+.outfit-title { font-family:'Cormorant Garamond',serif; font-size:13px; color:var(--text-mid); font-style:italic; }
 .outfit-info { padding:8px 10px 10px; min-height:32px; display:flex; align-items:center; justify-content:center; gap:8px; position:relative; }
 .outfit-info .outfit-vibe { font-size:12px; line-height:1; position:absolute; right:8px; bottom:7px; }
 .outfit-actions { display:flex; gap:4px; opacity:0; transition:opacity .2s; position:absolute; top:6px; right:6px; }
@@ -476,7 +490,7 @@ body:not(.handsome) #starFilterBtn { background-color:var(--cream) !important; c
 
 <header>
   <div style="display:flex;align-items:center;gap:10px;">
-    <button onclick="cyclePanels()" title="Toggle panels" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;color:var(--text-light);display:flex;align-items:center;transition:background .15s;">
+    <button id="cyclePanelsBtn" onclick="cyclePanels()" title="Toggle panels" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;color:var(--text-light);display:flex;align-items:center;transition:background .15s;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
       </svg>
@@ -1528,7 +1542,7 @@ let closetDragItem = null;
 
 function startClosetDrag(e, item) {
   closetDragItem = item;
-  document.getElementById('dragGhostImg').src = item.src;
+  document.getElementById('dragGhostImg').src = itemDisplaySrc(item);
   e.dataTransfer.effectAllowed = 'copy';
   e.dataTransfer.setDragImage(document.createElement('div'), 0, 0);
   document.getElementById('dragGhost').style.display = 'block';
@@ -2178,16 +2192,22 @@ function renderOutfits() {
     const faded = vibeFilter && outfit.vibe !== vibeFilter ? ' vibe-faded' : '';
     card.className = 'outfit-card' + faded;
     card.dataset.src = outfit.items.map(i => i.src).join('||');
-    const imgs = outfit.items.slice(0,4).map(i => {
+    const seenSrcs = new Set();
+    const dedupedItems = outfit.items.filter(i => {
+      const src = (viewMode === 'illustrations' && i.illustrationSrc) ? i.illustrationSrc : i.src;
+      if (seenSrcs.has(src)) return false;
+      seenSrcs.add(src); return true;
+    });
+    const imgs = dedupedItems.slice(0,4).map(i => {
       const src = (viewMode === 'illustrations' && i.illustrationSrc) ? i.illustrationSrc : i.src;
       return `<img src="${src}"/>`;
     }).join('');
     card.innerHTML = `
       <div class="outfit-preview">${imgs}</div>
       <div class="outfit-info">
-        <span style="position:absolute;bottom:8px;left:10px;font-size:10px;color:var(--text-light);font-family:'DM Sans',sans-serif;">${idx + 1}</span>
+        <span class="outfit-num">${idx + 1}</span>
         <span class="outfit-vibe" style="display:${showMoods ? '' : 'none'}">${outfit.vibe}</span>
-        ${outfit.name && outfit.name !== 'My Outfit' ? `<span style="font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-mid);font-style:italic;">${outfit.name}</span>` : ''}
+        ${outfit.name && outfit.name !== 'My Outfit' ? `<span class="outfit-title">${outfit.name}</span>` : ''}
       </div>
       <div class="outfit-actions">
         <button class="outfit-action-btn" title="Delete" onclick="deleteOutfit(${outfit.id},event)">✕</button>
@@ -2317,7 +2337,7 @@ function deleteOutfit(id, e) {
 document.getElementById('canvas').addEventListener('mousedown', e => {
   const isBackground = e.target.id === 'canvas' || e.target.id === 'stage' || e.target.closest('.canvas-drop-hint');
   if (isBackground) selectItem(null);
-  if (!editMode && isBackground) {
+  if (!editMode && !document.body.classList.contains('picture-mode') && isBackground) {
     if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
     else cyclePanels();
   }
@@ -2325,7 +2345,7 @@ document.getElementById('canvas').addEventListener('mousedown', e => {
 document.getElementById('canvas').addEventListener('touchend', e => {
   const t = e.target;
   const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest('.canvas-drop-hint');
-  if (!editMode && isBackground) {
+  if (!editMode && !document.body.classList.contains('picture-mode') && isBackground) {
     if (panelState.closet || panelState.outfits) { preCloseCycle = logoCycle; setPanels(false, false); }
     else cyclePanels();
   }
@@ -2405,16 +2425,16 @@ function loadPersonData(personId) {
   // Apply their moods spectrum
   applyMoodsSpectrum(person.moodsSpectrum || 0);
 
+  // Update silhouette and category config BEFORE rendering
+  refreshCatConfig();
+  setSilhouette(person.gender || 'female');
+
   clearCanvas();
   renderCloset();
   renderOutfits();
   updateDropHint();
   renderPeopleMenu();
   savePeopleData();
-
-  // Update silhouette and category config for this person's gender
-  refreshCatConfig();
-  setSilhouette(person.gender || 'female');
 
   showToast('Loaded ' + (person.name || 'Person'));
 }
