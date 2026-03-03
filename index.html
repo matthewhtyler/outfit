@@ -2783,7 +2783,8 @@ function ensureDefaultPerson() {
 }
 
 function savePeopleData() {
-  // Snapshot current closet/outfits/theme into active person before saving
+  // Snapshot current closet/outfits/theme/positions into active person before saving
+  persistPlacements();
   const ap = getActivePerson();
   if (ap) {
     ap.closet = JSON.parse(JSON.stringify(closetItems));
@@ -2791,6 +2792,8 @@ function savePeopleData() {
     ap.editMode = editMode;
     ap.showIntimate = showIntimate;
     ap.theme = currentTheme;
+    ap.itemPositions = JSON.parse(JSON.stringify(itemPositions));
+    ap.categoryDefaults = JSON.parse(JSON.stringify(categoryDefaults));
   }
   localStorage.setItem('wardrobe-people', JSON.stringify(people));
   localStorage.setItem('wardrobe-active-person', activePersonId);
@@ -2802,12 +2805,14 @@ function getActivePerson() {
 
 function loadPersonData(personId) {
   // Save current state into currently active person first
+  persistPlacements();
   const cur = getActivePerson();
   if (cur) {
     cur.closet = JSON.parse(JSON.stringify(closetItems));
     cur.outfits = JSON.parse(JSON.stringify(savedOutfits));
-    // Save current theme to current person
     cur.theme = currentTheme;
+    cur.itemPositions = JSON.parse(JSON.stringify(itemPositions));
+    cur.categoryDefaults = JSON.parse(JSON.stringify(categoryDefaults));
   }
 
   activePersonId = personId;
@@ -2817,6 +2822,12 @@ function loadPersonData(personId) {
   // Load this person's data
   closetItems = JSON.parse(JSON.stringify(person.closet || []));
   savedOutfits = JSON.parse(JSON.stringify(person.outfits || []));
+
+  // Restore their item positions and category defaults
+  itemPositions = JSON.parse(JSON.stringify(person.itemPositions || {}));
+  categoryDefaults = JSON.parse(JSON.stringify(person.categoryDefaults || {}));
+  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+  localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
   localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
   localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
 
@@ -3662,16 +3673,6 @@ function handleFileOpen(e) {
       if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
       // New people-aware import: if data has a 'people' array, merge each person
       if (Array.isArray(data.people) && data.people.length > 0) {
-        // Restore item positions if present
-        if (data.itemPositions && typeof data.itemPositions === 'object') {
-          Object.assign(itemPositions, data.itemPositions);
-          localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
-        }
-        // Restore category defaults if present
-        if (data.categoryDefaults && typeof data.categoryDefaults === 'object') {
-          Object.assign(categoryDefaults, data.categoryDefaults);
-          localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
-        }
         importPeopleAware(data.people);
       } else {
         // Legacy format: merge into active person
@@ -3710,6 +3711,9 @@ function importPeopleAware(importedPeople) {
       const existingOIds = new Set((existing.outfits || []).map(o => String(o.id)));
       const newOutfits = (ip.outfits || []).filter(o => !existingOIds.has(String(o.id)));
       if (newOutfits.length) { existing.outfits = (existing.outfits || []).concat(newOutfits); }
+      // Merge item positions and category defaults
+      if (ip.itemPositions) existing.itemPositions = Object.assign({}, ip.itemPositions, existing.itemPositions || {});
+      if (ip.categoryDefaults) existing.categoryDefaults = Object.assign({}, ip.categoryDefaults, existing.categoryDefaults || {});
       merged++;
     } else {
       // Create new person
@@ -3720,7 +3724,9 @@ function importPeopleAware(importedPeople) {
         moodsSpectrum: ip.moodsSpectrum || 0,
         theme: ip.theme || 'petite',
         closet: JSON.parse(JSON.stringify(ip.closet || [])),
-        outfits: JSON.parse(JSON.stringify(ip.outfits || []))
+        outfits: JSON.parse(JSON.stringify(ip.outfits || [])),
+        itemPositions: JSON.parse(JSON.stringify(ip.itemPositions || {})),
+        categoryDefaults: JSON.parse(JSON.stringify(ip.categoryDefaults || {})),
       };
       people.push(newPerson);
       created++;
@@ -3728,11 +3734,15 @@ function importPeopleAware(importedPeople) {
   });
   savePeopleData();
   renderPeopleMenu();
-  // Reload active person to reflect any merges
+  // Reload active person to reflect any merges, including positions
   const ap = getActivePerson();
   if (ap) {
     closetItems = JSON.parse(JSON.stringify(ap.closet || []));
     savedOutfits = JSON.parse(JSON.stringify(ap.outfits || []));
+    itemPositions = JSON.parse(JSON.stringify(ap.itemPositions || {}));
+    categoryDefaults = JSON.parse(JSON.stringify(ap.categoryDefaults || {}));
+    localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+    localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
     renderCloset();
     renderOutfits();
   }
