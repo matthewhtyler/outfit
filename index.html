@@ -219,9 +219,9 @@ body.sandalwood .outfit-preview { background:var(--canvas-bg); }
 body.sandalwood .mode-btn.active { background:white; color:var(--text); }
 body.sandalwood .canvas-toolbar { background:#7e6d64; }
 body.sandalwood .toolbar-btn { background:#d1ac98; color:#2b2826; }
-body.sandalwood .toolbar-btn:hover { background:#c49e8a; color:#1e1d1c; }
+body.sandalwood .toolbar-btn:hover { opacity:0.8; background:#d1ac98; color:#2b2826; }
 body.sandalwood .toolbar-btn.primary { background:#2b2826; color:#cec7bc; }
-body.sandalwood .toolbar-btn.primary:hover { background:#1a1714; color:#cec7bc; }
+body.sandalwood .toolbar-btn.primary:hover { opacity:1; background:#1a1714; color:#cec7bc; }
 body.sandalwood .closet-item { background:transparent; border-color:transparent; box-shadow:none; }
 body.sandalwood .empty-state { color:#d1ac98; }
 body.sandalwood .empty-state .empty-icon span { color:#d1ac98 !important; opacity:1 !important; }
@@ -440,10 +440,10 @@ body.edit-mode .canvas-item.selected .resize-grabber-left { display:block; }
 body:not(.edit-mode) .closet-item .used-check { display:none; }
 
 .canvas-toolbar { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:white; border-radius:24px; padding:8px 14px; box-shadow:0 4px 20px rgba(180,130,120,.2), 0 8px 32px rgba(61,46,42,.22), 0 2px 8px rgba(61,46,42,.15); z-index:10; white-space:nowrap; flex-wrap:nowrap; }
-.toolbar-btn { padding:6px 16px; border:none; border-radius:16px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .2s; background:var(--cream-dark); color:var(--text-mid); white-space:nowrap; flex-shrink:0; }
-.toolbar-btn:hover { background:var(--blush); color:var(--text); }
-.toolbar-btn.primary { background:var(--blush); color:var(--text); }
-.toolbar-btn.primary:hover { background:var(--blush-mid); }
+.toolbar-btn { padding:6px 16px; border:none; border-radius:16px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:opacity .15s; background:var(--cream-dark); color:var(--text-mid); white-space:nowrap; flex-shrink:0; }
+.toolbar-btn:hover { opacity:0.8; }
+.toolbar-btn.primary { transition:all .2s; background:var(--blush); color:var(--text); }
+.toolbar-btn.primary:hover { opacity:1; background:var(--blush-mid); }
 .toolbar-sep { display:none; }
 
 .outfit-card { background:var(--cream); border-radius:12px; overflow:hidden; margin-bottom:10px; border:1.5px solid var(--cream-border); box-shadow:var(--shadow); cursor:pointer; transition:all .2s; }
