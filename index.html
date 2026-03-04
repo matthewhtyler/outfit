@@ -342,11 +342,12 @@ body.handsome .closet-item:hover img { filter:drop-shadow(1px 0 0 #c3bba7) drop-
 .closet-item-duo { display:flex; width:100%; height:100%; }
 .closet-item-duo img { width:50%; height:100%; object-fit:contain; padding:6px; background:#FDFAF7; }
 body.night .closet-item-duo img { background:#1E1618; }
-.closet-item-socks { display:flex; width:100%; height:100%; justify-content:center; align-items:center; gap:2px; }
-.closet-item-socks img { width:44%; height:100%; object-fit:contain; padding:4px; }
-.closet-item-socks img:last-child { transform: scaleX(-1); }
-.outfit-socks-pair { display:inline-flex; align-items:center; height:65px; gap:1px; }
-.outfit-socks-pair img { height:65px; width:25px; object-fit:contain; }
+.closet-item-socks { display:flex; width:100%; height:100%; justify-content:center; align-items:center; gap:0px; }
+.closet-item-socks img { width:44%; height:100%; object-fit:contain; padding:4px; margin-right:-6px; }
+.closet-item-socks img:last-child { transform: scaleX(-1); margin-right:0; margin-left:-6px; }
+.outfit-socks-pair { display:inline-flex; align-items:center; height:65px; gap:0px; }
+.outfit-socks-pair img { height:65px; width:25px; object-fit:contain; margin-right:-30px; }
+.outfit-socks-pair img:last-child { margin-right:0; }
 .closet-item .remove-btn { position:absolute; top:4px; right:4px; width:18px; height:18px; background:rgba(255,255,255,.9); border:none; border-radius:50%; font-size:10px; cursor:pointer; display:none; align-items:center; justify-content:center; color:var(--rose); }
 .closet-item:hover .remove-btn { display:flex; }
 
@@ -1651,10 +1652,15 @@ function makeClosetEl(item, outfitSrcs) {
           window.open(item.productUrl, '_blank');
         } else {
           const existing = canvasItems.filter(ci => String(ci.itemId) === String(item.id));
-          if (existing.length) {
+          if (!editMode && existing.length) {
             existing.forEach(ci => { document.getElementById(ci.id)?.remove(); });
             canvasItems = canvasItems.filter(ci => String(ci.itemId) !== String(item.id));
             updateDropHint();
+          } else if (editMode && existing.length) {
+            const ref = existing[existing.length - 1];
+            const ci = { ...ref, id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
+              x: ref.x + 40, z: ++zCounter };
+            canvasItems.push(ci); renderCanvasItem(ci); selectItem(ci.id);
           } else {
             addToCanvasCenter(item);
           }
@@ -1682,6 +1688,17 @@ function makeClosetEl(item, outfitSrcs) {
         existing.forEach(ci => { document.getElementById(ci.id)?.remove(); });
         canvasItems = canvasItems.filter(ci => String(ci.itemId) !== String(item.id));
         updateDropHint();
+      } else {
+        addToCanvasCenter(item);
+      }
+    } else {
+      // Edit mode: clone existing item's size/rotation at +40px x offset, or add fresh
+      const existing = canvasItems.filter(ci => String(ci.itemId) === String(item.id));
+      if (existing.length) {
+        const ref = existing[existing.length - 1];
+        const ci = { ...ref, id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
+          x: ref.x + 40, z: ++zCounter };
+        canvasItems.push(ci); renderCanvasItem(ci); selectItem(ci.id);
       } else {
         addToCanvasCenter(item);
       }
