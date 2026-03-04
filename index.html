@@ -499,6 +499,28 @@ body:not(.edit-mode) .closet-item .used-check { display:none; }
 .outfit-card:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
 .outfit-preview { height:90px; background:var(--canvas-bg); display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; overflow:hidden; }
 .outfit-preview img { height:65px; width:50px; object-fit:contain; filter:drop-shadow(1px 0 0 var(--text-light)) drop-shadow(-1px 0 0 var(--text-light)) drop-shadow(0 1px 0 var(--text-light)) drop-shadow(0 -1px 0 var(--text-light)); }
+.outfit-preview.duo-center { position:relative; }
+.outfit-preview.duo-center > * { position:absolute; transform:translate(-50%,-50%); top:50%; }
+.outfit-preview.duo-center > *:nth-child(1) { left:25%; }
+.outfit-preview.duo-center > *:nth-child(2) { left:75%; }
+.outfit-preview.duo-center img { height:65px; width:50px; object-fit:contain; filter:inherit; position:static; transform:none; }
+.outfit-preview.duo-center .outfit-socks-pair { display:inline-flex; align-items:center; }
+.outfit-preview.quad-center { position:relative; }
+.outfit-preview.quad-center > * { position:absolute; transform:translate(-50%,-50%); top:50%; }
+.outfit-preview.quad-center > *:nth-child(1) { left:12.5%; }
+.outfit-preview.quad-center > *:nth-child(2) { left:37.5%; }
+.outfit-preview.quad-center > *:nth-child(3) { left:62.5%; }
+.outfit-preview.quad-center > *:nth-child(4) { left:87.5%; }
+.outfit-preview.quad-center img { height:65px; width:28px; object-fit:contain; filter:inherit; position:static; transform:none; }
+.outfit-preview.quad-center .outfit-socks-pair { display:inline-flex; align-items:center; }
+.outfit-preview.tri-center { position:relative; }
+.outfit-preview.tri-center > * { position:absolute; transform:translate(-50%,-50%); top:50%; }
+.outfit-preview.tri-center > *:nth-child(1) { left:16.7%; }
+.outfit-preview.tri-center > *:nth-child(2) { left:50%; }
+.outfit-preview.tri-center > *:nth-child(3) { left:83.3%; }
+.outfit-preview.tri-center img { height:65px; width:36px; object-fit:contain; filter:inherit; position:static; transform:none; }
+.outfit-preview.tri-center .outfit-socks-pair { display:inline-flex; align-items:center; }
+body.minimal .outfit-preview img, body.petite .outfit-preview img { filter:none; }
 body.handsome .outfit-preview img { filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); }
 body.sandalwood .outfit-preview img { filter:drop-shadow(1px 0 0 #d1ac98) drop-shadow(-1px 0 0 #d1ac98) drop-shadow(0 1px 0 #d1ac98) drop-shadow(0 -1px 0 #d1ac98); }
 body.handsome .closet-item img { background:transparent !important; filter:drop-shadow(1px 0 0 #c3bba7) drop-shadow(-1px 0 0 #c3bba7) drop-shadow(0 1px 0 #c3bba7) drop-shadow(0 -1px 0 #c3bba7); border-radius:4px; }
@@ -2849,7 +2871,10 @@ function renderOutfits() {
     }).join('');
     const isSmall = window.innerWidth <= 600;
     const useGrid = isSmall && dedupedItems.length > 2;
-    const previewClass = useGrid ? 'outfit-preview grid-2x2' : 'outfit-preview';
+    const useDuo = dedupedItems.length === 2;
+    const useQuad = !isSmall && dedupedItems.length >= 4;
+    const useTri = !isSmall && dedupedItems.length === 3;
+    const previewClass = useGrid ? 'outfit-preview grid-2x2' : useQuad ? 'outfit-preview quad-center' : useTri ? 'outfit-preview tri-center' : useDuo ? 'outfit-preview duo-center' : 'outfit-preview';
     card.innerHTML = `
       <div class="${previewClass}">${imgs}</div>
       <div class="outfit-info">
