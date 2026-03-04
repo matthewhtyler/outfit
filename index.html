@@ -3854,10 +3854,15 @@ function exitPictureMode() {
     delete stage._pictureModeStyle;
   }
   const photosOvl = document.getElementById('photosOverlay');
-  if (photosOvl && document.getElementById('photosToggle')?.checked) {
-    photosOvl.style.opacity = '1';
-    photosOvl.style.pointerEvents = '';
-    renderPhotosOverlay();
+  if (photosOvl) {
+    if (document.getElementById('photosToggle')?.checked) {
+      photosOvl.style.opacity = '1';
+      photosOvl.style.pointerEvents = 'none';
+      renderPhotosOverlay();
+    } else {
+      photosOvl.style.opacity = '0';
+      photosOvl.style.pointerEvents = 'none';
+    }
   }
 }
 function closeSettings() {
