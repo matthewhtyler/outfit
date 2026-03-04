@@ -2133,6 +2133,9 @@ function updateDropHint() { document.getElementById('dropHint').style.opacity = 
 function removeCanvasItem(id) {
   canvasItems = canvasItems.filter(i => i.id !== id);
   document.getElementById(id)?.remove(); selectedId = null; updateDropHint();
+  const fc = document.getElementById('floatingControls');
+  if (fc) fc.style.display = 'none';
+  document.querySelectorAll('.resize-grabber, .resize-grabber-left').forEach(g => g.style.display = 'none');
   renderPhotosOverlay();
 }
 
@@ -2637,9 +2640,23 @@ function flushItemPositions() {
 function openSaveModal() {
   if (!canvasItems.length) { showToast('Add some items to the canvas first'); return; }
   if (activeOutfitId) {
-    // Update the loaded outfit in place — no prompt needed
     const outfit = savedOutfits.find(o => o.id === activeOutfitId);
     if (outfit) {
+      // Check if any canvas items are new (not in the original outfit)
+      // or if any original items were removed
+      const originalItemIds = new Set(outfit.items.map(ci => String(ci.itemId)));
+      const currentItemIds = new Set(canvasItems.map(ci => String(ci.itemId)));
+      const hasNewItems = canvasItems.some(ci => !originalItemIds.has(String(ci.itemId)));
+      const hasRemovedItems = [...originalItemIds].some(id => !currentItemIds.has(id));
+      if (hasNewItems || hasRemovedItems) {
+        // New items added — save as a brand new outfit instead
+        activeOutfitId = null;
+        document.getElementById('saveModal').classList.add('open');
+        renderMoodPicker('saveMoodPicker', selectedVibe, k => { selectedVibe = k; });
+        setTimeout(() => document.getElementById('outfitNameInput').focus(), 100);
+        return;
+      }
+      // No new items — update in place
       persistPlacements();
       flushItemPositions();
       outfit.items = JSON.parse(JSON.stringify(canvasItems.map(ci => { const c = {...ci}; delete c.zLocked; return c; })));
