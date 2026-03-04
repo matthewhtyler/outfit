@@ -384,7 +384,7 @@ body.night .closet-item-duo img { background:#1E1618; }
 .canvas-drop-hint p { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--text-light); font-style:italic; }
 
 .canvas-item { position:absolute; user-select:none; cursor:move; -webkit-user-drag:none; overflow:visible; }
-.canvas-item img { width:100%; height:100%; object-fit:fill; display:block; pointer-events:none; filter:drop-shadow(0 4px 12px rgba(61,46,42,.15)); -webkit-user-drag:none; }
+.canvas-item img { width:100%; height:100%; object-fit:fill; display:block; pointer-events:none; -webkit-user-drag:none; }
 .canvas-item.selected img { filter:drop-shadow(0 0 8px rgba(201,123,122,.7)) drop-shadow(0 0 3px rgba(201,123,122,.5)); }
 body.edit-mode .canvas-item { will-change: transform; }
 .canvas-item .item-controls { display:none !important; }
@@ -750,6 +750,16 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   .outfit-preview.duo-center > *:nth-child(2) { left: 67%; }
 }
 
+@media (min-width: 601px) {
+  /* Duo-center: closer together on large screens */
+  .outfit-preview.duo-center > *:nth-child(1) { left: 33%; }
+  .outfit-preview.duo-center > *:nth-child(2) { left: 67%; }
+  /* Tri-center: closer together on large screens */
+  .outfit-preview.tri-center > *:nth-child(1) { left: 25%; }
+  .outfit-preview.tri-center > *:nth-child(2) { left: 50%; }
+  .outfit-preview.tri-center > *:nth-child(3) { left: 75%; }
+}
+
 /* Person checkboxes in Edit People */
 .person-checkbox-wrap { display:flex !important; align-items:center !important; align-self:center !important; cursor:pointer; flex-shrink:0; margin-top:0 !important; }
 .edit-person-row .person-checkbox-wrap,
@@ -780,7 +790,21 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
 </style>
 </head>
 <body>
-
+<svg width="0" height="0" style="position:absolute;overflow:hidden;">
+  <defs>
+    <filter id="crisp-outline" x="-5%" y="-5%" width="110%" height="115%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#3D2E2A" flood-opacity="0.15" result="shadow"/>
+      <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="expanded"/>
+      <feFlood flood-color="#000000" flood-opacity="1" result="color"/>
+      <feComposite in="color" in2="expanded" operator="in" result="outline"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="outline"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
 <header>
   <div style="display:flex;align-items:center;gap:10px;">
     <button id="cyclePanelsBtn" onclick="cyclePanels()" title="Toggle panels" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;color:var(--text-light);display:flex;align-items:center;transition:background .15s;">
@@ -1235,9 +1259,16 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
 <div class="drag-ghost" id="dragGhost" style="display:none;"><img id="dragGhostImg" style="width:80px;height:80px;object-fit:contain;" /></div>
 
 <script>
+// Safe localStorage wrapper for sandboxed WebViews (e.g. iOS Claude app)
+const _store = (() => {
+  try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return localStorage; } catch(e) { return { _d:{}, getItem(k){return this._d[k]!=null?this._d[k]:null;}, setItem(k,v){this._d[k]=String(v);}, removeItem(k){delete this._d[k];} }; }
+})();
+const _lsGet = k => _store.getItem(k);
+const _lsSet = (k,v) => { try { _store.setItem(k,v); } catch(e) {} };
+const _lsRemove = k => { try { _store.removeItem(k); } catch(e) {} };
 // v2026-03-02-r3
-let closetItems = JSON.parse(localStorage.getItem('outfit-closet') || '[]');
-let savedOutfits = JSON.parse(localStorage.getItem('outfit-saved') || '[]');
+let closetItems = JSON.parse(_lsGet('outfit-closet') || '[]');
+let savedOutfits = JSON.parse(_lsGet('outfit-saved') || '[]');
 let canvasItems = [];
 let activeOutfitId = null; // id of outfit currently loaded on canvas
 let selectedId = null;
@@ -1251,7 +1282,7 @@ const MOODS = [
 let vibeFilter = null;
 let selectedVibe = MOODS[0].key;
 let showMoods = true;
-let showHiddenPeople = JSON.parse(localStorage.getItem('wardrobe-show-hidden-people') || 'false');
+let showHiddenPeople = JSON.parse(_lsGet('wardrobe-show-hidden-people') || 'false');
 let starFilter = null; // null = all, 1-5 = show only that rating
 
 function renderMoodPicker(containerId, currentMood, onSelect) {
@@ -1274,9 +1305,9 @@ let zCounter = 1;
 let pendingItem = null;
 let toastTimer = null;
 // Per-item saved placement: { [item.id]: {x,y,w,h} }
-let itemPositions = JSON.parse(localStorage.getItem('outfit-item-positions') || '{}');
+let itemPositions = JSON.parse(_lsGet('outfit-item-positions') || '{}');
 // Per-category default placement for illustrated items: { [category]: {x,y,w,h} }
-let categoryDefaults = JSON.parse(localStorage.getItem('outfit-cat-defaults') || '{}');
+let categoryDefaults = JSON.parse(_lsGet('outfit-cat-defaults') || '{}');
 let pendingCategory = null;
 
 // ── Category configs per gender ──
@@ -1368,7 +1399,7 @@ function showIntimateToggle() {
 
 function setShowIntimate(val) {
   showIntimate = !!val;
-  localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
+  _lsSet('wardrobe-show-intimate', showIntimate ? '1' : '0');
   const ap = getActivePerson();
   if (ap) { ap.showIntimate = showIntimate; savePeopleData(); }
   renderCatGrid();
@@ -1511,7 +1542,7 @@ function confirmAddItem() {
         renderCanvasItem(ci);
       });
       // Explicitly persist — don't rely on renderCloset side-effect
-      localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+      _lsSet('outfit-closet', JSON.stringify(closetItems));
     }
     showToast(`Moved to ${CAT_CONFIG[pendingCategory]?.label || pendingCategory}`);
     renderCloset();
@@ -1895,7 +1926,7 @@ function renderCloset() {
     });
   });
 
-  localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+  _lsSet('outfit-closet', JSON.stringify(closetItems));
   const n = closetItems.length;
   document.getElementById('closetSubtitle').textContent = `${n} item${n === 1 ? '' : 's'}`;
 }
@@ -2455,10 +2486,10 @@ function setTheme(t) {
   // Update settings dropdown to match
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = t;
-  localStorage.setItem('wardrobe-theme', t);
+  _lsSet('wardrobe-theme', t);
   // Save to active person
   const ap = typeof getActivePerson === 'function' ? getActivePerson() : null;
-  if (ap) { ap.theme = t; localStorage.setItem('wardrobe-people', JSON.stringify(people)); }
+  if (ap) { ap.theme = t; _lsSet('wardrobe-people', JSON.stringify(people)); }
 }
 function updateThemeDiamonds() {
   const isHandsome = document.body.classList.contains('handsome') || document.body.classList.contains('sandalwood');
@@ -2646,6 +2677,19 @@ let preCloseCycle = null; // saved cycle before canvas-tap close
 document.body.classList.add('panel-open'); // panels start open
 
 function setPanels(left, right) {
+  // Close star dropdown if closet panel is closing
+  if (!left && panelState.closet && starDropdownOpen) {
+    starDropdownOpen = false;
+    document.getElementById('starDropdown').style.display = 'none';
+  }
+  // Close mood dropdown if outfits panel is closing
+  if (!right && panelState.outfits && moodDropdownOpen) {
+    moodDropdownOpen = false;
+    document.getElementById('moodDropdown').style.display = 'none';
+  }
+  // Close hamburger menu if open
+  const hw = document.getElementById('hamburgerWrap');
+  if (hw) hw.classList.remove('open');
   panelState.closet = left;
   panelState.outfits = right;
   const lw = left ? (window.innerWidth <= 600 ? '120px' : '260px') : '0px';
@@ -2735,7 +2779,7 @@ function flushItemPositions() {
       }));
     }
   });
-  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+  _lsSet('outfit-item-positions', JSON.stringify(itemPositions));
 }
 
 // ── Used item highlight ──
@@ -2764,7 +2808,7 @@ function openSaveModal() {
       flushItemPositions();
       outfit.items = JSON.parse(JSON.stringify(canvasItems.map(ci => { const c = {...ci}; delete c.zLocked; return c; })));
       outfit.timestamp = new Date().toLocaleDateString();
-      localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+      _lsSet('outfit-saved', JSON.stringify(savedOutfits));
       refreshCatConfig();
       renderOutfits();
       selectItem(null);
@@ -2813,7 +2857,7 @@ function persistPlacements() {
     }
   });
 
-  localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+  _lsSet('outfit-cat-defaults', JSON.stringify(categoryDefaults));
 }
 
 function saveItemPosition(ciId) {
@@ -2827,7 +2871,7 @@ function saveItemPosition(ciId) {
   } else {
     itemPositions[ci.itemId] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false }));
   }
-  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+  _lsSet('outfit-item-positions', JSON.stringify(itemPositions));
 }
 
 function saveOutfit() {
@@ -2835,7 +2879,7 @@ function saveOutfit() {
   persistPlacements();
   flushItemPositions();
   savedOutfits.unshift({ id: Date.now(), name, vibe: selectedVibe, items: JSON.parse(JSON.stringify(canvasItems.map(ci => { const c = {...ci}; delete c.zLocked; return c; }))), timestamp: new Date().toLocaleDateString() });
-  localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+  _lsSet('outfit-saved', JSON.stringify(savedOutfits));
   renderOutfits(); closeSaveModal();
   document.getElementById('outfitNameInput').value = '';
   clearCanvas();
@@ -3048,7 +3092,7 @@ function saveEditOutfit() {
   if (outfit) {
     outfit.name = document.getElementById('editOutfitName').value.trim() || '';
     outfit.vibe = editingVibe;
-    localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+    _lsSet('outfit-saved', JSON.stringify(savedOutfits));
     renderOutfits();
   }
   document.getElementById('editOutfitModal').classList.remove('open');
@@ -3059,7 +3103,7 @@ function saveEditOutfit() {
 function deleteOutfit(id, e) {
   e.stopPropagation();
   savedOutfits = savedOutfits.filter(o => o.id !== id);
-  localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+  _lsSet('outfit-saved', JSON.stringify(savedOutfits));
   renderOutfits();
 }
 
@@ -3219,10 +3263,10 @@ const DEFAULT_MOOD_SPECTRUMS = [
   [ { key:'😇', label:'Innocent' }, { key:'🌹', label:'Elegant' }, { key:'🔥', label:'Sexy' }, { key:'😈', label:'Naughty' } ],
   [ { key:'🌸', label:'Soft' }, { key:'🌹', label:'Elegant' }, { key:'🌻', label:'Sunny' }, { key:'🌷', label:'Flirty' } ],
 ];
-let MOOD_SPECTRUMS = JSON.parse(localStorage.getItem('wardrobe-mood-spectrums') || 'null') || JSON.parse(JSON.stringify(DEFAULT_MOOD_SPECTRUMS));
+let MOOD_SPECTRUMS = JSON.parse(_lsGet('wardrobe-mood-spectrums') || 'null') || JSON.parse(JSON.stringify(DEFAULT_MOOD_SPECTRUMS));
 
 function saveMoodSpectrums() {
-  localStorage.setItem('wardrobe-mood-spectrums', JSON.stringify(MOOD_SPECTRUMS));
+  _lsSet('wardrobe-mood-spectrums', JSON.stringify(MOOD_SPECTRUMS));
 }
 
 function renderMoodsSelect() {
@@ -3239,8 +3283,8 @@ function renderMoodsSelect() {
   sel.value = cur && parseInt(cur) < MOOD_SPECTRUMS.length ? cur : '0';
 }
 
-let people = JSON.parse(localStorage.getItem('wardrobe-people') || '[]');
-let activePersonId = localStorage.getItem('wardrobe-active-person') || null;
+let people = JSON.parse(_lsGet('wardrobe-people') || '[]');
+let activePersonId = _lsGet('wardrobe-active-person') || null;
 
 // Default person auto-created if none exist
 function ensureDefaultPerson() {
@@ -3267,8 +3311,8 @@ function savePeopleData() {
     ap.itemPositions = JSON.parse(JSON.stringify(itemPositions));
     ap.categoryDefaults = JSON.parse(JSON.stringify(categoryDefaults));
   }
-  localStorage.setItem('wardrobe-people', JSON.stringify(people));
-  localStorage.setItem('wardrobe-active-person', activePersonId);
+  _lsSet('wardrobe-people', JSON.stringify(people));
+  _lsSet('wardrobe-active-person', activePersonId);
 }
 
 function getActivePerson() {
@@ -3297,10 +3341,10 @@ function loadPersonData(personId) {
   // Restore their item positions and category defaults
   itemPositions = JSON.parse(JSON.stringify(person.itemPositions || {}));
   categoryDefaults = JSON.parse(JSON.stringify(person.categoryDefaults || {}));
-  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
-  localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
-  localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
-  localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+  _lsSet('outfit-item-positions', JSON.stringify(itemPositions));
+  _lsSet('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+  _lsSet('outfit-closet', JSON.stringify(closetItems));
+  _lsSet('outfit-saved', JSON.stringify(savedOutfits));
 
   // Apply their theme
   setTheme(person.theme || 'minimal');
@@ -3317,7 +3361,7 @@ function loadPersonData(personId) {
   closetItems = JSON.parse(JSON.stringify(person.closet || []));
   setEditMode(person.editMode === true);
   showIntimate = person.showIntimate === true;
-  localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
+  _lsSet('wardrobe-show-intimate', showIntimate ? '1' : '0');
   showIntimateToggle();
   renderCloset();
   renderOutfits();
@@ -3343,7 +3387,7 @@ function applyMoodsSpectrum(spectrumIdx) {
 
 function setShowHiddenPeople(val) {
   showHiddenPeople = val;
-  localStorage.setItem('wardrobe-show-hidden-people', JSON.stringify(val));
+  _lsSet('wardrobe-show-hidden-people', JSON.stringify(val));
   renderPeopleMenu();
 }
 
@@ -4000,8 +4044,8 @@ function confirmDeletePerson() {
         activePersonId = null;
         closetItems = [];
         savedOutfits = [];
-        localStorage.setItem('outfit-closet', '[]');
-        localStorage.setItem('outfit-saved', '[]');
+        _lsSet('outfit-closet', '[]');
+        _lsSet('outfit-saved', '[]');
         renderCloset();
         renderOutfits();
         clearCanvas();
@@ -4040,7 +4084,7 @@ function openSettings() {
 let fullButtons = false;
 function setFullButtons(on) {
   fullButtons = on;
-  localStorage.setItem('wardrobe-full-buttons', on ? '1' : '');
+  _lsSet('wardrobe-full-buttons', on ? '1' : '');
   applyFullButtons();
 }
 function applyFullButtons() {
@@ -4158,12 +4202,12 @@ function handleFileOpen(e) {
         // Legacy format: merge into active person
         if (data.itemPositions && typeof data.itemPositions === 'object') {
           Object.assign(itemPositions, data.itemPositions);
-          localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+          _lsSet('outfit-item-positions', JSON.stringify(itemPositions));
         }
         // Restore category defaults if present
         if (data.categoryDefaults && typeof data.categoryDefaults === 'object') {
           Object.assign(categoryDefaults, data.categoryDefaults);
-          localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+          _lsSet('outfit-cat-defaults', JSON.stringify(categoryDefaults));
         }
         const changed = mergeImportData(data);
         showToast(changed ? 'Imported ' + getThemeDiamond() : 'Nothing new');
@@ -4234,29 +4278,29 @@ function importPeopleAware(importedPeople) {
 
   // Persist people array directly — do NOT call savePeopleData() here as it
   // would overwrite imported data with the current empty live state
-  localStorage.setItem('wardrobe-people', JSON.stringify(people));
+  _lsSet('wardrobe-people', JSON.stringify(people));
 
   // Select and fully load the first person
   const firstPerson = people[0];
   if (firstPerson) {
     activePersonId = firstPerson.id;
-    localStorage.setItem('wardrobe-active-person', activePersonId);
+    _lsSet('wardrobe-active-person', activePersonId);
     // Load all their data into live state
     closetItems = JSON.parse(JSON.stringify(firstPerson.closet || []));
     savedOutfits = JSON.parse(JSON.stringify(firstPerson.outfits || []));
     itemPositions = JSON.parse(JSON.stringify(firstPerson.itemPositions || {}));
     categoryDefaults = JSON.parse(JSON.stringify(firstPerson.categoryDefaults || {}));
-    localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
-    localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
-    localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
-    localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+    _lsSet('outfit-closet', JSON.stringify(closetItems));
+    _lsSet('outfit-saved', JSON.stringify(savedOutfits));
+    _lsSet('outfit-item-positions', JSON.stringify(itemPositions));
+    _lsSet('outfit-cat-defaults', JSON.stringify(categoryDefaults));
     setTheme(firstPerson.theme || 'minimal');
     applyMoodsSpectrum(firstPerson.moodsSpectrum || 0);
     refreshCatConfig();
     setSilhouette(firstPerson.gender || 'female');
     setEditMode(firstPerson.editMode === true);
     showIntimate = firstPerson.showIntimate === true;
-    localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
+    _lsSet('wardrobe-show-intimate', showIntimate ? '1' : '0');
     showIntimateToggle();
     clearCanvas();
     renderCloset();
@@ -4376,7 +4420,7 @@ function mergeImportData(data) {
     const newItems = migrated.closet.filter(i => !existingIds.has(String(i.id)));
     if (newItems.length) {
       closetItems = closetItems.concat(newItems);
-      localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+      _lsSet('outfit-closet', JSON.stringify(closetItems));
       renderCloset();
       changed = true;
     }
@@ -4386,7 +4430,7 @@ function mergeImportData(data) {
     const newOutfits = migrated.savedOutfits.filter(o => !existingIds.has(String(o.id)));
     if (newOutfits.length) {
       savedOutfits = newOutfits.concat(savedOutfits);
-      localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
+      _lsSet('outfit-saved', JSON.stringify(savedOutfits));
       renderOutfits();
       changed = true;
     }
@@ -4440,7 +4484,7 @@ closetItems.forEach(item => {
   }
   delete item.originalCategory;
 });
-if (migratedUsed) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+if (migratedUsed) _lsSet('outfit-closet', JSON.stringify(closetItems));
 
 // ── Purge legacy sample items seeded in earlier versions ──
 const SAMPLE_SRCS = [
@@ -4458,7 +4502,7 @@ closetItems = closetItems.filter(i =>
   !SAMPLE_SRCS.some(s => i.src && i.src.startsWith(s)) &&
   VALID_CATS.has(i.category)
 );
-if (closetItems.length !== before) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+if (closetItems.length !== before) _lsSet('outfit-closet', JSON.stringify(closetItems));
 
 renderCloset(); renderOutfits(); updateDropHint();
 // Launch panel state: small screens = closed, large screens = both open
@@ -4473,10 +4517,10 @@ if (window.innerWidth <= 600) {
   setPanels(true, true); logoCycle = 0; preCloseCycle = null;
 }
 // Load persisted settings
-if (localStorage.getItem('wardrobe-full-buttons')) { fullButtons = true; }
+if (_lsGet('wardrobe-full-buttons')) { fullButtons = true; }
 applyFullButtons();
 // Load persisted theme — always call setTheme so CSS vars are applied even on first launch
-const savedTheme = localStorage.getItem('wardrobe-theme');
+const savedTheme = _lsGet('wardrobe-theme');
 setTheme(savedTheme || (getActivePerson()?.theme) || 'minimal');
 
 // ── Bootstrap People system ──
@@ -4493,8 +4537,8 @@ if (people.length === 0) {
   };
   people.push(defaultPerson);
   activePersonId = 'default';
-  localStorage.setItem('wardrobe-people', JSON.stringify(people));
-  localStorage.setItem('wardrobe-active-person', activePersonId);
+  _lsSet('wardrobe-people', JSON.stringify(people));
+  _lsSet('wardrobe-active-person', activePersonId);
 } else {
   ensureDefaultPerson();
   // Load active person's moods spectrum
@@ -4508,6 +4552,22 @@ renderMoodsSelect();
   const el = document.getElementById(id);
   if (el && el.parentElement !== document.body) document.body.appendChild(el);
 });
+// Apply crisp outline filter — fallback to drop-shadow if url() filter unsupported
+try {
+  const testEl = document.createElement('div');
+  testEl.style.filter = 'url(#crisp-outline)';
+  const supported = testEl.style.filter.indexOf('url') !== -1;
+  const rule = supported
+    ? '.canvas-item img { filter: url(#crisp-outline) !important; }'
+    : '.canvas-item img { filter: drop-shadow(0 4px 12px rgba(61,46,42,.15)) !important; }';
+  const styleEl = document.createElement('style');
+  styleEl.textContent = rule;
+  document.head.appendChild(styleEl);
+} catch(e) {
+  const styleEl = document.createElement('style');
+  styleEl.textContent = '.canvas-item img { filter: drop-shadow(0 4px 12px rgba(61,46,42,.15)) !important; }';
+  document.head.appendChild(styleEl);
+}
 const LINGERIE_CATS = new Set(['Bra', 'Panties', 'Lingerie']);
 const Z_TIERS = [
   new Set(['Panties']),                                    // 0 — furthest back
@@ -4671,7 +4731,7 @@ function openRatingModal(item) {
 function closeRatingModal() {
   document.getElementById('ratingModal').classList.remove('open');
   ratingItemId = null;
-  localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
+  _lsSet('outfit-closet', JSON.stringify(closetItems));
   renderCloset();
 }
 function setStatusAndClose(status) {
@@ -4813,7 +4873,7 @@ function setCtxDefault(ciId) {
   } else {
     categoryDefaults[ci.category] = { x: ci.x, y: ci.y, w: ci.w, h: ci.h, z: ci.z };
   }
-  localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+  _lsSet('outfit-cat-defaults', JSON.stringify(categoryDefaults));
   showToast(`Default set for ${CAT_CONFIG[ci.category]?.label || ci.category}`);
 }
 function resetToSavedPos(ciId) {
@@ -4954,7 +5014,7 @@ function setHair(mode) {
   const ap = getActivePerson();
   if (ap) {
     showIntimate = ap.showIntimate === true;
-    localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
+    _lsSet('wardrobe-show-intimate', showIntimate ? '1' : '0');
     refreshCatConfig();
     setSilhouette(ap.gender || 'female');
     showIntimateToggle();
