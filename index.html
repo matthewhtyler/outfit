@@ -3040,7 +3040,7 @@ let activePersonId = localStorage.getItem('wardrobe-active-person') || null;
 // Default person auto-created if none exist
 function ensureDefaultPerson() {
   if (people.length === 0) {
-    const def = { id: 'default', name: 'Person', gender: 'female', moodsSpectrum: 0, theme: 'minimal', closet: [], outfits: [] };
+    const def = { id: 'default', name: 'Person', gender: 'male', moodsSpectrum: 0, theme: 'minimal', closet: [], outfits: [] };
     people.push(def);
     activePersonId = 'default';
     savePeopleData();
@@ -4246,8 +4246,8 @@ if (people.length === 0) {
   const defaultPerson = {
     id: 'default',
     name: 'Person',
-    gender: 'female',
-    moodsSpectrum: 3, // default = Innocent/Elegant/Sexy/Naughty
+    gender: 'male',
+    moodsSpectrum: 3,
     theme: savedTheme || 'minimal',
     closet: JSON.parse(JSON.stringify(closetItems)),
     outfits: JSON.parse(JSON.stringify(savedOutfits))
