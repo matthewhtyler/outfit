@@ -342,6 +342,11 @@ body.handsome .closet-item:hover img { filter:drop-shadow(1px 0 0 #c3bba7) drop-
 .closet-item-duo { display:flex; width:100%; height:100%; }
 .closet-item-duo img { width:50%; height:100%; object-fit:contain; padding:6px; background:#FDFAF7; }
 body.night .closet-item-duo img { background:#1E1618; }
+.closet-item-socks { display:flex; width:100%; height:100%; justify-content:center; align-items:center; gap:2px; }
+.closet-item-socks img { width:44%; height:100%; object-fit:contain; padding:4px; }
+.closet-item-socks img:last-child { transform: scaleX(-1); }
+.outfit-socks-pair { display:inline-flex; align-items:center; height:65px; gap:1px; }
+.outfit-socks-pair img { height:65px; width:25px; object-fit:contain; }
 .closet-item .remove-btn { position:absolute; top:4px; right:4px; width:18px; height:18px; background:rgba(255,255,255,.9); border:none; border-radius:50%; font-size:10px; cursor:pointer; display:none; align-items:center; justify-content:center; color:var(--rose); }
 .closet-item:hover .remove-btn { display:flex; }
 
@@ -1582,9 +1587,13 @@ function makeClosetEl(item, outfitSrcs) {
   const starBadge = (item.rating >= 4) ? `<div class="star-badge">☆</div>` : '';
   const illSrcs = item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []);
   const showDuo = item.category === 'Costume' && viewMode === 'illustrations' && illSrcs.length >= 2;
+  const showSocks = item.category === 'SocksStockings';
   let imgHtml;
   if (showDuo) {
     imgHtml = `<div class="closet-item-duo"><img src="${illSrcs[0]}" alt="${item.name}" onerror="this.style.opacity=.3"/><img src="${illSrcs[1]}" alt="${item.name}" onerror="this.style.opacity=.3"/></div>`;
+  } else if (showSocks) {
+    const sockSrc = illSrcs.length ? illSrcs[0] : item.src;
+    imgHtml = `<div class="closet-item-socks"><img src="${sockSrc}" alt="${item.name}" onerror="this.style.opacity=.3"/><img src="${sockSrc}" alt="${item.name}" onerror="this.style.opacity=.3"/></div>`;
   } else {
     const dispSrc = itemDisplaySrc(item);
     imgHtml = `<img src="${dispSrc}" alt="${item.name}" onerror="this.style.opacity=.3"/>`;
@@ -2724,6 +2733,9 @@ function renderOutfits() {
     });
     const imgs = dedupedItems.slice(0,4).map(i => {
       const src = i.illustrationSrc ? i.illustrationSrc : i.src;
+      if (i.category === 'SocksStockings') {
+        return `<span class="outfit-socks-pair"><img src="${src}"/><img src="${src}" style="transform:scaleX(-1)"/></span>`;
+      }
       return `<img src="${src}"/>`;
     }).join('');
     card.innerHTML = `
