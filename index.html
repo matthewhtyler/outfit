@@ -2962,6 +2962,20 @@ document.getElementById('canvas').addEventListener('touchend', e => {
   const isBackground = t.id === 'canvas' || t.id === 'stage' || t.closest?.('.canvas-drop-hint');
   // In edit mode, only fire on background taps; in non-edit mode, fire anywhere non-excluded
   if (!isPictureMode && editMode && !isBackground) return;
+
+  // On small screens, ignore touches in the safe zone around camera button and layer slider
+  if (window.innerWidth <= 600) {
+    const touch = e.changedTouches[0];
+    const SAFE = 36;
+    for (const id of ['shareBtn', 'layerSliderWrap']) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (touch.clientX >= r.left - SAFE && touch.clientX <= r.right + SAFE &&
+          touch.clientY >= r.top - SAFE && touch.clientY <= r.bottom + SAFE) return;
+    }
+  }
+
   e.preventDefault();
   const touch = e.changedTouches[0];
   handleCanvasBgClick(touch.clientX, t);
