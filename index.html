@@ -2434,7 +2434,8 @@ function renderPhotosOverlay() {
 
     // Highlight matching closet item on click — open wardrobe panel first if needed
     thumb.addEventListener('click', () => {
-      if (!panelState.closet) setPanels(true, panelState.outfits);
+      const isSmall = window.innerWidth <= 600;
+      if (!panelState.closet) setPanels(true, isSmall ? false : panelState.outfits);
       const closetEl = document.querySelector(`.closet-item[data-id="${ci.itemId}"]`);
       const doHighlight = () => {
         if (closetEl) {
@@ -2930,6 +2931,8 @@ function handleCanvasBgClick(clientX, target) {
     if (panelState.closet || panelState.outfits) { setPanels(false, false); return; }
     const canvasRect = document.getElementById('canvas').getBoundingClientRect();
     const isRightSide = clientX > canvasRect.left + canvasRect.width / 2;
+    // In photos mode on small screen, right-side taps do nothing (thumbnails are there)
+    if (isRightSide && viewMode === 'photos') return;
     if (isRightSide) setPanels(false, true);
     else setPanels(true, false);
     return;
