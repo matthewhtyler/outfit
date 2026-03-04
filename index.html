@@ -1175,7 +1175,6 @@ const CAT_CONFIG_FEMALE = {
   Sweater:        { label: 'Sweater' },
   Skirt:          { label: 'Skirt' },
   Shorts:         { label: 'Shorts' },
-  Jeans:          { label: 'Jeans' },
   Pants:          { label: 'Pants' },
   SocksStockings: { label: 'Socks' },
   Shoes:          { label: 'Shoes' },
@@ -1253,10 +1252,10 @@ function showIntimateToggle() {
 
 function setShowIntimate(val) {
   showIntimate = !!val;
+  localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
   const ap = getActivePerson();
   if (ap) { ap.showIntimate = showIntimate; savePeopleData(); }
   renderCatGrid();
-  // update checkbox if visible
   const cb = document.getElementById('intimateCheckbox');
   if (cb) cb.checked = showIntimate;
 }
@@ -3075,6 +3074,8 @@ function loadPersonData(personId) {
   closetItems = JSON.parse(JSON.stringify(person.closet || []));
   setEditMode(person.editMode === true);
   showIntimate = person.showIntimate === true;
+  localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
+  showIntimateToggle();
   renderCloset();
   renderOutfits();
   updateDropHint();
@@ -3984,6 +3985,8 @@ function importPeopleAware(importedPeople) {
     setSilhouette(firstPerson.gender || 'female');
     setEditMode(firstPerson.editMode === true);
     showIntimate = firstPerson.showIntimate === true;
+    localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
+    showIntimateToggle();
     clearCanvas();
     renderCloset();
     renderOutfits();
