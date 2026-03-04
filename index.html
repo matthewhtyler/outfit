@@ -2611,7 +2611,7 @@ function openSaveModal() {
     if (outfit) {
       persistPlacements();
       flushItemPositions();
-      outfit.items = JSON.parse(JSON.stringify(canvasItems));
+      outfit.items = JSON.parse(JSON.stringify(canvasItems.map(ci => { const c = {...ci}; delete c.zLocked; return c; })));
       outfit.timestamp = new Date().toLocaleDateString();
       localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
       refreshCatConfig();
@@ -2683,7 +2683,7 @@ function saveOutfit() {
   const name = document.getElementById('outfitNameInput').value.trim() || 'My Outfit';
   persistPlacements();
   flushItemPositions();
-  savedOutfits.unshift({ id: Date.now(), name, vibe: selectedVibe, items: JSON.parse(JSON.stringify(canvasItems)), timestamp: new Date().toLocaleDateString() });
+  savedOutfits.unshift({ id: Date.now(), name, vibe: selectedVibe, items: JSON.parse(JSON.stringify(canvasItems.map(ci => { const c = {...ci}; delete c.zLocked; return c; }))), timestamp: new Date().toLocaleDateString() });
   localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
   renderOutfits(); closeSaveModal();
   document.getElementById('outfitNameInput').value = '';
@@ -2768,6 +2768,7 @@ function loadOutfit(id, e) {
     const copy = { ...ci };
     // Offset z by current zCounter baseline, preserving relative order exactly
     copy.z = zBase + ((ci.z || 0) - minZ) + 1;
+    copy.zLocked = true; // preserve saved z, don't auto-tier
     canvasItems.push(copy);
     renderCanvasItem(copy);
   });
@@ -4265,14 +4266,18 @@ renderPeopleMenu();
 renderMoodsSelect();
 const LINGERIE_CATS = new Set(['Bra', 'Panties', 'Lingerie']);
 const Z_TIERS = [
-  new Set(['Panties']),
-  new Set(['SocksStockings']),
-  new Set(['Bra']),
-  new Set(['Lingerie']),
-  new Set(['Shoes']),
-  new Set(['Shorts', 'Skirt', 'Pants', 'Jeans']),
-  new Set(['Top', 'TShirt', 'ButtonShirt', 'Sweater', 'Sweatshirt']),
-  new Set(['Jacket']),
+  new Set(['Panties']),                                    // 0 — furthest back
+  new Set(['SocksStockings']),                             // 1
+  new Set(['Bra']),                                        // 2
+  new Set(['Costume']),                                    // 3
+  new Set(['Lingerie']),                                   // 4
+  new Set(['Dress', 'Nightie']),                           // 5
+  new Set(['Shorts', 'Skirt', 'Pants', 'Jeans']),          // 6
+  new Set(['TShirt', 'Top']),                              // 7
+  new Set(['ButtonShirt', 'Sweater', 'Sweatshirt']),       // 8
+  new Set(['Shoes']),                                      // 9
+  new Set(['Accessory']),                                  // 10
+  new Set(['Jacket']),                                     // 11 — furthest front
 ];
 function getTier(category) {
   for (let i = 0; i < Z_TIERS.length; i++) {
@@ -4281,25 +4286,25 @@ function getTier(category) {
   return null; // no tier = free z
 }
 function applyZTiers() {
-  // Only reorder items that belong to a defined tier
-  const tiered = canvasItems.filter(ci => getTier(ci.category) !== null);
-  const free = canvasItems.filter(ci => getTier(ci.category) === null);
-  if (!tiered.length) return;
-  // Sort tiered items by tier ascending
-  tiered.sort((a, b) => getTier(a.category) - getTier(b.category));
-  // Find the minimum z across all items to anchor below
-  const allZ = canvasItems.map(ci => ci.z);
-  const minZ = allZ.length ? Math.min(...allZ) : 1;
-  // Assign tiered items z values starting from minZ, preserving relative order within same tier
+  // Items loaded from a saved outfit have zLocked=true — respect their saved z
+  // Only auto-tier items that are freshly added (no zLocked flag)
+  const toTier = canvasItems.filter(ci => !ci.zLocked && getTier(ci.category) !== null);
+  const skip = canvasItems.filter(ci => ci.zLocked || getTier(ci.category) === null);
+  if (!toTier.length) return;
+  // Sort by tier ascending
+  toTier.sort((a, b) => getTier(a.category) - getTier(b.category));
+  // Find min z among all non-locked items to anchor below locked ones
+  const allUnlockedZ = toTier.map(ci => ci.z);
+  const minZ = allUnlockedZ.length ? Math.min(...allUnlockedZ) : 1;
   let z = minZ;
-  tiered.forEach(ci => {
+  toTier.forEach(ci => {
     ci.z = z++;
     const el = document.getElementById(ci.id);
     if (el) el.style.zIndex = ci.z;
   });
-  // Bump free items above all tiered items
+  // Bump free (no-tier, unlocked) items above all tiered items
   const maxTieredZ = z - 1;
-  free.forEach(ci => {
+  skip.filter(ci => !ci.zLocked).forEach(ci => {
     if (ci.z <= maxTieredZ) {
       ci.z = ++z;
       const el = document.getElementById(ci.id);
