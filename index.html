@@ -1837,14 +1837,18 @@ function addToCanvas(item, x, y, forceSize) {
     const hasOwnSavedPos = Array.isArray(savedPieces) && savedPieces.length > 0;
 
     if (hasOwnSavedPos) {
-      // Explicitly saved position — use exactly as saved
+      // Explicitly saved position — use exactly as saved, preserving relative z-order
       const sorted = [...savedPieces].sort((a, b) => (a.z || 0) - (b.z || 0));
+      const minZ = sorted[0].z || 0;
+      const zBase = zCounter;
+      zCounter += sorted.length;
       let lastCi;
       sorted.forEach(piece => {
         const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
           src: item.src, illustrationSrc: piece.src, canvasSrc: piece.src,
           name: item.name, itemId: String(item.id), category: item.category,
-          x: piece.x, y: piece.y, w: piece.w, h: piece.h, rot: piece.rot||0, flipped: piece.flipped||false, z: ++zCounter };
+          x: piece.x, y: piece.y, w: piece.w, h: piece.h, rot: piece.rot||0, flipped: piece.flipped||false,
+          z: zBase + ((piece.z || 0) - minZ) + 1 };
         canvasItems.push(ci); renderCanvasItem(ci); lastCi = ci;
       });
       if (lastCi) selectItem(lastCi.id);
