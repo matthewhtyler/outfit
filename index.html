@@ -3014,6 +3014,7 @@ function toggleVibeFilter(mood) {
 }
 
 let moodDropdownOpen = false;
+let starDropdownOpen = false;
 function toggleMoodDropdown() {
   moodDropdownOpen = !moodDropdownOpen;
   const dd = document.getElementById('moodDropdown');
@@ -4212,7 +4213,7 @@ function handleFileOpen(e) {
         const changed = mergeImportData(data);
         showToast(changed ? 'Imported ' + getThemeDiamond() : 'Nothing new');
       }
-    } catch(err) { console.error('Import error:', err); showToast('Import error — check console'); }
+    } catch(err) { console.error('Import error:', err); showToast('Import error: ' + (err && err.message ? err.message : String(err))); }
   };
   reader.readAsText(file);
   e.target.value = '';
@@ -4631,7 +4632,6 @@ function positionDropdownByBtn(dd, btnId) {
   dd.style.right = 'auto';
 }
 
-let starDropdownOpen = false;
 function toggleStarDropdown() {
   starDropdownOpen = !starDropdownOpen;
   const dd = document.getElementById('starDropdown');
