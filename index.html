@@ -2386,6 +2386,9 @@ function renderPhotosOverlay() {
     seen.add(ci.itemId); return true;
   });
 
+  // Sort by canvas y position so top thumbnails connect to top canvas items — minimises line crossings
+  uniqueItems.sort((a, b) => (a.y + a.h / 2) - (b.y + b.h / 2));
+
   // Split into left and right columns
   const half = Math.ceil(uniqueItems.length / 2);
   const leftItems  = uniqueItems.slice(0, half);
