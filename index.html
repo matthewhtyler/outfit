@@ -59,7 +59,9 @@ body.night #starFilterBtn:hover,
 body.night #moodFilterBtn:hover { background:transparent !important; color:var(--text-mid) !important; }
 /* Hide floating item controls when any modal/popup is open */
 body:has(.modal-overlay.open) #floatingControls,
-body:has(#hamburgerWrap.open) #floatingControls {
+body:has(#hamburgerWrap.open) #floatingControls,
+body:has(.modal-overlay.open) .resize-grabber,
+body:has(#hamburgerWrap.open) .resize-grabber {
   display: none !important;
 }
 body.night .toolbar-btn { background:#3A2A2E; }
@@ -422,7 +424,7 @@ body.picture-mode .canvas-figure svg {
 .ctrl-btn.rotate-handle { cursor:grab; }
 .ctrl-btn.rotate-handle:active { cursor:grabbing; }
 /* Corner resize grabber on selected canvas items */
-.resize-grabber { display:none; position:absolute; bottom:0; right:0; width:16px; height:16px; cursor:se-resize; z-index:10; overflow:hidden; }
+.resize-grabber { display:none; position:absolute; bottom:0; right:0; width:16px; height:16px; cursor:se-resize; z-index:99999; overflow:hidden; }
 .resize-grabber::after { content:''; position:absolute; bottom:2px; right:2px; width:8px; height:8px; border-right:2px solid white; border-bottom:2px solid white; border-radius:1px; opacity:.9; filter:drop-shadow(1px 1px 1px rgba(0,0,0,.7)); }
 @media (pointer: coarse) {
   .resize-grabber { width:36px; height:36px; overflow:visible; }
@@ -1849,6 +1851,9 @@ function addToCanvas(item, x, y, forceSize) {
       // No saved position — place using category default x/y but correct size to natural ratio
       let lastCi;
       const createdCis = [];
+      // Pre-allocate z values: first piece highest (on top), last piece lowest
+      const zValues = srcs.map((_, i) => zCounter + srcs.length - i);
+      zCounter += srcs.length;
       srcs.forEach((src, idx) => {
         let px2, py2, pw2, ph2;
         if (catDefault && Array.isArray(catDefault) && catDefault[idx]) {
@@ -1862,7 +1867,7 @@ function addToCanvas(item, x, y, forceSize) {
         const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
           src: item.src, illustrationSrc: src, canvasSrc: src,
           name: item.name, itemId: String(item.id), category: item.category,
-          x: px2, y: py2, w: pw2, h: ph2, rot: 0, flipped: false, z: ++zCounter };
+          x: px2, y: py2, w: pw2, h: ph2, rot: 0, flipped: false, z: zValues[idx] };
         canvasItems.push(ci); renderCanvasItem(ci);
         createdCis.push({ ci, src });
         lastCi = ci;
