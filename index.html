@@ -521,15 +521,15 @@ body.minimal .outfit-preview.quad-center > img, body.petite .outfit-preview.quad
 .outfit-preview.quad-center .outfit-socks-pair { display:inline-flex; align-items:center; width:28px; height:65px; overflow:visible; }
 .outfit-preview.quad-center .outfit-socks-pair img { height:65px; width:14px; object-fit:contain; position:static; transform:none; margin-right:-8px; }
 .outfit-preview.quad-center .outfit-socks-pair img:last-child { transform:scaleX(-1) !important; margin-right:0; }
-.outfit-preview.tri-small { position:relative; }
-.outfit-preview.tri-small > * { position:absolute; transform:translate(-50%,-50%); }
+.outfit-preview.tri-small { position:relative; display:block; height:90px; padding:0; background:var(--canvas-bg); }
+.outfit-preview.tri-small > * { position:absolute !important; width:38px !important; height:44px !important; object-fit:contain !important; margin:0 !important; transform:translate(-50%,-50%) !important; flex-shrink:unset !important; }
 .outfit-preview.tri-small > *:nth-child(1) { left:27%; top:30%; }
 .outfit-preview.tri-small > *:nth-child(2) { left:73%; top:30%; }
 .outfit-preview.tri-small > *:nth-child(3) { left:50%; top:70%; }
-.outfit-preview.tri-small > img { height:55px; width:38px; object-fit:contain; filter:drop-shadow(1px 0 0 var(--text-light)) drop-shadow(-1px 0 0 var(--text-light)) drop-shadow(0 1px 0 var(--text-light)) drop-shadow(0 -1px 0 var(--text-light)); position:absolute; }
-.outfit-preview.tri-small .outfit-socks-pair { display:inline-flex; align-items:center; width:38px; height:55px; overflow:visible; }
-.outfit-preview.tri-small .outfit-socks-pair img { height:55px; width:19px; object-fit:contain; position:static; transform:none; margin-right:-10px; }
-.outfit-preview.tri-small .outfit-socks-pair img:last-child { transform:scaleX(-1) !important; margin-right:0; }
+.outfit-preview.tri-small > img { height:44px !important; width:38px !important; object-fit:contain; filter:drop-shadow(1px 0 0 var(--text-light)) drop-shadow(-1px 0 0 var(--text-light)) drop-shadow(0 1px 0 var(--text-light)) drop-shadow(0 -1px 0 var(--text-light)); position:absolute; }
+.outfit-preview.tri-small .outfit-socks-pair { display:inline-flex !important; width:38px !important; height:44px !important; justify-content:center; align-items:center; }
+.outfit-preview.tri-small .outfit-socks-pair img { height:44px !important; width:17px !important; object-fit:contain; position:static; transform:none !important; margin-right:-8px !important; }
+.outfit-preview.tri-small .outfit-socks-pair img:last-child { transform:scaleX(-1) !important; margin-right:0 !important; }
 body.minimal .outfit-preview.tri-small > img, body.petite .outfit-preview.tri-small > img { filter:drop-shadow(1px 0 0 #999) drop-shadow(-1px 0 0 #999) drop-shadow(0 1px 0 #999) drop-shadow(0 -1px 0 #999); }
 .outfit-preview.tri-center { position:relative; }
 .outfit-preview.tri-center > * { position:absolute; transform:translate(-50%,-50%); top:50%; }
@@ -745,19 +745,23 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   body.panel-open #backBtn,
   body.panel-open #fwdBackSep { display: none; }
 
-  /* Outfit preview: only overlap when needed — let items breathe if they fit */
-  .outfit-preview:not(.grid-2x2) { gap: 4px; padding: 6px 4px; justify-content: center; flex-wrap: nowrap; }
-  .outfit-preview:not(.grid-2x2) img { width: 40px; height: 55px; flex-shrink: 1; }
-  /* When 4+ items, overlap to fit */
-  .outfit-preview:not(.grid-2x2):has(img:nth-child(4)) img { margin-left: -10px; }
-  .outfit-preview:not(.grid-2x2):has(img:nth-child(4)) img:first-child { margin-left: 0; }
+  /* Outfit preview: uniform 38x44px sizing on all small screen previews */
+  .outfit-preview { display:block; position:relative; height:90px; padding:0; background:var(--canvas-bg); }
+  .outfit-preview > * { position:absolute !important; width:38px !important; height:44px !important; object-fit:contain !important; margin:0 !important; transform:translate(-50%,-50%) !important; flex-shrink:unset !important; }
+  .outfit-preview img { width:38px !important; height:44px !important; flex-shrink:unset !important; }
+  .outfit-preview .outfit-socks-pair { display:inline-flex !important; width:38px !important; height:44px !important; justify-content:center; align-items:center; }
+  .outfit-preview .outfit-socks-pair img { height:44px !important; width:17px !important; margin-right:-8px !important; transform:none !important; }
+  .outfit-preview .outfit-socks-pair img:last-child { transform:scaleX(-1) !important; margin-right:0 !important; }
+
+  /* Single item: center it */
+  .outfit-preview:not(.duo-center):not(.tri-small):not(.grid-2x2) > *:only-child { left:50%; top:50%; }
 
   /* Fix outfit info strip height */
   .outfit-info .outfit-vibe { bottom: 9px; }
 
-  /* Duo-center: bring points closer together on small screens */
-  .outfit-preview.duo-center > *:nth-child(1) { left: 33%; }
-  .outfit-preview.duo-center > *:nth-child(2) { left: 67%; }
+  /* Duo-center: match grid-2x2 row spacing exactly */
+  .outfit-preview.duo-center > *:nth-child(1) { left: 27%; top: 50%; }
+  .outfit-preview.duo-center > *:nth-child(2) { left: 73%; top: 50%; }
 }
 
 @media (min-width: 601px) {
@@ -4602,31 +4606,72 @@ function getTier(category) {
   return null; // no tier = free z
 }
 function applyZTiers() {
-  // Items loaded from a saved outfit have zLocked=true — respect their saved z
-  // Only auto-tier items that are freshly added (no zLocked flag)
-  const toTier = canvasItems.filter(ci => !ci.zLocked && getTier(ci.category) !== null);
-  const skip = canvasItems.filter(ci => ci.zLocked || getTier(ci.category) === null);
-  if (!toTier.length) return;
-  // Sort by tier ascending
-  toTier.sort((a, b) => getTier(a.category) - getTier(b.category));
-  // Find min z among all non-locked items to anchor below locked ones
-  const allUnlockedZ = toTier.map(ci => ci.z);
-  const minZ = allUnlockedZ.length ? Math.min(...allUnlockedZ) : 1;
-  let z = minZ;
-  toTier.forEach(ci => {
+  if (!canvasItems.length) return;
+
+  // Separate locked items (keep their z) from items to auto-tier
+  const locked = canvasItems.filter(ci => ci.zLocked);
+  const unlocked = canvasItems.filter(ci => !ci.zLocked);
+
+  if (!unlocked.length) return;
+
+  // Give each unlocked item a tier value (null = free/no-tier)
+  const tiered  = unlocked.filter(ci => getTier(ci.category) !== null);
+  const free     = unlocked.filter(ci => getTier(ci.category) === null);
+
+  // Merge ALL items and assign z in one unified sort:
+  // locked items keep their z, tiered items slot by tier, free items go on top
+  // Strategy: collect all z slots, sort locked by their saved z, interleave tiered by tier
+
+  // 1. Start z above 0
+  let z = 1;
+
+  // 2. Build a combined ordering:
+  //    - locked items sorted by their existing z
+  //    - tiered items sorted by tier
+  //    - free items on top
+  // We interleave locked and tiered by tier vs saved-z rank
+
+  // Simple approach: assign tiers a relative rank, then interleave with locked
+  tiered.sort((a, b) => getTier(a.category) - getTier(b.category));
+  locked.sort((a, b) => a.z - b.z);
+
+  // Combine: for each position decide if the next locked item's tier is lower
+  // than the next tiered item's tier. Use locked item's category tier if available.
+  const combined = [];
+  let li = 0, ti = 0;
+  while (li < locked.length || ti < tiered.length) {
+    const lockedTier = li < locked.length ? (getTier(locked[li].category) ?? 999) : Infinity;
+    const tieredTier = ti < tiered.length ? getTier(tiered[ti].category) : Infinity;
+    if (lockedTier <= tieredTier && li < locked.length) {
+      combined.push({ ci: locked[li++], lock: true });
+    } else if (ti < tiered.length) {
+      combined.push({ ci: tiered[ti++], lock: false });
+    } else {
+      combined.push({ ci: locked[li++], lock: true });
+    }
+  }
+
+  // Assign z values in order
+  combined.forEach(({ ci, lock }) => {
     ci.z = z++;
-    const el = document.getElementById(ci.id);
-    if (el) el.style.zIndex = ci.z;
-  });
-  // Bump free (no-tier, unlocked) items above all tiered items
-  const maxTieredZ = z - 1;
-  skip.filter(ci => !ci.zLocked).forEach(ci => {
-    if (ci.z <= maxTieredZ) {
-      ci.z = ++z;
+    if (!lock) { // only update DOM for unlocked items
+      const el = document.getElementById(ci.id);
+      if (el) el.style.zIndex = ci.z;
+    } else {
+      // update locked DOM too so render matches
       const el = document.getElementById(ci.id);
       if (el) el.style.zIndex = ci.z;
     }
   });
+
+  // Free (no-tier) unlocked items go on top
+  free.forEach(ci => {
+    ci.z = z++;
+    const el = document.getElementById(ci.id);
+    if (el) el.style.zIndex = ci.z;
+  });
+
+  zCounter = z;
 }
 function pinLingerieToBack() { applyZTiers(); }
 
