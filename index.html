@@ -2716,12 +2716,12 @@ function renderOutfits() {
     card.dataset.src = outfit.items.map(i => i.src).join('||');
     const seenSrcs = new Set();
     const dedupedItems = outfit.items.filter(i => {
-      const src = (viewMode === 'illustrations' && i.illustrationSrc) ? i.illustrationSrc : i.src;
+      const src = i.illustrationSrc ? i.illustrationSrc : i.src;
       if (seenSrcs.has(src)) return false;
       seenSrcs.add(src); return true;
     });
     const imgs = dedupedItems.slice(0,4).map(i => {
-      const src = (viewMode === 'illustrations' && i.illustrationSrc) ? i.illustrationSrc : i.src;
+      const src = i.illustrationSrc ? i.illustrationSrc : i.src;
       return `<img src="${src}"/>`;
     }).join('');
     card.innerHTML = `
