@@ -4236,9 +4236,9 @@ if (window.innerWidth <= 600) {
 // Load persisted settings
 if (localStorage.getItem('wardrobe-full-buttons')) { fullButtons = true; }
 applyFullButtons();
-// Load persisted theme
+// Load persisted theme — always call setTheme so CSS vars are applied even on first launch
 const savedTheme = localStorage.getItem('wardrobe-theme');
-if (savedTheme) setTheme(savedTheme);
+setTheme(savedTheme || (getActivePerson()?.theme) || 'minimal');
 
 // ── Bootstrap People system ──
 // Migrate existing closet/outfit data into default person if needed
