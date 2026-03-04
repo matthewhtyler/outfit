@@ -499,10 +499,10 @@ body:not(.edit-mode) .closet-item .used-check { display:none; }
 .outfit-card:hover { border-color:var(--blush-mid); box-shadow:var(--shadow-hover); transform:translateY(-1px); }
 .outfit-preview { height:90px; background:var(--canvas-bg); display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; overflow:hidden; }
 .outfit-preview img { height:65px; width:50px; object-fit:contain; filter:drop-shadow(1px 0 0 var(--text-light)) drop-shadow(-1px 0 0 var(--text-light)) drop-shadow(0 1px 0 var(--text-light)) drop-shadow(0 -1px 0 var(--text-light)); }
-body.minimal .outfit-preview img, body.petite .outfit-preview img { filter:drop-shadow(1px 0 0 #555) drop-shadow(-1px 0 0 #555) drop-shadow(0 1px 0 #555) drop-shadow(0 -1px 0 #555); }
+body.minimal .outfit-preview img, body.petite .outfit-preview img { filter:drop-shadow(1px 0 0 #222) drop-shadow(-1px 0 0 #222) drop-shadow(0 1px 0 #222) drop-shadow(0 -1px 0 #222); }
 body.minimal .outfit-preview.duo-center > img, body.petite .outfit-preview.duo-center > img,
 body.minimal .outfit-preview.tri-center > img, body.petite .outfit-preview.tri-center > img,
-body.minimal .outfit-preview.quad-center > img, body.petite .outfit-preview.quad-center > img { filter:drop-shadow(1px 0 0 #555) drop-shadow(-1px 0 0 #555) drop-shadow(0 1px 0 #555) drop-shadow(0 -1px 0 #555); }
+body.minimal .outfit-preview.quad-center > img, body.petite .outfit-preview.quad-center > img { filter:drop-shadow(1px 0 0 #222) drop-shadow(-1px 0 0 #222) drop-shadow(0 1px 0 #222) drop-shadow(0 -1px 0 #222); }
 .outfit-preview.duo-center { position:relative; }
 .outfit-preview.duo-center > * { position:absolute; transform:translate(-50%,-50%); top:50%; }
 .outfit-preview.duo-center > *:nth-child(1) { left:25%; }
@@ -744,6 +744,10 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
 
   /* Fix outfit info strip height */
   .outfit-info .outfit-vibe { bottom: 9px; }
+
+  /* Duo-center: bring points closer together on small screens */
+  .outfit-preview.duo-center > *:nth-child(1) { left: 33%; }
+  .outfit-preview.duo-center > *:nth-child(2) { left: 67%; }
 }
 
 /* Person checkboxes in Edit People */
