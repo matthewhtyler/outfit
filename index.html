@@ -689,6 +689,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   pointer-events: all;
   border: 2px solid var(--rose);
   transition: border-color .15s, transform .15s;
+  z-index: 16;
 }
 .photo-thumb:hover { transform: scale(1.06); }
 .photo-thumb.highlighted { box-shadow: 0 0 0 2px var(--rose); }
@@ -701,14 +702,14 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   background: var(--rose);
   transform: translate(-50%,-50%);
   pointer-events: none;
-  z-index: 16;
+  z-index: 17;
 }
 #photosLineSvg {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
   pointer-events: none;
-  z-index: 14;
+  z-index: 15;
   overflow: visible;
 }
 @media (max-width: 600px) {
@@ -2581,8 +2582,8 @@ function renderPhotosOverlay() {
     dot.style.top = center.y + 'px';
     overlay.appendChild(dot);
 
-    // Line from thumb edge to item center
-    const thumbConnX = side === 'left' ? thumbX + THUMB_W : thumbX;
+    // Line from thumb edge (extended 2px into border) to item center
+    const thumbConnX = side === 'left' ? thumbX + THUMB_W + 2 : thumbX - 2;
     const thumbConnY = thumbY + THUMB_H / 2;
 
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -2594,7 +2595,7 @@ function renderPhotosOverlay() {
     const lineColor = isNight ? 'var(--rose)' : '#000000';
     line.setAttribute('stroke', lineColor);
     line.setAttribute('stroke-width', '3');
-    line.setAttribute('opacity', '0.6');
+    line.setAttribute('opacity', '1');
     svg.appendChild(line);
   }
 
