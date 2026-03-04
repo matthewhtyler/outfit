@@ -122,7 +122,7 @@ body.handsome .logo span { color:#30342b; }
 body.handsome .stage-toggle-pill input:checked + .stage-toggle-track { background:#30342b; }
 body.handsome .vibe-opt.selected { border-color:#30342b; background:var(--blush); }
 body.handsome .cat-opt.selected { border-color:#30342b; background:var(--blush); }
-body.handsome .canvas-item.selected { filter:drop-shadow(0 0 6px rgba(196,187,168,.45)) drop-shadow(0 4px 14px rgba(196,187,168,.3)); }
+body.handsome .canvas-item.selected { outline: 2px solid rgba(196,187,168,.8); outline-offset: 2px; }
 /* Save button: light bg swapped with other buttons */
 /* Silhouette: very desaturated warm grey */
 body.handsome .canvas-figure svg { fill:#34342b !important; }
@@ -217,7 +217,7 @@ body.sandalwood .logo span { color:#2b2826; }
 body.sandalwood .stage-toggle-pill input:checked + .stage-toggle-track { background:#2b2826; }
 body.sandalwood .vibe-opt.selected { border-color:#2b2826; background:var(--blush); }
 body.sandalwood .cat-opt.selected { border-color:#2b2826; background:var(--blush); }
-body.sandalwood .canvas-item.selected { filter:drop-shadow(0 0 6px rgba(209,172,152,.45)) drop-shadow(0 4px 14px rgba(209,172,152,.3)); }
+body.sandalwood .canvas-item.selected { outline: 2px solid rgba(209,172,152,.8); outline-offset: 2px; }
 body.sandalwood .canvas-figure svg { fill:#1e1b18 !important; }
 body.sandalwood .canvas-figure svg path { fill:#1e1b18 !important; }
 body.sandalwood #layerSlider { opacity:.9; accent-color:#2b2826; }
@@ -356,8 +356,9 @@ body.night .closet-item-duo img { background:#1E1618; }
 
 .canvas-item { position:absolute; user-select:none; cursor:move; -webkit-user-drag:none; overflow:visible; }
 .canvas-item img { width:100%; height:100%; object-fit:fill; display:block; pointer-events:none; filter:drop-shadow(0 4px 12px rgba(61,46,42,.15)); -webkit-user-drag:none; }
-.canvas-item.selected { filter:drop-shadow(0 0 10px rgba(201,123,122,.55)) drop-shadow(0 4px 20px rgba(201,123,122,.35)); }
+.canvas-item.selected { outline: 2px solid rgba(201,123,122,.7); outline-offset: 2px; }
 .canvas-item.selected img { filter:none; }
+body.edit-mode .canvas-item { will-change: transform; }
 .canvas-item .item-controls { display:none !important; }
 body:not(.edit-mode) #floatingControls { display:none !important;  z-index:50;}
 /* Photos overlay: use dark olive in petite (same as handsome) */
@@ -2642,13 +2643,42 @@ function loadOutfit(id, e) {
   if (!outfit) return;
   clearCanvas();
   activeOutfitId = id;
-  outfit.items.forEach(ci => {
-    const copy = {...ci};
-    // Ensure z is above current max to preserve relative order
-    copy.z = ++zCounter;
+
+  // Sort by saved z so we render in correct order
+  const sorted = [...outfit.items].sort((a, b) => (a.z || 0) - (b.z || 0));
+  const minZ = sorted.length ? (sorted[0].z || 0) : 0;
+  const zBase = zCounter;
+
+  sorted.forEach(ci => {
+    const copy = { ...ci };
+    // Offset z by current zCounter baseline, preserving relative order exactly
+    copy.z = zBase + ((ci.z || 0) - minZ) + 1;
     canvasItems.push(copy);
     renderCanvasItem(copy);
   });
+  zCounter = zBase + sorted.length + 1;
+
+  // Write each item's position from outfit into itemPositions so re-adding
+  // from wardrobe lands in the same spot it was in this outfit
+  const byItemId = {};
+  sorted.forEach(ci => {
+    if (!ci.itemId) return;
+    if (!byItemId[ci.itemId]) byItemId[ci.itemId] = [];
+    byItemId[ci.itemId].push(ci);
+  });
+  Object.entries(byItemId).forEach(([itemId, pieces]) => {
+    if (pieces.length === 1 && !pieces[0].illustrationSrc) {
+      const p = pieces[0];
+      itemPositions[itemId] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot || 0, flipped: p.flipped || false };
+    } else {
+      itemPositions[itemId] = pieces.map(p => ({
+        src: p.illustrationSrc || p.canvasSrc,
+        x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot || 0, flipped: p.flipped || false
+      }));
+    }
+  });
+  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
+
   updateDropHint();
   if (editMode) setHair('down');
   pinLingerieToBack();
