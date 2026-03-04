@@ -1653,7 +1653,16 @@ function makeClosetEl(item, outfitSrcs) {
     }
   });
   // iOS single-tap fix: use touchend to bypass hover-then-click delay
+  // Track touchstart position to distinguish tap from scroll
+  let touchStartY = 0, touchStartX = 0;
+  el.addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
   el.addEventListener('touchend', e => {
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+    if (dy > 8 || dx > 8) return; // was a scroll, not a tap
     if (e.cancelable) e.preventDefault();
     el.classList.add('touch-active');
     setTimeout(() => el.classList.remove('touch-active'), 400);
@@ -2722,7 +2731,15 @@ function renderOutfits() {
         <button class="outfit-action-btn" title="Delete" onclick="deleteOutfit(${outfit.id},event)">✕</button>
       </div>`;
     let clickTimer;
+    let cardTouchStartY = 0, cardTouchStartX = 0;
+    card.addEventListener('touchstart', e => {
+      cardTouchStartY = e.touches[0].clientY;
+      cardTouchStartX = e.touches[0].clientX;
+    }, { passive: true });
     card.addEventListener('touchend', e => {
+      const dy = Math.abs(e.changedTouches[0].clientY - cardTouchStartY);
+      const dx = Math.abs(e.changedTouches[0].clientX - cardTouchStartX);
+      if (dy > 8 || dx > 8) return; // scroll, not tap
       if (e.cancelable) e.preventDefault();
       card.classList.add('touch-active');
       setTimeout(() => card.classList.remove('touch-active'), 400);
