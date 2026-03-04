@@ -389,11 +389,11 @@ body.night .closet-item-duo img { background:#1E1618; }
 body.edit-mode .canvas-item { will-change: transform; }
 .canvas-item .item-controls { display:none !important; }
 body:not(.edit-mode) #floatingControls { display:none !important;  z-index:50;}
-/* Photos overlay: use dark olive in petite (same as handsome) */
-body:not(.night):not(.sandalwood) .photo-thumb { border-color: #30342b; }
-body:not(.night):not(.sandalwood) .photo-thumb-dot { background: #30342b; }
-body.sandalwood .photo-thumb { border-color: #2b2826; }
-body.sandalwood .photo-thumb-dot { background: #2b2826; }
+/* Photos overlay: black lines/dots/borders except Dark Cherry */
+body:not(.night) .photo-thumb { border-color: #000; }
+body:not(.night) .photo-thumb-dot { background: #000; }
+body.sandalwood .photo-thumb { border-color: #000; }
+body.sandalwood .photo-thumb-dot { background: #000; }
 input, select, textarea { font-size:16px !important; }
 input::placeholder, textarea::placeholder { color:var(--text-light); opacity:0.6; }
 
@@ -2591,8 +2591,7 @@ function renderPhotosOverlay() {
     line.setAttribute('x2', center.x);
     line.setAttribute('y2', center.y);
     const isNight = document.body.classList.contains('night');
-    const isSandalwood = document.body.classList.contains('sandalwood');
-    const lineColor = isNight ? 'var(--rose)' : (isSandalwood ? '#2b2826' : '#30342b');
+    const lineColor = isNight ? 'var(--rose)' : '#000000';
     line.setAttribute('stroke', lineColor);
     line.setAttribute('stroke-width', '3');
     line.setAttribute('opacity', '0.6');
