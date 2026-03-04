@@ -1612,13 +1612,20 @@ function makeClosetEl(item, outfitSrcs) {
       document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
       document.getElementById('catModal').classList.add('open');
     } else {
-      // Single click → in photos mode with productUrl: open product page; else add to canvas
+      // Single click → in photos mode with productUrl: open product page; else toggle on/off canvas
       clickTimer = setTimeout(() => {
         clickTimer = null;
         if (viewMode === 'photos' && item.productUrl) {
           window.open(item.productUrl, '_blank');
         } else {
-          addToCanvasCenter(item);
+          const existing = canvasItems.filter(ci => String(ci.itemId) === String(item.id));
+          if (existing.length) {
+            existing.forEach(ci => { document.getElementById(ci.id)?.remove(); });
+            canvasItems = canvasItems.filter(ci => String(ci.itemId) !== String(item.id));
+            updateDropHint();
+          } else {
+            addToCanvasCenter(item);
+          }
         }
       }, 220);
     }
@@ -1628,7 +1635,16 @@ function makeClosetEl(item, outfitSrcs) {
     if (e.cancelable) e.preventDefault();
     el.classList.add('touch-active');
     setTimeout(() => el.classList.remove('touch-active'), 400);
-    if (!editMode) addToCanvasCenter(item);
+    if (!editMode) {
+      const existing = canvasItems.filter(ci => String(ci.itemId) === String(item.id));
+      if (existing.length) {
+        existing.forEach(ci => { document.getElementById(ci.id)?.remove(); });
+        canvasItems = canvasItems.filter(ci => String(ci.itemId) !== String(item.id));
+        updateDropHint();
+      } else {
+        addToCanvasCenter(item);
+      }
+    }
   }, { passive: false });
   return el;
 }
@@ -1795,11 +1811,12 @@ function addToCanvas(item, x, y, forceSize) {
   if (editMode) setHair('up');
   resetLayerSlider();
 
-  // In non-edit mode: swap out any existing items from the same category (Skirt/Shorts and Lingerie/Costume are interchangeable)
+  // In non-edit mode: swap out any existing items from the same category group
   if (!editMode) {
     const LINGERIE_COSTUME_SWAP = new Set(['Lingerie', 'Costume']);
-    const swapGroup = (item.category === 'Skirt' || item.category === 'Shorts')
-      ? ci => ci.category === 'Skirt' || ci.category === 'Shorts'
+    const BODY_SWAP = new Set(['Nightie', 'Dress', 'Top', 'Skirt', 'Shorts']);
+    const swapGroup = BODY_SWAP.has(item.category)
+      ? ci => BODY_SWAP.has(ci.category)
       : LINGERIE_COSTUME_SWAP.has(item.category)
       ? ci => LINGERIE_COSTUME_SWAP.has(ci.category)
       : (item.category === 'Jeans' || item.category === 'Pants')
@@ -2866,13 +2883,13 @@ function handleCanvasBgClick(clientX, target) {
   // If edit mode and item selected, just deselect
   if (editMode && selectedId) { selectItem(null); return; }
 
-  // Edit mode: tapping canvas only closes panels, never opens
-  if (editMode) {
+  const isSmall = window.innerWidth <= 600;
+
+  // Edit mode on small screen: only close panels, never open
+  if (editMode && isSmall) {
     if (panelState.closet || panelState.outfits) setPanels(false, false);
     return;
   }
-
-  const isSmall = window.innerWidth <= 600;
 
   // Small screen: if any panel open, close it (don't open the other)
   if (isSmall) {
@@ -4051,6 +4068,7 @@ function migrateImportData(data) {
     if (!item || typeof item !== 'object') return item;
     try {
       if (item.category === 'BraAndPanties') item.category = 'Lingerie';
+      if (item.category === 'Babydoll') item.category = 'Nightie';
       if (item.category === 'Used') item.category = item.originalCategory || 'Top';
       if (!VALID_CATS.has(item.category)) item.category = 'Top';
       delete item.originalCategory;
@@ -4177,7 +4195,10 @@ const SAMPLE_SRCS = [
   'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa',
 ];
 const VALID_CATS = new Set([...Object.keys(CAT_CONFIG_FEMALE), ...Object.keys(CAT_CONFIG_MALE), ...Object.keys(CAT_CONFIG_OTHER)]);
+const LEGACY_CAT_MAP = { 'Babydoll': 'Nightie' };
 const before = closetItems.length;
+// Remap legacy categories before filtering
+closetItems.forEach(i => { if (LEGACY_CAT_MAP[i.category]) i.category = LEGACY_CAT_MAP[i.category]; });
 closetItems = closetItems.filter(i =>
   !SAMPLE_SRCS.some(s => i.src && i.src.startsWith(s)) &&
   VALID_CATS.has(i.category)
@@ -4645,8 +4666,11 @@ function setHair(mode) {
 (function applyBootPerson() {
   const ap = getActivePerson();
   if (ap) {
+    showIntimate = ap.showIntimate === true;
+    localStorage.setItem('wardrobe-show-intimate', showIntimate ? '1' : '0');
     refreshCatConfig();
     setSilhouette(ap.gender || 'female');
+    showIntimateToggle();
   }
 })();
 
