@@ -414,6 +414,48 @@ body.picture-mode .canvas-drop-hint { display:none !important; }
 body.picture-mode header { background: var(--canvas-bg) !important; box-shadow: none !important; border: none !important; }
 body.picture-mode header * { color: var(--canvas-bg) !important; opacity: 0 !important; pointer-events: none !important; }
 body.picture-mode #shareBtn { opacity: 0 !important; pointer-events: none !important; }
+@media (max-width: 600px) { body.photos-mode #shareBtn { display: none !important; } }
+@media (max-width: 600px) {
+  .outfit-preview.grid-2x2 {
+    display: block;
+    position: relative;
+    height: 90px;
+    padding: 0;
+    background: var(--canvas-bg);
+  }
+  .outfit-preview.grid-2x2 > * {
+    position: absolute !important;
+    width: 38px !important;
+    height: 44px !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+    transform: translate(-50%, -50%) !important;
+    flex-shrink: unset !important;
+  }
+  /* Dice-4 positions: top-left, top-right, bottom-left, bottom-right */
+  .outfit-preview.grid-2x2 > *:nth-child(1) { left: 27%; top: 30%; }
+  .outfit-preview.grid-2x2 > *:nth-child(2) { left: 73%; top: 30%; }
+  .outfit-preview.grid-2x2 > *:nth-child(3) { left: 27%; top: 70%; }
+  .outfit-preview.grid-2x2 > *:nth-child(4) { left: 73%; top: 70%; }
+  /* Socks pair inside grid */
+  .outfit-preview.grid-2x2 .outfit-socks-pair {
+    display: inline-flex !important;
+    width: 38px !important;
+    height: 44px !important;
+    justify-content: center;
+    align-items: center;
+  }
+  .outfit-preview.grid-2x2 .outfit-socks-pair img {
+    height: 44px !important;
+    width: 17px !important;
+    margin-right: -8px !important;
+    transform: none !important;
+  }
+  .outfit-preview.grid-2x2 .outfit-socks-pair img:last-child {
+    transform: scaleX(-1) !important;
+    margin-right: 0 !important;
+  }
+}
 body.picture-mode #canvas { border: none; }
 /* Expand canvas to fill remaining space WITHOUT shifting the stage */
 body.picture-mode #canvas {
@@ -662,11 +704,11 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   body.panel-open #fwdBackSep { display: none; }
 
   /* Outfit preview: only overlap when needed — let items breathe if they fit */
-  .outfit-preview { gap: 4px; padding: 6px 4px; justify-content: center; flex-wrap: nowrap; }
-  .outfit-preview img { width: 40px; height: 55px; flex-shrink: 1; }
+  .outfit-preview:not(.grid-2x2) { gap: 4px; padding: 6px 4px; justify-content: center; flex-wrap: nowrap; }
+  .outfit-preview:not(.grid-2x2) img { width: 40px; height: 55px; flex-shrink: 1; }
   /* When 4+ items, overlap to fit */
-  .outfit-preview:has(img:nth-child(4)) img { margin-left: -10px; }
-  .outfit-preview:has(img:nth-child(4)) img:first-child { margin-left: 0; }
+  .outfit-preview:not(.grid-2x2):has(img:nth-child(4)) img { margin-left: -10px; }
+  .outfit-preview:not(.grid-2x2):has(img:nth-child(4)) img:first-child { margin-left: 0; }
 
   /* Fix outfit info strip height */
   .outfit-info .outfit-vibe { bottom: 9px; }
@@ -968,6 +1010,10 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
       <option value="sandalwood">Sandalwood</option>
       <option value="night">Dark Cherry</option>
     </select>
+    <div style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:14px;">
+      <input type="checkbox" id="personHiddenCheck" style="width:15px;height:15px;accent-color:var(--rose);cursor:pointer;margin:0;flex-shrink:0;">
+      <span style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-light);">Hidden</span>
+    </div>
     <div class="modal-actions" style="margin-top:20px;">
       <button class="btn-cancel" onclick="closePersonModal()" style="flex:1;">Cancel</button>
       <button class="btn-confirm" id="personSaveBtn" onclick="savePerson()" style="flex:1;">Create</button>
@@ -1052,6 +1098,10 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:11px 16px;font-size:13px;line-height:1;">
+        <input type="checkbox" id="showHiddenCheck" style="width:15px;height:15px;accent-color:var(--rose);cursor:pointer;flex-shrink:0;margin:0;vertical-align:middle;display:block;" onchange="setShowHiddenPeople(this.checked)">
+        <span style="line-height:1;">Show all</span>
+      </label>
       <button class="btn-cancel" onclick="openEditPeopleModal();" style="width:100%;text-align:left;padding:11px 16px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.6;"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>Edit People…</button>
       <button class="btn-cancel" onclick="openEditMoodsModal();" style="width:100%;text-align:left;padding:11px 16px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.6;"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/></svg>Edit Moods…</button>
     </div>
@@ -1165,6 +1215,7 @@ const MOODS = [
 let vibeFilter = null;
 let selectedVibe = MOODS[0].key;
 let showMoods = true;
+let showHiddenPeople = JSON.parse(localStorage.getItem('wardrobe-show-hidden-people') || 'false');
 let starFilter = null; // null = all, 1-5 = show only that rating
 
 function renderMoodPicker(containerId, currentMood, onSelect) {
@@ -2383,9 +2434,15 @@ function setViewMode(mode) {
   viewMode = mode;
   const cb = document.getElementById('photosToggle');
   if (cb) cb.checked = mode === 'photos';
+  document.body.classList.toggle('photos-mode', mode === 'photos');
   renderCloset();
   renderOutfits();
-  renderPhotosOverlay();
+  // Small delay ensures canvas has settled before measuring positions
+  if (mode === 'photos') {
+    setTimeout(renderPhotosOverlay, 50);
+  } else {
+    renderPhotosOverlay();
+  }
 }
 
 function renderPhotosOverlay() {
@@ -2589,19 +2646,29 @@ function cyclePanels() {
   if (preCloseCycle !== null && !panelState.closet && !panelState.outfits) {
     logoCycle = preCloseCycle;
     preCloseCycle = null;
-    if      (logoCycle === 0) setPanels(true,  true);
-    else if (logoCycle === 2) setPanels(true,  false);
-    else if (logoCycle === 3) setPanels(false, true);
-    else setPanels(true, true);
+    if (window.innerWidth <= 600) {
+      if      (logoCycle === 0) setPanels(true,  false);
+      else if (logoCycle === 1) setPanels(false, true);
+      else                      setPanels(false, false);
+    } else {
+      if (logoCycle === 0) setPanels(true, true);
+      else                 setPanels(false, false);
+    }
     return;
   }
   preCloseCycle = null;
-  // 0: both → 1: none → 2: closet only → 3: outfits only → back to 0
-  logoCycle = (logoCycle + 1) % 4;
-  if      (logoCycle === 0) setPanels(true,  true);
-  else if (logoCycle === 1) setPanels(false, false);
-  else if (logoCycle === 2) setPanels(true,  false);
-  else                      setPanels(false, true);
+  if (window.innerWidth <= 600) {
+    // Small: closet only → outfits only → both closed → repeat
+    logoCycle = (logoCycle + 1) % 3;
+    if      (logoCycle === 0) setPanels(true,  false);
+    else if (logoCycle === 1) setPanels(false, true);
+    else                      setPanels(false, false);
+  } else {
+    // Large: both open → both closed → repeat
+    logoCycle = (logoCycle + 1) % 2;
+    if (logoCycle === 0) setPanels(true,  true);
+    else                 setPanels(false, false);
+  }
 }
 
 function cycleLeft()  { setPanels(!panelState.closet,  panelState.outfits);  }
@@ -2754,28 +2821,39 @@ function renderOutfits() {
   const btn = document.getElementById('moodFilterBtn');
   if (btn) btn.style.background = vibeFilter ? 'var(--blush)' : '';
   savedOutfits.forEach((outfit, idx) => {
+    const outfitNum = savedOutfits.length - idx; // #1 = oldest (bottom), highest = newest (top)
     const card = document.createElement('div');
     const faded = vibeFilter && outfit.vibe !== vibeFilter ? ' vibe-faded' : '';
     card.className = 'outfit-card' + faded;
     if (vibeFilter && outfit.vibe !== vibeFilter) { card.style.display = 'none'; } else { card.style.display = ''; }
     card.dataset.src = outfit.items.map(i => i.src).join('||');
+    // Deduplicate: show each unique piece by canvasSrc (unique per piece),
+    // but collapse SocksStockings pieces sharing the same itemId into one entry
     const seenSrcs = new Set();
+    const seenSockIds = new Set();
     const dedupedItems = outfit.items.filter(i => {
-      const src = i.illustrationSrc ? i.illustrationSrc : i.src;
-      if (seenSrcs.has(src)) return false;
-      seenSrcs.add(src); return true;
+      if (i.category === 'SocksStockings' && i.itemId) {
+        if (seenSockIds.has(String(i.itemId))) return false;
+        seenSockIds.add(String(i.itemId)); return true;
+      }
+      const key = i.canvasSrc || i.illustrationSrc || i.src;
+      if (seenSrcs.has(key)) return false;
+      seenSrcs.add(key); return true;
     });
     const imgs = dedupedItems.slice(0,4).map(i => {
-      const src = i.illustrationSrc ? i.illustrationSrc : i.src;
+      const src = i.canvasSrc || i.illustrationSrc || i.src;
       if (i.category === 'SocksStockings') {
         return `<span class="outfit-socks-pair"><img src="${src}"/><img src="${src}" style="transform:scaleX(-1)"/></span>`;
       }
       return `<img src="${src}"/>`;
     }).join('');
+    const isSmall = window.innerWidth <= 600;
+    const useGrid = isSmall && dedupedItems.length > 2;
+    const previewClass = useGrid ? 'outfit-preview grid-2x2' : 'outfit-preview';
     card.innerHTML = `
-      <div class="outfit-preview">${imgs}</div>
+      <div class="${previewClass}">${imgs}</div>
       <div class="outfit-info">
-        <span class="outfit-num">${idx + 1}</span>
+        <span class="outfit-num">${outfitNum}</span>
         <span class="outfit-vibe" style="display:${showMoods ? '' : 'none'}">${outfit.vibe}</span>
         ${outfit.name && outfit.name !== 'My Outfit' ? `<span class="outfit-title">${outfit.name}</span>` : ''}
       </div>
@@ -3223,6 +3301,12 @@ function applyMoodsSpectrum(spectrumIdx) {
   while (MOODS.length < 4) MOODS.push(spectrum[MOODS.length] || { key:'?', label:'Mood' });
 }
 
+function setShowHiddenPeople(val) {
+  showHiddenPeople = val;
+  localStorage.setItem('wardrobe-show-hidden-people', JSON.stringify(val));
+  renderPeopleMenu();
+}
+
 function renderPeopleMenu() {
   const container = document.getElementById('peopleMenuItems');
   if (!container) return;
@@ -3230,6 +3314,7 @@ function renderPeopleMenu() {
   if (people.length === 0) return;
 
   people.forEach(person => {
+    if (person.hidden && !showHiddenPeople) return;
     const btn = document.createElement('button');
     btn.className = 'hamburger-item person-item' + (person.id === activePersonId ? ' active-person' : '');
     const isActive = person.id === activePersonId;
@@ -3237,7 +3322,6 @@ function renderPeopleMenu() {
     btn.addEventListener('click', () => {
       document.getElementById('hamburgerWrap').classList.remove('open');
       if (person.id === activePersonId) {
-        // Re-select = open edit modal
         openEditPersonModal(person.id);
       } else {
         loadPersonData(person.id);
@@ -3261,6 +3345,7 @@ function openNewPersonModal() {
   renderMoodsSelect();
   document.getElementById('personMoodsSelect').value = '0';
   document.getElementById('personThemeSelect').value = 'minimal';
+  document.getElementById('personHiddenCheck').checked = false;
   // Hide import row, show all fields
   document.getElementById('importTargetRow').style.display = 'none';
   document.getElementById('importTargetSelect').onchange = null;
@@ -3287,6 +3372,7 @@ function openEditPersonModal(personId) {
   renderMoodsSelect();
   document.getElementById('personMoodsSelect').value = String(person.moodsSpectrum || 0);
   document.getElementById('personThemeSelect').value = person.theme || 'minimal';
+  document.getElementById('personHiddenCheck').checked = person.hidden === true;
   // Hide import row, show all fields
   document.getElementById('importTargetRow').style.display = 'none';
   document.getElementById('importTargetSelect').onchange = null;
@@ -3419,6 +3505,7 @@ function savePerson() {
   const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
   const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
   const theme = document.getElementById('personThemeSelect').value || 'minimal';
+  const hidden = document.getElementById('personHiddenCheck')?.checked === true;
 
   if (editingPersonId) {
     // Edit existing
@@ -3428,6 +3515,7 @@ function savePerson() {
       person.name = name;
       person.gender = gender;
       person.theme = theme;
+      person.hidden = hidden;
       // If spectrum changed, realign saved outfit vibes (index maps to index)
       if (oldSpectrum !== moodsSpectrum) {
         const oldSpec = MOOD_SPECTRUMS[oldSpectrum] || MOOD_SPECTRUMS[0];
@@ -3465,7 +3553,7 @@ function savePerson() {
     // Create new person
     const newPerson = {
       id: 'p_' + Date.now(),
-      name, gender, moodsSpectrum, theme,
+      name, gender, moodsSpectrum, theme, hidden,
       closet: [],
       outfits: []
     };
@@ -3903,6 +3991,8 @@ function openSettings() {
   document.getElementById('hamburgerWrap').classList.remove('open');
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = currentTheme;
+  const shc = document.getElementById('showHiddenCheck');
+  if (shc) shc.checked = showHiddenPeople;
   document.getElementById('settingsModal').classList.add('open');
 }
 
@@ -3980,6 +4070,7 @@ function menuSave() {
   savePeopleData();
   const data = {
     exportedAt: new Date().toISOString(),
+    showHiddenPeople: showHiddenPeople,
     people: JSON.parse(JSON.stringify(people)),
     itemPositions: itemPositions,
     categoryDefaults: categoryDefaults,
@@ -4014,6 +4105,12 @@ function handleFileOpen(e) {
       let data;
       try { data = JSON.parse(ev.target.result); } catch(parseErr) { showToast('Invalid file'); return; }
       if (typeof data !== 'object' || data === null || Array.isArray(data)) { showToast('Invalid file'); return; }
+      // Restore showHiddenPeople setting if present in file
+      if (typeof data.showHiddenPeople === 'boolean') {
+        setShowHiddenPeople(data.showHiddenPeople);
+        const shc = document.getElementById('showHiddenCheck');
+        if (shc) shc.checked = data.showHiddenPeople;
+      }
       // New people-aware import: if data has a 'people' array, merge each person
       if (Array.isArray(data.people) && data.people.length > 0) {
         importPeopleAware(data.people);
@@ -4082,6 +4179,7 @@ function importPeopleAware(importedPeople) {
         gender: ip.gender || 'female',
         moodsSpectrum: ip.moodsSpectrum || 0,
         theme: ip.theme || 'minimal',
+        hidden: ip.hidden === true,
         closet: JSON.parse(JSON.stringify(ip.closet || [])),
         outfits: JSON.parse(JSON.stringify(ip.outfits || [])),
         itemPositions: JSON.parse(JSON.stringify(ip.itemPositions || {})),
@@ -4263,6 +4361,7 @@ function exportData() {
   savePeopleData();
   const data = {
     exportedAt: new Date().toISOString(),
+    showHiddenPeople: showHiddenPeople,
     people: JSON.parse(JSON.stringify(people)),
     itemPositions: itemPositions,
     categoryDefaults: categoryDefaults,
@@ -4322,9 +4421,14 @@ closetItems = closetItems.filter(i =>
 if (closetItems.length !== before) localStorage.setItem('outfit-closet', JSON.stringify(closetItems));
 
 renderCloset(); renderOutfits(); updateDropHint();
-// Launch panel state: small screens = wardrobe only, large screens = both
+// Launch panel state: small screens = closed, large screens = both open
 if (window.innerWidth <= 600) {
-  setPanels(true, false); logoCycle = 2; preCloseCycle = null;
+  setPanels(false, false); logoCycle = 2; preCloseCycle = null;
+  // Load the oldest outfit (last in array = #1) on small screens
+  if (savedOutfits.length > 0) {
+    const oldest = savedOutfits[savedOutfits.length - 1];
+    setTimeout(() => loadOutfit(oldest.id), 100);
+  }
 } else {
   setPanels(true, true); logoCycle = 0; preCloseCycle = null;
 }
