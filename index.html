@@ -69,6 +69,26 @@ body:has(#hamburgerWrap.open) .resize-grabber-left {
 body.night .toolbar-btn { background:#3A2A2E; }
 body.night .canvas-toolbar { background:#131012; }
 body.petite .canvas-toolbar { box-shadow:0 2px 10px rgba(180,130,120,.1), 0 4px 16px rgba(61,46,42,.08); }
+
+body.minimal {
+  --cream: #FAF6F0;
+  --cream-dark: #F2EBE0;
+  --cream-border: #E8DDD0;
+  --blush: #E0D5C5;
+  --blush-mid: #CEC0A8;
+  --rose: #9E8B72;
+  --text: #3D2E2A;
+  --text-mid: #7A5E58;
+  --text-light: #B09990;
+  --canvas-bg: #F5EFE8;
+  --shadow: 0 2px 12px rgba(140,115,90,0.12);
+  --shadow-hover: 0 6px 24px rgba(140,115,90,0.2);
+  --ci-fill: #D8CBBA;
+  --ci-mid: #C4B09A;
+  --ci-stroke: #9E8B72;
+  --ci-eye: #ffffff;
+}
+body.minimal .canvas-toolbar { box-shadow:0 2px 10px rgba(120,120,120,.1), 0 4px 16px rgba(61,46,42,.08); }
 body.night .toolbar-btn.primary { background:#5A2F3A; color:#F0E8E4; }
 body.night .toolbar-btn.primary:hover { background:#7A3F4A; color:#F0E8E4; }
 body.night .closet-item { background:#241D20; }
@@ -935,6 +955,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
     </select>
     <label>Theme</label>
     <select id="personThemeSelect">
+      <option value="minimal">Minimal</option>
       <option value="petite">Petite</option>
       <option value="handsome">Handsome</option>
       <option value="sandalwood">Sandalwood</option>
@@ -1014,6 +1035,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div style="font-size:13px;font-weight:500;color:var(--text);">Theme</div>
           <select id="themeSelect" onchange="setTheme(this.value)" style="padding:5px 10px;border:1.5px solid var(--cream-border);border-radius:10px;background:var(--cream-dark);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);outline:none;cursor:pointer;">
+            <option value="minimal">Minimal</option>
             <option value="petite">Petite</option>
             <option value="handsome">Handsome</option>
             <option value="sandalwood">Sandalwood</option>
@@ -2289,15 +2311,16 @@ function setEditMode(on) {
   if (ap) { ap.editMode = editMode; savePeopleData(); }
 }
 
-let currentTheme = 'petite';
+let currentTheme = 'minimal';
 function setTheme(t) {
   currentTheme = t;
-  document.body.classList.remove('night', 'handsome', 'sandalwood');
+  document.body.classList.remove('night', 'handsome', 'sandalwood', 'minimal');
+  if (t === 'minimal') document.body.classList.add('minimal');
   if (t === 'night') document.body.classList.add('night');
   if (t === 'handsome') document.body.classList.add('handsome');
   if (t === 'sandalwood') document.body.classList.add('sandalwood');
   // Update theme-color meta for iOS PWA status bar
-  const themeColors = { petite: '#FAF6F0', night: '#1A1418', handsome: '#272824', sandalwood: '#E8E0D0' };
+  const themeColors = { petite: '#FAF6F0', night: '#1A1418', handsome: '#272824', sandalwood: '#E8E0D0', minimal: '#FAF6F0' };
   const tc = document.getElementById('themeColorMeta');
   if (tc) tc.setAttribute('content', themeColors[t] || '#FAF6F0');
   // Update diamond symbols
@@ -2998,7 +3021,7 @@ let activePersonId = localStorage.getItem('wardrobe-active-person') || null;
 // Default person auto-created if none exist
 function ensureDefaultPerson() {
   if (people.length === 0) {
-    const def = { id: 'default', name: 'Person', gender: 'female', moodsSpectrum: 0, theme: 'petite', closet: [], outfits: [] };
+    const def = { id: 'default', name: 'Person', gender: 'female', moodsSpectrum: 0, theme: 'minimal', closet: [], outfits: [] };
     people.push(def);
     activePersonId = 'default';
     savePeopleData();
@@ -3056,7 +3079,7 @@ function loadPersonData(personId) {
   localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
 
   // Apply their theme
-  setTheme(person.theme || 'petite');
+  setTheme(person.theme || 'minimal');
 
   // Apply their moods spectrum
   applyMoodsSpectrum(person.moodsSpectrum || 0);
@@ -3131,7 +3154,7 @@ function openNewPersonModal() {
   document.getElementById('genderFemale').checked = true;
   renderMoodsSelect();
   document.getElementById('personMoodsSelect').value = '0';
-  document.getElementById('personThemeSelect').value = 'petite';
+  document.getElementById('personThemeSelect').value = 'minimal';
   // Hide import row, show all fields
   document.getElementById('importTargetRow').style.display = 'none';
   document.getElementById('importTargetSelect').onchange = null;
@@ -3141,7 +3164,7 @@ function openNewPersonModal() {
   document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
   document.querySelector('.gender-radios').style.display = '';
   document.getElementById('personModal').classList.add('open');
-  applyPersonModalTheme(document.getElementById('personThemeSelect')?.value || 'petite');
+  applyPersonModalTheme(document.getElementById('personThemeSelect')?.value || 'minimal');
   setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
 
@@ -3157,7 +3180,7 @@ function openEditPersonModal(personId) {
   document.querySelectorAll('input[name=personGender]').forEach(r => r.checked = r.value === (person.gender || 'female'));
   renderMoodsSelect();
   document.getElementById('personMoodsSelect').value = String(person.moodsSpectrum || 0);
-  document.getElementById('personThemeSelect').value = person.theme || 'petite';
+  document.getElementById('personThemeSelect').value = person.theme || 'minimal';
   // Hide import row, show all fields
   document.getElementById('importTargetRow').style.display = 'none';
   document.getElementById('importTargetSelect').onchange = null;
@@ -3167,14 +3190,14 @@ function openEditPersonModal(personId) {
   document.querySelectorAll('#personModal label:not([for])').forEach(l => l.style.display = '');
   document.querySelector('.gender-radios').style.display = '';
   document.getElementById('personModal').classList.add('open');
-  applyPersonModalTheme(document.getElementById('personThemeSelect')?.value || 'petite');
+  applyPersonModalTheme(document.getElementById('personThemeSelect')?.value || 'minimal');
   setTimeout(() => document.getElementById('personNameInput').focus(), 100);
 }
 
 function applyPersonModalTheme(theme) {
   const m = document.getElementById('personModal');
   m.classList.remove('preview-petite','preview-handsome','preview-sandalwood','preview-night');
-  m.classList.add('preview-' + (theme || 'petite'));
+  m.classList.add('preview-' + (theme || 'minimal'));
 }
 
 function closePersonModal() {
@@ -3199,7 +3222,7 @@ function savePerson() {
     const name = document.getElementById('personNameInput').value.trim() || 'Merged Person';
     const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
     const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
-    const theme = document.getElementById('personThemeSelect').value || 'petite';
+    const theme = document.getElementById('personThemeSelect').value || 'minimal';
     // Combine closets and outfits
     const allCloset = [];
     const seenClosetIds = new Set();
@@ -3233,7 +3256,7 @@ function savePerson() {
     const name = document.getElementById('personNameInput').value.trim() || 'Merged Person';
     const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
     const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
-    const theme = document.getElementById('personThemeSelect').value || 'petite';
+    const theme = document.getElementById('personThemeSelect').value || 'minimal';
     // Combine closets and outfits
     const allCloset = [];
     const seenClosetIds = new Set();
@@ -3267,7 +3290,7 @@ function savePerson() {
       const name = document.getElementById('personNameInput').value.trim() || 'Person';
       const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
       const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
-      const theme = document.getElementById('personThemeSelect').value || 'petite';
+      const theme = document.getElementById('personThemeSelect').value || 'minimal';
       const newPerson = { id: 'p_' + Date.now(), name, gender, moodsSpectrum, theme, closet: [], outfits: [] };
       people.push(newPerson);
       savePeopleData();
@@ -3289,7 +3312,7 @@ function savePerson() {
   const name = document.getElementById('personNameInput').value.trim() || 'Person';
   const gender = document.querySelector('input[name=personGender]:checked')?.value || 'female';
   const moodsSpectrum = parseInt(document.getElementById('personMoodsSelect').value) || 0;
-  const theme = document.getElementById('personThemeSelect').value || 'petite';
+  const theme = document.getElementById('personThemeSelect').value || 'minimal';
 
   if (editingPersonId) {
     // Edit existing
@@ -3612,7 +3635,7 @@ function openMergePersonModal(ids) {
   document.getElementById('genderFemale').checked = true;
   renderMoodsSelect();
   document.getElementById('personMoodsSelect').value = '0';
-  document.getElementById('personThemeSelect').value = currentTheme || 'petite';
+  document.getElementById('personThemeSelect').value = currentTheme || 'minimal';
   document.getElementById('importTargetRow').style.display = 'none';
   ['personNameInput','personMoodsSelect','personThemeSelect'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = '';
@@ -3855,7 +3878,7 @@ function menuSave() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `outfit-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `wardrobe-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
   showToast('Saved ' + getThemeDiamond());
@@ -3944,7 +3967,7 @@ function importPeopleAware(importedPeople) {
         name: ip.name,
         gender: ip.gender || 'female',
         moodsSpectrum: ip.moodsSpectrum || 0,
-        theme: ip.theme || 'petite',
+        theme: ip.theme || 'minimal',
         closet: JSON.parse(JSON.stringify(ip.closet || [])),
         outfits: JSON.parse(JSON.stringify(ip.outfits || [])),
         itemPositions: JSON.parse(JSON.stringify(ip.itemPositions || {})),
@@ -3975,7 +3998,7 @@ function importPeopleAware(importedPeople) {
     localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
     localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
     localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
-    setTheme(firstPerson.theme || 'petite');
+    setTheme(firstPerson.theme || 'minimal');
     applyMoodsSpectrum(firstPerson.moodsSpectrum || 0);
     refreshCatConfig();
     setSilhouette(firstPerson.gender || 'female');
@@ -4003,7 +4026,7 @@ function openImportPersonModal() {
   document.getElementById('personNameInput').value = '';
   document.getElementById('genderFemale').checked = true;
   document.getElementById('personMoodsSelect').value = '0';
-  document.getElementById('personThemeSelect').value = currentTheme || 'petite';
+  document.getElementById('personThemeSelect').value = currentTheme || 'minimal';
   // Show "Import to" row and populate it
   const row = document.getElementById('importTargetRow');
   const sel = document.getElementById('importTargetSelect');
@@ -4138,7 +4161,7 @@ function exportData() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `outfit-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `wardrobe-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
   showToast('Data exported ♡');
@@ -4206,7 +4229,7 @@ if (people.length === 0) {
     name: 'Person',
     gender: 'female',
     moodsSpectrum: 3, // default = Innocent/Elegant/Sexy/Naughty
-    theme: savedTheme || 'petite',
+    theme: savedTheme || 'minimal',
     closet: JSON.parse(JSON.stringify(closetItems)),
     outfits: JSON.parse(JSON.stringify(savedOutfits))
   };
