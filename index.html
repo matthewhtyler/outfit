@@ -521,6 +521,16 @@ body.minimal .outfit-preview.quad-center > img, body.petite .outfit-preview.quad
 .outfit-preview.quad-center .outfit-socks-pair { display:inline-flex; align-items:center; width:28px; height:65px; overflow:visible; }
 .outfit-preview.quad-center .outfit-socks-pair img { height:65px; width:14px; object-fit:contain; position:static; transform:none; margin-right:-8px; }
 .outfit-preview.quad-center .outfit-socks-pair img:last-child { transform:scaleX(-1) !important; margin-right:0; }
+.outfit-preview.tri-small { position:relative; }
+.outfit-preview.tri-small > * { position:absolute; transform:translate(-50%,-50%); }
+.outfit-preview.tri-small > *:nth-child(1) { left:33%; top:30%; }
+.outfit-preview.tri-small > *:nth-child(2) { left:67%; top:30%; }
+.outfit-preview.tri-small > *:nth-child(3) { left:50%; top:70%; }
+.outfit-preview.tri-small > img { height:55px; width:38px; object-fit:contain; filter:drop-shadow(1px 0 0 var(--text-light)) drop-shadow(-1px 0 0 var(--text-light)) drop-shadow(0 1px 0 var(--text-light)) drop-shadow(0 -1px 0 var(--text-light)); position:absolute; }
+.outfit-preview.tri-small .outfit-socks-pair { display:inline-flex; align-items:center; width:38px; height:55px; overflow:visible; }
+.outfit-preview.tri-small .outfit-socks-pair img { height:55px; width:19px; object-fit:contain; position:static; transform:none; margin-right:-10px; }
+.outfit-preview.tri-small .outfit-socks-pair img:last-child { transform:scaleX(-1) !important; margin-right:0; }
+body.minimal .outfit-preview.tri-small > img, body.petite .outfit-preview.tri-small > img { filter:drop-shadow(1px 0 0 #999) drop-shadow(-1px 0 0 #999) drop-shadow(0 1px 0 #999) drop-shadow(0 -1px 0 #999); }
 .outfit-preview.tri-center { position:relative; }
 .outfit-preview.tri-center > * { position:absolute; transform:translate(-50%,-50%); top:50%; }
 .outfit-preview.tri-center > *:nth-child(1) { left:16.7%; }
@@ -2928,11 +2938,12 @@ function renderOutfits() {
       return `<img src="${src}"/>`;
     }).join('');
     const isSmall = window.innerWidth <= 600;
-    const useGrid = isSmall && dedupedItems.length > 2;
+    const useGrid = isSmall && dedupedItems.length > 3;
+    const useSmallTri = isSmall && dedupedItems.length === 3;
     const useDuo = dedupedItems.length === 2;
     const useQuad = !isSmall && dedupedItems.length >= 4;
     const useTri = !isSmall && dedupedItems.length === 3;
-    const previewClass = useGrid ? 'outfit-preview grid-2x2' : useQuad ? 'outfit-preview quad-center' : useTri ? 'outfit-preview tri-center' : useDuo ? 'outfit-preview duo-center' : 'outfit-preview';
+    const previewClass = useGrid ? 'outfit-preview grid-2x2' : useSmallTri ? 'outfit-preview tri-small' : useQuad ? 'outfit-preview quad-center' : useTri ? 'outfit-preview tri-center' : useDuo ? 'outfit-preview duo-center' : 'outfit-preview';
     card.innerHTML = `
       <div class="${previewClass}">${imgs}</div>
       <div class="outfit-info">
