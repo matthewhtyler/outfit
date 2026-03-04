@@ -14,6 +14,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  --header-h: calc(56px + env(safe-area-inset-top));
   --cream: #FAF6F0;
   --cream-dark: #F2EBE0;
   --cream-border: #E8DDD0;
@@ -395,7 +396,6 @@ body:not(.edit-mode) #backBtn,
 body:not(.edit-mode) #fwdBackSep { display:none !important; }
 
 /* Picture mode */
-body.picture-mode header,
 body.picture-mode .panel,
 body.picture-mode .stage-toggles,
 body.picture-mode #layerSliderWrap,
@@ -405,16 +405,17 @@ body.picture-mode #floatingControls,
 body.picture-mode .item-controls,
 body.picture-mode #pictureModeBtn,
 body.picture-mode .canvas-drop-hint { display:none !important; }
-body.picture-mode #canvas { border:none; }
-body.picture-mode #shareBtn { display:none !important; }
-/* Expand canvas to full viewport WITHOUT shifting the stage */
+body.picture-mode header { background: var(--canvas-bg) !important; box-shadow: none !important; border: none !important; }
+body.picture-mode header * { color: var(--canvas-bg) !important; opacity: 0 !important; pointer-events: none !important; }
+body.picture-mode #shareBtn { opacity: 0 !important; pointer-events: none !important; }
+body.picture-mode #canvas { border: none; }
+/* Expand canvas to fill remaining space WITHOUT shifting the stage */
 body.picture-mode #canvas {
   position: fixed !important;
-  top: 0 !important;
+  top: var(--header-h, 48px) !important;
   left: 0 !important;
   width: 100vw !important;
-  height: 100vh !important;
-  height: 100dvh !important;
+  height: calc(100dvh - var(--header-h, 48px)) !important;
   z-index: 500;
 }
 #shareBtn { position:absolute; top:50%; right:12px; transform:translateY(-50%); z-index:20; width:30px; height:30px; border-radius:50%; border:none; background:var(--cream); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-light); box-shadow:var(--shadow); transition:background .15s, color .15s; }
@@ -2907,7 +2908,9 @@ function handleCanvasBgClick(clientX, target) {
                      target.closest?.('.stage-toggles') ||
                      target.closest?.('.modal-overlay') ||
                      target.closest?.('#floatingControls') ||
-                     target.closest?.('#ctxMenu');
+                     target.closest?.('#ctxMenu') ||
+                     target.closest?.('#shareBtn') ||
+                     target.closest?.('#layerSliderWrap');
   if (isExcluded) return;
 
   const isBackground = target.id === 'canvas' || target.id === 'stage' || target.closest?.('.canvas-drop-hint');
@@ -3871,18 +3874,18 @@ function applyFullButtons() {
 }
 
 // ── Picture mode ──
+let _pictureModeStyle = null;
 function enterPictureMode() {
-  stage._pictureModeStyle = document.getElementById('stage').getAttribute('style') || '';
+  _pictureModeStyle = document.getElementById('stage').getAttribute('style') || '';
   document.body.classList.add('picture-mode');
   const photosOvl = document.getElementById('photosOverlay');
   if (photosOvl) { photosOvl.style.opacity = '0'; photosOvl.style.pointerEvents = 'none'; }
 }
 function exitPictureMode() {
   document.body.classList.remove('picture-mode');
-  const stage = document.getElementById('stage');
-  if (stage._pictureModeStyle !== undefined) {
-    stage.setAttribute('style', stage._pictureModeStyle);
-    delete stage._pictureModeStyle;
+  if (_pictureModeStyle !== null) {
+    document.getElementById('stage').setAttribute('style', _pictureModeStyle);
+    _pictureModeStyle = null;
   }
   const photosOvl = document.getElementById('photosOverlay');
   if (photosOvl) {
