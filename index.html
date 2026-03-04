@@ -1172,8 +1172,8 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:11px 16px;font-size:13px;line-height:1;">
-        <input type="checkbox" id="showHiddenCheck" style="width:15px;height:15px;accent-color:var(--rose);cursor:pointer;flex-shrink:0;margin:0;vertical-align:middle;display:block;" onchange="setShowHiddenPeople(this.checked)">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:11px 16px;font-size:13px;line-height:1;">
+        <input type="checkbox" id="showHiddenCheck" style="width:15px;height:15px;min-width:15px;accent-color:var(--rose);cursor:pointer;flex-shrink:0;margin:0;padding:0;vertical-align:middle;display:block;-webkit-appearance:checkbox;appearance:checkbox;" onchange="setShowHiddenPeople(this.checked)">
         <span style="line-height:1;">Show all</span>
       </label>
       <button class="btn-cancel" onclick="openEditPeopleModal();" style="width:100%;text-align:left;padding:11px 16px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.6;"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>Edit People…</button>
