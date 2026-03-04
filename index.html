@@ -3934,7 +3934,10 @@ function menuSave() {
   savePeopleData();
   const data = {
     exportedAt: new Date().toISOString(),
-    people: people,
+    people: JSON.parse(JSON.stringify(people)),
+    itemPositions: itemPositions,
+    categoryDefaults: categoryDefaults,
+    // Legacy fields for backwards compat
     closet: closetItems,
     savedOutfits: savedOutfits,
     canvas: canvasItems,
@@ -4017,7 +4020,7 @@ function importPeopleAware(importedPeople) {
       // Merge outfits not already present
       const existingOIds = new Set((existing.outfits || []).map(o => String(o.id)));
       const newOutfits = (ip.outfits || []).filter(o => !existingOIds.has(String(o.id)));
-      if (newOutfits.length) { existing.outfits = (existing.outfits || []).concat(newOutfits); }
+      if (newOutfits.length) { existing.outfits = newOutfits.concat(existing.outfits || []); }
       // Merge item positions and category defaults
       if (ip.itemPositions) existing.itemPositions = Object.assign({}, ip.itemPositions, existing.itemPositions || {});
       if (ip.categoryDefaults) existing.categoryDefaults = Object.assign({}, ip.categoryDefaults, existing.categoryDefaults || {});
@@ -4198,7 +4201,7 @@ function mergeImportData(data) {
     const existingIds = new Set(savedOutfits.map(o => String(o.id)));
     const newOutfits = migrated.savedOutfits.filter(o => !existingIds.has(String(o.id)));
     if (newOutfits.length) {
-      savedOutfits = savedOutfits.concat(newOutfits);
+      savedOutfits = newOutfits.concat(savedOutfits);
       localStorage.setItem('outfit-saved', JSON.stringify(savedOutfits));
       renderOutfits();
       changed = true;
