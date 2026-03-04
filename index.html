@@ -1871,23 +1871,28 @@ function addToCanvas(item, x, y, forceSize) {
   // Photo item — single canvas item with saved/default/centered placement
   const savedPlacement = itemPositions[String(item.id)];
   const catDefault = categoryDefaults[item.category];
+  const hasOwnSavedPos = !!savedPlacement && !Array.isArray(savedPlacement);
   let px, py, pw, ph, savedZ, savedRot = 0, savedFlipped = false;
+
   if (Array.isArray(savedPlacement)) {
     ({ x: px, y: py, w: pw, h: ph } = savedPlacement[0]);
     savedZ = savedPlacement[0].z;
     savedRot = savedPlacement[0].rot || 0;
     savedFlipped = savedPlacement[0].flipped || false;
   } else if (savedPlacement) {
+    // Item has its own explicitly saved position — use exactly as saved
     ({ x: px, y: py, w: pw, h: ph } = savedPlacement);
     savedZ = savedPlacement.z;
     savedRot = savedPlacement.rot || 0;
     savedFlipped = savedPlacement.flipped || false;
   } else if (catDefault && !Array.isArray(catDefault)) {
-    ({ x: px, y: py, w: pw, h: ph } = catDefault);
+    // Category default: use x/y/z from default but size will be corrected to natural ratio below
+    ({ x: px, y: py } = catDefault);
     savedZ = catDefault.z;
+    pw = ph = catDefault.w || 350; // temporary, overwritten below
   } else {
     px = x; py = y;
-    pw = ph = Math.max(350, forceSize || 350);
+    pw = ph = 350;
   }
 
   const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
@@ -1895,6 +1900,22 @@ function addToCanvas(item, x, y, forceSize) {
     name: item.name, itemId: String(item.id), category: item.category,
     x: px, y: py, w: pw, h: ph, rot: savedRot, flipped: savedFlipped, z: ++zCounter };
   canvasItems.push(ci); renderCanvasItem(ci);
+
+  // Always correct to natural image ratio UNLESS item has its own saved position
+  if (!hasOwnSavedPos) {
+    const img = new Image();
+    img.onload = () => {
+      if (!img.naturalWidth || !img.naturalHeight) return;
+      const maxSide = catDefault ? Math.max(ci.w, ci.h) : 350;
+      const ratio = img.naturalWidth / img.naturalHeight;
+      if (ratio >= 1) { ci.w = maxSide; ci.h = Math.round(maxSide / ratio); }
+      else            { ci.h = maxSide; ci.w = Math.round(maxSide * ratio); }
+      ci.aspectRatio = ratio;
+      const el = document.getElementById(ci.id);
+      if (el) { el.style.width = ci.w + 'px'; el.style.height = ci.h + 'px'; }
+    };
+    img.src = item.src;
+  }
   updateDropHint();
   applyZTiers();
   selectItem(ci.id);
@@ -2492,20 +2513,36 @@ function persistPlacements() {
   });
 
   Object.entries(byItem).forEach(([itemId, pieces]) => {
-    if (pieces.length === 1 && !pieces[0].illustrationSrc) {
-      const p = pieces[0];
-      itemPositions[itemId] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false };
-    } else {
-      itemPositions[itemId] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false }));
-      const cat = pieces[0].category;
-      if (cat && !categoryDefaults[cat]) {
+    // Only update categoryDefaults if not already set — never overwrite
+    const cat = pieces[0].category;
+    if (cat && !categoryDefaults[cat]) {
+      if (pieces.length === 1 && !pieces[0].illustrationSrc) {
+        // Don't set category default from a square default placement
+        const p = pieces[0];
+        if (p.w !== p.h || p.w !== 350) {
+          categoryDefaults[cat] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z };
+        }
+      } else {
         categoryDefaults[cat] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z }));
       }
     }
   });
 
-  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
   localStorage.setItem('outfit-cat-defaults', JSON.stringify(categoryDefaults));
+}
+
+function saveItemPosition(ciId) {
+  // Explicitly save position for a specific item (called from context menu)
+  const ci = canvasItems.find(i => i.id === ciId);
+  if (!ci || !ci.itemId) return;
+  const pieces = canvasItems.filter(c => c.itemId === ci.itemId);
+  if (pieces.length === 1 && !pieces[0].illustrationSrc) {
+    const p = pieces[0];
+    itemPositions[ci.itemId] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false };
+  } else {
+    itemPositions[ci.itemId] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false }));
+  }
+  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
 }
 
 function saveOutfit() {
@@ -4345,7 +4382,7 @@ function openCtxMenu(x, y, ciId) {
     ? `<svg style="display:inline;vertical-align:-2px;margin-right:5px;" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Position saved`
     : `Save position`;
   posSaved.onclick = isAtSavedPos ? null : () => {
-    persistPlacements();
+    saveItemPosition(ciId);
     closeCtxMenu();
     showToast('Position saved');
   };
