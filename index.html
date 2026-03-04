@@ -2732,27 +2732,6 @@ function loadOutfit(id, e) {
   });
   zCounter = zBase + sorted.length + 1;
 
-  // Write each item's position from outfit into itemPositions so re-adding
-  // from wardrobe lands in the same spot it was in this outfit
-  const byItemId = {};
-  sorted.forEach(ci => {
-    if (!ci.itemId) return;
-    if (!byItemId[ci.itemId]) byItemId[ci.itemId] = [];
-    byItemId[ci.itemId].push(ci);
-  });
-  Object.entries(byItemId).forEach(([itemId, pieces]) => {
-    if (pieces.length === 1 && !pieces[0].illustrationSrc) {
-      const p = pieces[0];
-      itemPositions[itemId] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot || 0, flipped: p.flipped || false };
-    } else {
-      itemPositions[itemId] = pieces.map(p => ({
-        src: p.illustrationSrc || p.canvasSrc,
-        x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot || 0, flipped: p.flipped || false
-      }));
-    }
-  });
-  localStorage.setItem('outfit-item-positions', JSON.stringify(itemPositions));
-
   updateDropHint();
   if (editMode) setHair('down');
   pinLingerieToBack();
