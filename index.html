@@ -762,6 +762,9 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   /* Duo-center: match grid-2x2 row spacing exactly */
   .outfit-preview.duo-center > *:nth-child(1) { left: 27%; top: 50%; }
   .outfit-preview.duo-center > *:nth-child(2) { left: 73%; top: 50%; }
+
+  /* Edit Item modal: fit on iPhone screen */
+  .cat-modal { height:82svh; max-height:82svh; border-radius:16px; }
 }
 
 @media (min-width: 601px) {
@@ -2242,9 +2245,12 @@ function selectItem(id) {
 
         // Hamburger → context menu
         document.getElementById('fctrlCtxMenu').onclick = (e) => {
+          e.stopPropagation();
           const fc = document.getElementById('floatingControls');
-          const rect = e.currentTarget.getBoundingClientRect();
-          openCtxMenu(rect.left + rect.width / 2, rect.bottom + 4, id);
+          const fcRect = fc.getBoundingClientRect();
+          const cx = fcRect.left + fcRect.width / 2;
+          const cy = fcRect.bottom + 5;
+          openCtxMenu(cx, cy, id, true);
         };
 
         // Resize handle: drag = resize, clean tap = toggle ratio lock
@@ -4900,7 +4906,7 @@ document.getElementById('fctrlRotate').addEventListener('touchstart', e => {
 document.getElementById('layerSlider').addEventListener('input', function() {
   applyLayerSlider(Number(this.value));
 });
-function openCtxMenu(x, y, ciId) {
+function openCtxMenu(x, y, ciId, centerOnX) {
   const ci = canvasItems.find(i => i.id === ciId);
   if (!ci) return;
   const catLabel = CAT_CONFIG[ci.category]?.label || ci.category;
@@ -4946,9 +4952,12 @@ function openCtxMenu(x, y, ciId) {
   resetSaved.style.display = (hasSavedPos && !isAtSavedPos) ? 'block' : 'none';
   resetSaved.onclick = () => { resetToSavedPos(ciId); closeCtxMenu(); };
   menu.style.display = 'block';
-  const mw = 200, mh = 115;
-  menu.style.left = Math.min(x, window.innerWidth - mw) + 'px';
-  menu.style.top = Math.min(y, window.innerHeight - mh) + 'px';
+  const mw = menu.offsetWidth || 200, mh = menu.offsetHeight || 140;
+  let left = centerOnX ? x - mw / 2 : x;
+  left = Math.max(6, Math.min(left, window.innerWidth - mw - 6));
+  const top = Math.min(y, window.innerHeight - mh - 6);
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
   selectItem(ciId);
 }
 function closeCtxMenu() {
@@ -5021,7 +5030,10 @@ function resetToDefault(ciId) {
   }
   showToast(`Reset to default`);
 }
-document.addEventListener('click', closeCtxMenu);
+document.addEventListener('click', e => {
+  if (e.target.closest('#fctrlCtxMenu')) return;
+  closeCtxMenu();
+});
 document.addEventListener('touchend', e => {
   const menu = document.getElementById('ctxMenu');
   if (menu.style.display !== 'none' && !menu.contains(e.target)) closeCtxMenu();
