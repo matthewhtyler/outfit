@@ -2175,8 +2175,8 @@ function renderCanvasItem(ci) {
   el.className = 'canvas-item'; el.id = ci.id; el.draggable = false;
   el.style.cssText = `left:${ci.x}px;top:${ci.y}px;width:${ci.w}px;height:${ci.h}px;transform:rotate(${ci.rot||0}deg);z-index:${ci.z};cursor:${editMode?'grab':'default'};`;
   const flipTransform = ci.flipped ? 'scaleX(-1)' : '';
-  const imgFilter = ci.outline === false ? 'none' : 'url(#crisp-outline)';
-  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform};filter:${imgFilter}"/><div class="resize-grabber" data-id="${ci.id}" title="Drag to resize"></div><div class="resize-grabber-left" data-id="${ci.id}" title="Drag to resize"></div>`;
+  const outlinedClass = ci.outline === false ? '' : ' outlined';
+  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" class="${outlinedClass.trim()}" style="transform:${flipTransform}"/><div class="resize-grabber" data-id="${ci.id}" title="Drag to resize"></div><div class="resize-grabber-left" data-id="${ci.id}" title="Drag to resize"></div>`;
   const handlePointerDown = e => {
     if (e.target.classList.contains('resize-grabber')) {
       selectItem(ci.id);
@@ -2227,8 +2227,6 @@ function positionFloatingControls(fc, ci) {
 function selectItem(id) {
   document.querySelectorAll('.canvas-item').forEach(el => {
     el.classList.remove('selected');
-    const img = el.querySelector('img');
-    if (img) img.style.filter = '';
   });
   selectedId = id;
   const fc = document.getElementById('floatingControls');
@@ -4626,14 +4624,14 @@ try {
   testEl.style.filter = 'url(#crisp-outline)';
   const supported = testEl.style.filter.indexOf('url') !== -1;
   const rule = supported
-    ? '.canvas-item img { filter: url(#crisp-outline) !important; }'
-    : '.canvas-item img { filter: drop-shadow(0 4px 12px rgba(61,46,42,.15)) !important; }';
+    ? '.canvas-item img.outlined { filter: url(#crisp-outline); }'
+    : '.canvas-item img.outlined { filter: drop-shadow(0 4px 12px rgba(61,46,42,.15)); }';
   const styleEl = document.createElement('style');
   styleEl.textContent = rule;
   document.head.appendChild(styleEl);
 } catch(e) {
   const styleEl = document.createElement('style');
-  styleEl.textContent = '.canvas-item img { filter: drop-shadow(0 4px 12px rgba(61,46,42,.15)) !important; }';
+  styleEl.textContent = '.canvas-item img.outlined { filter: drop-shadow(0 4px 12px rgba(61,46,42,.15)); }';
   document.head.appendChild(styleEl);
 }
 const LINGERIE_CATS = new Set(['Bra', 'Panties', 'Lingerie']);
