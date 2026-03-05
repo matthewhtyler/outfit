@@ -932,13 +932,14 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
       <button class="ctrl-btn" id="fctrlRemove">−</button>
       <button class="ctrl-btn" id="fctrlFlip">↔</button>
       <button class="ctrl-btn rotate-handle" id="fctrlRotate" title="Drag to rotate">↻</button>
-      <button class="ctrl-btn" id="fctrlResetHandle" title="Drag to resize" style="cursor:se-resize;">
+      <button class="ctrl-btn" id="fctrlResetHandle" title="Drag to resize / tap to toggle ratio lock" style="cursor:se-resize;position:relative;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        <span id="fctrlRatioUnlocked" style="display:none;position:absolute;bottom:1px;right:1px;line-height:1;pointer-events:none;">
+          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+        </span>
       </button>
-      <button class="ctrl-btn" id="fctrlAspect" title="Lock aspect ratio" style="opacity:1;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>
-        </svg>
+      <button class="ctrl-btn" id="fctrlCtxMenu" title="More options">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
     </div>
 
@@ -1543,6 +1544,7 @@ function confirmAddItem() {
       const illSrcs = getIllustrSrcs();
       item.illustrationSrcs = illSrcs;
       item.illustrationSrc = illSrcs[0] || '';
+      item.illustrationOutlines = getIllustrOutlines();
       // Sync any canvas items that came from this closet item
       const itemIdStr = String(item.id);
       canvasItems.forEach((ci, idx) => {
@@ -1565,7 +1567,7 @@ function confirmAddItem() {
     const illustrationSrcs = getIllustrSrcs();
     const photoSrc = document.getElementById('catPhotoUrlInput').value.trim() || pendingItem.src;
     const productUrl = document.getElementById('catProductUrlInput').value.trim();
-    const newItem = { id: Date.now() + Math.random(), src: photoSrc, illustrationSrcs, illustrationSrc: illustrationSrcs[0] || '', name, category: pendingCategory, productUrl };
+    const newItem = { id: Date.now() + Math.random(), src: photoSrc, illustrationSrcs, illustrationSrc: illustrationSrcs[0] || '', illustrationOutlines: getIllustrOutlines(), name, category: pendingCategory, productUrl };
     closetItems.push(newItem);
     renderCloset();
     // Log entry in add modal
@@ -1599,6 +1601,7 @@ function renderIllustrSlots() {
   }
   illustSlots.forEach((slot, i) => {
     const isPrefix = slot.src && !hasNumber(slot.src) && !slot.src.includes('/') && !slot.src.includes('.');
+    const outlineChecked = slot.outline !== false; // default true
     const div = document.createElement('div');
     div.className = 'illust-slot';
     div.innerHTML = `
@@ -1608,7 +1611,11 @@ function renderIllustrSlots() {
           style="color:${isPrefix ? 'var(--text-light)' : 'var(--text)'}"
           oninput="updateSlotSrc(${i}, this.value)" data-slot="${i}"/>
         ${illustSlots.length > 1 ? `<button class="illust-slot-remove" onclick="removeIllustrSlot(${i})">−</button>` : ''}
-      </div>`;
+      </div>
+      <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light);padding:2px 0 2px 2px;cursor:pointer;">
+        <input type="checkbox" data-outline-slot="${i}" ${outlineChecked ? 'checked' : ''} onchange="updateSlotOutline(${i}, this.checked)" style="width:12px;height:12px;accent-color:var(--rose);margin:0;padding:0;cursor:pointer;flex-shrink:0;-webkit-appearance:checkbox;appearance:checkbox;">
+        Outline
+      </label>`;
     container.appendChild(div);
     div.querySelector('.illust-slot-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); confirmAddItem(); }
@@ -1641,13 +1648,13 @@ function addIllustrSlot() {
       }
     }
   }
-  illustSlots.push({ src: newSrc });
+  illustSlots.push({ src: newSrc, outline: true });
   renderIllustrSlots();
 }
 
 function removeIllustrSlot(i) {
   illustSlots.splice(i, 1);
-  if (illustSlots.length === 0) illustSlots.push({ src: '' });
+  if (illustSlots.length === 0) illustSlots.push({ src: '', outline: true });
   renderIllustrSlots();
 }
 
@@ -1675,6 +1682,14 @@ function updateSlotSrc(i, val) {
   if (img) { img.src = expanded || ''; img.style.opacity = expanded ? '1' : '0.3'; }
 }
 
+function updateSlotOutline(i, val) {
+  illustSlots[i].outline = val;
+}
+
+function getIllustrOutlines() {
+  return illustSlots.map(s => s.outline !== false);
+}
+
 function getIllustrSrcs() {
   return illustSlots.map(s => expandIllustrUrl(s.src)).filter(Boolean);
 }
@@ -1687,8 +1702,8 @@ function unexpandIllustrUrl(src) {
   return src;
 }
 
-function setIllustrSlots(srcs) {
-  illustSlots = (srcs && srcs.length) ? srcs.map(src => ({ src: unexpandIllustrUrl(src) })) : [{ src: '' }];
+function setIllustrSlots(srcs, outlines) {
+  illustSlots = (srcs && srcs.length) ? srcs.map((src, i) => ({ src: unexpandIllustrUrl(src), outline: outlines ? outlines[i] !== false : true })) : [{ src: '', outline: true }];
   renderIllustrSlots();
 }
 
@@ -1706,12 +1721,35 @@ function confirmSaveCatModal() {
 }
 
 function updateIllustrPreview(src) {
-  if (illustSlots.length === 0) illustSlots.push({ src: '' });
+  if (illustSlots.length === 0) illustSlots.push({ src: '', outline: true });
   const lastEmpty = illustSlots.findIndex(s => !s.src);
   if (lastEmpty >= 0) illustSlots[lastEmpty].src = src;
-  else illustSlots.push({ src });
+  else illustSlots.push({ src, outline: true });
   renderIllustrSlots();
 }
+function openClosetItemEditModal(item) {
+  recategorizeId = item.id;
+  pendingItem = { src: item.src, name: item.name };
+  pendingCategory = item.category;
+  document.getElementById('catPreviewImg').src = item.src;
+  document.getElementById('catPhotoUrlInput').value = item.src;
+  document.getElementById('catProductUrlInput').value = item.productUrl || '';
+  document.getElementById('catNameInput').value = item.name;
+  setIllustrSlots(
+    item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []),
+    item.illustrationOutlines
+  );
+  if (!item.illustrationSrcs?.length && !item.illustrationSrc) {
+    const prefix = catPrefix(item.category);
+    illustSlots.forEach((slot, i) => { if (!slot.src) illustSlots[i].src = prefix; });
+    renderIllustrSlots();
+  }
+  refreshCatConfig(); renderCatGrid(); showIntimateToggle();
+  document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+  document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
+  document.getElementById('catModal').classList.add('open');
+}
+
 function makeClosetEl(item, outfitSrcs) {
   const el = document.createElement('div');
   el.className = 'closet-item'; el.draggable = true; el.dataset.id = item.id;
@@ -1736,46 +1774,12 @@ function makeClosetEl(item, outfitSrcs) {
   // Click handling: in edit mode single=add, double=category picker; outside edit mode single=add
   let clickTimer = null;
   el.addEventListener('click', e => {
-    if (e.altKey) {
-      e.preventDefault();
-      recategorizeId = item.id;
-      pendingItem = { src: item.src, name: item.name };
-      pendingCategory = item.category;
-      document.getElementById('catPreviewImg').src = item.src;
-      document.getElementById('catPhotoUrlInput').value = item.src;
-      document.getElementById('catProductUrlInput').value = item.productUrl || '';
-      document.getElementById('catNameInput').value = item.name;
-      setIllustrSlots(item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []));
-      if (!item.illustrationSrcs?.length && !item.illustrationSrc) {
-        const prefix = catPrefix(item.category);
-        illustSlots.forEach((slot, i) => { if (!slot.src) illustSlots[i].src = prefix; });
-        renderIllustrSlots();
-      }
-      refreshCatConfig(); renderCatGrid(); showIntimateToggle(); document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
-      document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
-      document.getElementById('catModal').classList.add('open');
-      return;
-    }
+    if (e.altKey) { e.preventDefault(); openClosetItemEditModal(item); return; }
     if (e.metaKey || e.ctrlKey) { e.preventDefault(); openRatingModal(item); return; }
     if (clickTimer) {
-      // Double click → open category picker (any mode)
+      // Double click → open edit modal
       clearTimeout(clickTimer); clickTimer = null;
-      recategorizeId = item.id;
-      pendingItem = { src: item.src, name: item.name };
-      pendingCategory = item.category;
-      document.getElementById('catPreviewImg').src = item.src;
-      document.getElementById('catPhotoUrlInput').value = item.src;
-      document.getElementById('catProductUrlInput').value = item.productUrl || '';
-      document.getElementById('catNameInput').value = item.name;
-      setIllustrSlots(item.illustrationSrcs && item.illustrationSrcs.length ? item.illustrationSrcs : (item.illustrationSrc ? [item.illustrationSrc] : []));
-      if (!item.illustrationSrcs?.length && !item.illustrationSrc) {
-        const prefix = catPrefix(item.category);
-        illustSlots.forEach((slot, i) => { if (!slot.src) illustSlots[i].src = prefix; });
-        renderIllustrSlots();
-      }
-      refreshCatConfig(); renderCatGrid(); showIntimateToggle(); document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
-      document.querySelector(`.cat-opt[data-cat="${item.category}"]`)?.classList.add('selected');
-      document.getElementById('catModal').classList.add('open');
+      openClosetItemEditModal(item);
     } else {
       // Single click → in photos mode with productUrl: open product page; else toggle on/off canvas
       clickTimer = setTimeout(() => {
@@ -1803,6 +1807,7 @@ function makeClosetEl(item, outfitSrcs) {
   // iOS single-tap fix: use touchend to bypass hover-then-click delay
   // Track touchstart position to distinguish tap from scroll
   let touchStartY = 0, touchStartX = 0;
+  let lastTouchTap = 0;
   el.addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
     touchStartX = e.touches[0].clientX;
@@ -1812,6 +1817,15 @@ function makeClosetEl(item, outfitSrcs) {
     const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
     if (dy > 8 || dx > 8) return; // was a scroll, not a tap
     if (e.cancelable) e.preventDefault();
+    const now = Date.now();
+    if (now - lastTouchTap < 300) {
+      // Double-tap → open edit modal
+      lastTouchTap = 0;
+      el.classList.remove('touch-active');
+      openClosetItemEditModal(item);
+      return;
+    }
+    lastTouchTap = now;
     el.classList.add('touch-active');
     setTimeout(() => el.classList.remove('touch-active'), 400);
     if (!editMode) {
@@ -2020,6 +2034,7 @@ function addToCanvas(item, x, y, forceSize) {
 
   const srcs = (item.illustrationSrcs && item.illustrationSrcs.length) ? item.illustrationSrcs
               : (item.illustrationSrc ? [item.illustrationSrc] : []);
+  const outlines = item.illustrationOutlines || [];
   const hasIllust = srcs.length > 0;
 
   if (hasIllust) {
@@ -2040,7 +2055,8 @@ function addToCanvas(item, x, y, forceSize) {
           src: item.src, illustrationSrc: piece.src, canvasSrc: piece.src,
           name: item.name, itemId: String(item.id), category: item.category,
           x: piece.x, y: piece.y, w: piece.w, h: piece.h, rot: piece.rot||0, flipped: piece.flipped||false,
-          z: zBase + ((piece.z || 0) - minZ) + 1 };
+          z: zBase + ((piece.z || 0) - minZ) + 1,
+          outline: piece.outline !== false };
         canvasItems.push(ci); renderCanvasItem(ci); lastCi = ci;
       });
       if (lastCi) selectItem(lastCi.id);
@@ -2064,7 +2080,8 @@ function addToCanvas(item, x, y, forceSize) {
         const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
           src: item.src, illustrationSrc: src, canvasSrc: src,
           name: item.name, itemId: String(item.id), category: item.category,
-          x: px2, y: py2, w: pw2, h: ph2, rot: 0, flipped: false, z: zValues[idx] };
+          x: px2, y: py2, w: pw2, h: ph2, rot: 0, flipped: false, z: zValues[idx],
+          outline: outlines[idx] !== false };
         canvasItems.push(ci); renderCanvasItem(ci);
         createdCis.push({ ci, src });
         lastCi = ci;
@@ -2122,7 +2139,8 @@ function addToCanvas(item, x, y, forceSize) {
   const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
     src: item.src, illustrationSrc: '', canvasSrc: item.src,
     name: item.name, itemId: String(item.id), category: item.category,
-    x: px, y: py, w: pw, h: ph, rot: savedRot, flipped: savedFlipped, z: ++zCounter };
+    x: px, y: py, w: pw, h: ph, rot: savedRot, flipped: savedFlipped, z: ++zCounter,
+    outline: (item.illustrationOutlines ? item.illustrationOutlines[0] : undefined) !== false };
   canvasItems.push(ci); renderCanvasItem(ci);
 
   // Always correct to natural image ratio UNLESS item has its own saved position
@@ -2153,7 +2171,8 @@ function renderCanvasItem(ci) {
   el.className = 'canvas-item'; el.id = ci.id; el.draggable = false;
   el.style.cssText = `left:${ci.x}px;top:${ci.y}px;width:${ci.w}px;height:${ci.h}px;transform:rotate(${ci.rot||0}deg);z-index:${ci.z};cursor:${editMode?'grab':'default'};`;
   const flipTransform = ci.flipped ? 'scaleX(-1)' : '';
-  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform}"/><div class="resize-grabber" data-id="${ci.id}" title="Drag to resize"></div><div class="resize-grabber-left" data-id="${ci.id}" title="Drag to resize"></div>`;
+  const imgFilter = ci.outline === false ? 'none' : 'url(#crisp-outline)';
+  el.innerHTML = `<div class="item-controls"><button class="ctrl-btn" onclick="removeCanvasItem('${ci.id}')">−</button><button class="ctrl-btn" onclick="flipItem('${ci.id}')">↔</button><button class="ctrl-btn rotate-handle" data-id="${ci.id}" title="Drag to rotate">↻</button></div><img src="${ci.canvasSrc || ci.src}" alt="${ci.name}" style="transform:${flipTransform};filter:${imgFilter}"/><div class="resize-grabber" data-id="${ci.id}" title="Drag to resize"></div><div class="resize-grabber-left" data-id="${ci.id}" title="Drag to resize"></div>`;
   const handlePointerDown = e => {
     if (e.target.classList.contains('resize-grabber')) {
       selectItem(ci.id);
@@ -2176,10 +2195,9 @@ function renderCanvasItem(ci) {
     e.preventDefault();
     if (editMode) openCtxMenu(e.clientX, e.clientY, ci.id);
   });
-  // Double-tap to open context menu on touch devices
+  // Double-tap to open context menu on touch devices (works in any mode)
   let lastTap = 0;
   el.addEventListener('touchend', e => {
-    if (!editMode) return;
     const now = Date.now();
     if (now - lastTap < 300) {
       e.preventDefault();
@@ -2221,37 +2239,54 @@ function selectItem(id) {
         document.getElementById('fctrlRemove').onclick = () => removeCanvasItem(id);
         document.getElementById('fctrlFlip').onclick = () => flipItem(id);
         document.getElementById('fctrlRotate').dataset.id = id;
-        // Aspect ratio lock button
-        const aspectBtn = document.getElementById('fctrlAspect');
+
+        // Hamburger → context menu
+        document.getElementById('fctrlCtxMenu').onclick = (e) => {
+          const fc = document.getElementById('floatingControls');
+          const rect = e.currentTarget.getBoundingClientRect();
+          openCtxMenu(rect.left + rect.width / 2, rect.bottom + 4, id);
+        };
+
+        // Resize handle: drag = resize, clean tap = toggle ratio lock
+        const resizeBtn = document.getElementById('fctrlResetHandle');
+        const ratioUnlocked = document.getElementById('fctrlRatioUnlocked');
         const ciRef = canvasItems.find(c => c.id === id);
         if (ciRef && !ciRef.hasOwnProperty('lockAspect')) ciRef.lockAspect = true;
-        aspectBtn.style.opacity = (ciRef && ciRef.lockAspect !== false) ? '1' : '0.3';
-        aspectBtn.onclick = (e) => {
+        ratioUnlocked.style.display = (ciRef && ciRef.lockAspect === false) ? '' : 'none';
+
+        let _resizeStartX = 0, _resizeStartY = 0, _resizeMoved = false;
+        const _resizePointerDown = (e) => {
+          const pt = e.touches ? e.touches[0] : e;
+          _resizeStartX = pt.clientX; _resizeStartY = pt.clientY; _resizeMoved = false;
+        };
+        const _resizePointerMove = (e) => {
+          const pt = e.touches ? e.touches[0] : e;
+          if (Math.abs(pt.clientX - _resizeStartX) > 4 || Math.abs(pt.clientY - _resizeStartY) > 4) _resizeMoved = true;
+        };
+        const _resizePointerUp = () => {
+          document.removeEventListener('mousemove', _resizePointerMove);
+          document.removeEventListener('mouseup', _resizePointerUp);
+          document.removeEventListener('touchmove', _resizePointerMove);
+          document.removeEventListener('touchend', _resizePointerUp);
+        };
+        resizeBtn.onmousedown = (e) => {
+          _resizePointerDown(e);
+          document.addEventListener('mousemove', _resizePointerMove);
+          document.addEventListener('mouseup', _resizePointerUp);
+          if (editMode) startResize(e, id);
+        };
+        resizeBtn.ontouchstart = (e) => {
+          _resizePointerDown(e);
+          document.addEventListener('touchmove', _resizePointerMove, { passive: true });
+          document.addEventListener('touchend', _resizePointerUp);
+          if (editMode) startResize(e, id);
+        };
+        resizeBtn.onclick = (e) => {
+          if (_resizeMoved) return; // was a drag, not a click
           const ci2 = canvasItems.find(c => c.id === id);
           if (!ci2) return;
-          if (e.altKey) {
-            const imgEl = document.getElementById(ci2.id)?.querySelector('img');
-            if (imgEl && imgEl.naturalWidth && imgEl.naturalHeight) {
-              const naturalRatio = imgEl.naturalWidth / imgEl.naturalHeight;
-              ci2.aspectRatio = naturalRatio;
-              // Keep width, adjust height to match natural ratio immediately
-              ci2.h = Math.round(ci2.w / naturalRatio);
-              const domEl = document.getElementById(ci2.id);
-              if (domEl) { domEl.style.width = ci2.w + 'px'; domEl.style.height = ci2.h + 'px'; }
-              const fc = document.getElementById('floatingControls');
-              if (fc && fc.style.display !== 'none') positionFloatingControls(fc, ci2);
-            }
-            return;
-          }
-          ci2.lockAspect = !ci2.lockAspect;
-          aspectBtn.style.opacity = ci2.lockAspect ? '1' : '0.3';
-        };
-        // Resize button in toolbar — drag to resize, same as grabber
-        document.getElementById('fctrlResetHandle').onmousedown = (e) => {
-          if (editMode) startResize(e, id);
-        };
-        document.getElementById('fctrlResetHandle').ontouchstart = (e) => {
-          if (editMode) startResize(e, id);
+          ci2.lockAspect = ci2.lockAspect !== false ? false : true;
+          ratioUnlocked.style.display = ci2.lockAspect === false ? '' : 'none';
         };
       }
     }
@@ -2789,7 +2824,8 @@ function flushItemPositions() {
     } else {
       itemPositions[itemId] = pieces.map(p => ({
         src: p.illustrationSrc || p.canvasSrc,
-        x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false
+        x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false,
+        outline: p.outline !== false
       }));
     }
   });
@@ -2883,7 +2919,7 @@ function saveItemPosition(ciId) {
     const p = pieces[0];
     itemPositions[ci.itemId] = { x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false };
   } else {
-    itemPositions[ci.itemId] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false }));
+    itemPositions[ci.itemId] = pieces.map(p => ({ src: p.illustrationSrc || p.canvasSrc, x: p.x, y: p.y, w: p.w, h: p.h, z: p.z, rot: p.rot||0, flipped: p.flipped||false, outline: p.outline !== false }));
   }
   _lsSet('outfit-item-positions', JSON.stringify(itemPositions));
 }
