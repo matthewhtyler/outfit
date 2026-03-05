@@ -764,7 +764,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   .outfit-preview.duo-center > *:nth-child(2) { left: 73%; top: 50%; }
 
   /* Edit Item modal: fit on iPhone screen */
-  .cat-modal { height:82svh; max-height:82svh; border-radius:16px; }
+  .cat-modal { height:78svh !important; max-height:78svh !important; border-radius:16px; }
 }
 
 @media (min-width: 601px) {
@@ -938,7 +938,7 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
       <button class="ctrl-btn" id="fctrlResetHandle" title="Drag to resize / tap to toggle ratio lock" style="cursor:se-resize;position:relative;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
         <span id="fctrlRatioUnlocked" style="display:none;position:absolute;bottom:1px;right:1px;line-height:1;pointer-events:none;">
-          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v1"/></svg>
         </span>
       </button>
       <button class="ctrl-btn" id="fctrlCtxMenu" title="More options">
@@ -2267,7 +2267,14 @@ function selectItem(id) {
         };
         const _resizePointerMove = (e) => {
           const pt = e.touches ? e.touches[0] : e;
-          if (Math.abs(pt.clientX - _resizeStartX) > 4 || Math.abs(pt.clientY - _resizeStartY) > 4) _resizeMoved = true;
+          if (Math.abs(pt.clientX - _resizeStartX) > 8 || Math.abs(pt.clientY - _resizeStartY) > 8) _resizeMoved = true;
+        };
+        const _toggleRatioLock = () => {
+          if (_resizeMoved) return;
+          const ci2 = canvasItems.find(c => c.id === id);
+          if (!ci2) return;
+          ci2.lockAspect = ci2.lockAspect !== false ? false : true;
+          ratioUnlocked.style.display = ci2.lockAspect === false ? '' : 'none';
         };
         const _resizePointerUp = () => {
           document.removeEventListener('mousemove', _resizePointerMove);
@@ -2287,12 +2294,14 @@ function selectItem(id) {
           document.addEventListener('touchend', _resizePointerUp);
           if (editMode) startResize(e, id);
         };
+        resizeBtn.ontouchend = (e) => {
+          e.preventDefault();
+          _toggleRatioLock();
+        };
         resizeBtn.onclick = (e) => {
-          if (_resizeMoved) return; // was a drag, not a click
-          const ci2 = canvasItems.find(c => c.id === id);
-          if (!ci2) return;
-          ci2.lockAspect = ci2.lockAspect !== false ? false : true;
-          ratioUnlocked.style.display = ci2.lockAspect === false ? '' : 'none';
+          // Desktop only — on touch, ontouchend handles it
+          if (e.pointerType === 'touch') return;
+          _toggleRatioLock();
         };
       }
     }
