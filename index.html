@@ -1550,15 +1550,31 @@ function confirmAddItem() {
       item.illustrationOutlines = getIllustrOutlines();
       // Sync any canvas items that came from this closet item
       const itemIdStr = String(item.id);
-      canvasItems.forEach((ci, idx) => {
-        if (ci.itemId !== itemIdStr) return;
-        const pieces = canvasItems.filter(c => c.itemId === itemIdStr);
-        const pieceIdx = pieces.indexOf(ci);
-        const newIllustSrc = illSrcs[pieceIdx] || illSrcs[0] || '';
+      const pieces = canvasItems.filter(c => c.itemId === itemIdStr);
+      pieces.forEach((ci) => {
+        // Match this canvas piece to its illustration index by src
+        const illIdx = illSrcs.indexOf(ci.illustrationSrc);
+        const outlineIdx = illIdx >= 0 ? illIdx : 0;
+        const newIllustSrc = illSrcs[outlineIdx] || illSrcs[0] || '';
+        const srcChanged = ci.illustrationSrc !== newIllustSrc || (photoSrc && ci.src !== photoSrc);
         ci.illustrationSrc = newIllustSrc;
         ci.canvasSrc = newIllustSrc || ci.src;
         if (photoSrc) ci.src = photoSrc;
-        renderCanvasItem(ci);
+        ci.outline = item.illustrationOutlines ? item.illustrationOutlines[outlineIdx] !== false : true;
+        if (srcChanged) {
+          renderCanvasItem(ci);
+        } else {
+          // Just update the img src and outline class without re-appending the element
+          const el = document.getElementById(ci.id);
+          if (el) {
+            const img = el.querySelector('img');
+            if (img) {
+              img.src = ci.canvasSrc || ci.src;
+              if (ci.outline === false) img.classList.remove('outlined');
+              else img.classList.add('outlined');
+            }
+          }
+        }
       });
       // Explicitly persist — don't rely on renderCloset side-effect
       _lsSet('outfit-closet', JSON.stringify(closetItems));
@@ -1616,13 +1632,19 @@ function renderIllustrSlots() {
         ${illustSlots.length > 1 ? `<button class="illust-slot-remove" onclick="removeIllustrSlot(${i})">−</button>` : ''}
       </div>
       <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light);padding:2px 0 2px 2px;cursor:pointer;">
-        <input type="checkbox" data-outline-slot="${i}" ${outlineChecked ? 'checked' : ''} onchange="updateSlotOutline(${i}, this.checked)" style="width:12px;height:12px;accent-color:var(--rose);margin:0;padding:0;cursor:pointer;flex-shrink:0;-webkit-appearance:checkbox;appearance:checkbox;">
+        <input type="checkbox" data-outline-slot="${i}" ${outlineChecked ? 'checked' : ''} style="width:12px;height:12px;accent-color:var(--rose);margin:0;padding:0;cursor:pointer;flex-shrink:0;-webkit-appearance:checkbox;appearance:checkbox;">
         Outline
       </label>`;
     container.appendChild(div);
     div.querySelector('.illust-slot-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); confirmAddItem(); }
     });
+    const cb = div.querySelector(`[data-outline-slot="${i}"]`);
+    if (cb) {
+      const handler = () => { illustSlots[i].outline = cb.checked; };
+      cb.addEventListener('change', handler);
+      cb.addEventListener('click', handler); // iOS fallback
+    }
   });
 }
 
@@ -1685,12 +1707,9 @@ function updateSlotSrc(i, val) {
   if (img) { img.src = expanded || ''; img.style.opacity = expanded ? '1' : '0.3'; }
 }
 
-function updateSlotOutline(i, val) {
-  illustSlots[i].outline = val;
-}
 
 function getIllustrOutlines() {
-  return illustSlots.map(s => s.outline !== false);
+  return illustSlots.filter(s => !!expandIllustrUrl(s.src)).map(s => s.outline !== false);
 }
 
 function getIllustrSrcs() {
@@ -2054,13 +2073,16 @@ function addToCanvas(item, x, y, forceSize) {
       const zBase = zCounter;
       zCounter += sorted.length;
       let lastCi;
-      sorted.forEach(piece => {
+      sorted.forEach((piece, pieceIdx) => {
+        // Match piece to its illustration index by src so outline maps correctly
+        const illIdx = item.illustrationSrcs ? item.illustrationSrcs.indexOf(piece.src) : -1;
+        const outlineIdx = illIdx >= 0 ? illIdx : pieceIdx;
         const ci = { id: 'ci_'+Date.now()+'_'+Math.floor(Math.random()*10000),
           src: item.src, illustrationSrc: piece.src, canvasSrc: piece.src,
           name: item.name, itemId: String(item.id), category: item.category,
           x: piece.x, y: piece.y, w: piece.w, h: piece.h, rot: piece.rot||0, flipped: piece.flipped||false,
           z: zBase + ((piece.z || 0) - minZ) + 1,
-          outline: piece.outline !== false };
+          outline: item.illustrationOutlines ? item.illustrationOutlines[outlineIdx] !== false : true };
         canvasItems.push(ci); renderCanvasItem(ci); lastCi = ci;
       });
       if (lastCi) selectItem(lastCi.id);
