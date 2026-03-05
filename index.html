@@ -763,8 +763,8 @@ body:not(.handsome) #starFilterBtn { background-color:transparent !important; co
   .outfit-preview.duo-center > *:nth-child(1) { left: 27%; top: 50%; }
   .outfit-preview.duo-center > *:nth-child(2) { left: 73%; top: 50%; }
 
-  /* Edit Item modal: fit on iPhone screen */
-  .cat-modal { height:78svh !important; max-height:78svh !important; border-radius:16px; }
+  /* Edit Item modal: fit on iPhone screen, shifted down 20px */
+  .cat-modal { height:78svh !important; max-height:78svh !important; border-radius:16px; margin-top:20px; }
 }
 
 @media (min-width: 601px) {
@@ -1857,6 +1857,7 @@ function makeClosetEl(item, outfitSrcs) {
 }
 
 function renderCloset() {
+  refreshCatConfig(); // ensure CAT_ORDER matches current person's gender
   const body = document.getElementById('closetBody');
   document.getElementById('closetEmpty').style.display = closetItems.length ? 'none' : '';
   body.querySelectorAll('.category-group, .closet-section-divider').forEach(g => g.remove());
