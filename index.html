@@ -3248,6 +3248,17 @@ function handleCanvasBgClick(clientX, target) {
 document.getElementById('canvas').addEventListener('mousedown', e => {
   handleCanvasBgClick(e.clientX, e.target);
 });
+// On small screens: clicking anything in the closet panel closes the outfits panel
+;(function() {
+  const closetPanel = document.getElementById('closetPanel');
+  const handler = () => {
+    if (window.innerWidth <= 600 && panelState.closet && panelState.outfits) {
+      setPanels(true, false);
+    }
+  };
+  closetPanel.addEventListener('click', handler);
+  closetPanel.addEventListener('touchend', handler, { passive: true });
+})();
 document.getElementById('canvas').addEventListener('touchend', e => {
   const t = e.target;
   const isPictureMode = document.body.classList.contains('picture-mode');
