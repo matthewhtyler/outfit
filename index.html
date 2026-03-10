@@ -3385,6 +3385,12 @@ function renderMoodsSelect() {
 let people = JSON.parse(_lsGet('wardrobe-people') || '[]');
 let activePersonId = _lsGet('wardrobe-active-person') || null;
 
+// Returns the first non-hidden person id, or people[0].id as fallback
+function firstVisiblePersonId() {
+  const visible = people.find(p => !p.hidden);
+  return visible ? visible.id : (people[0]?.id || null);
+}
+
 // Default person auto-created if none exist
 function ensureDefaultPerson() {
   if (people.length === 0) {
@@ -3395,6 +3401,11 @@ function ensureDefaultPerson() {
   }
   if (!activePersonId || !people.find(p => p.id === activePersonId)) {
     activePersonId = people[0].id;
+  }
+  // If Show all is off and the active person is hidden, switch to first visible
+  const ap = people.find(p => p.id === activePersonId);
+  if (ap?.hidden && !showHiddenPeople) {
+    activePersonId = firstVisiblePersonId();
   }
 }
 
@@ -3419,6 +3430,12 @@ function getActivePerson() {
 }
 
 function loadPersonData(personId) {
+  // If Show all is off and target person is hidden, redirect to first visible person
+  const target = people.find(p => p.id === personId);
+  if (target?.hidden && !showHiddenPeople) {
+    personId = firstVisiblePersonId();
+    if (!personId) return;
+  }
   // Save current state into currently active person first
   const cur = getActivePerson();
   if (cur) {
@@ -3487,6 +3504,14 @@ function applyMoodsSpectrum(spectrumIdx) {
 function setShowHiddenPeople(val) {
   showHiddenPeople = val;
   _lsSet('wardrobe-show-hidden-people', JSON.stringify(val));
+  // If turning off and active person is hidden, switch to first visible person
+  if (!val) {
+    const ap = getActivePerson();
+    if (ap?.hidden) {
+      const fallback = firstVisiblePersonId();
+      if (fallback) loadPersonData(fallback);
+    }
+  }
   renderPeopleMenu();
 }
 
