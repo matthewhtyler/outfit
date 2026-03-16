@@ -2040,16 +2040,23 @@ function addToCanvas(item, x, y, forceSize) {
 
   // In non-edit mode: swap out any existing items from the same category group
   if (!editMode) {
-    const LINGERIE_COSTUME_SWAP = new Set(['Lingerie', 'Costume']);
+    const LINGERIE_COSTUME = new Set(['Lingerie', 'Costume']);
     const TOP_SWAP = new Set(['Nightie', 'Dress', 'Top']);
     const BOTTOM_SWAP = new Set(['Skirt', 'Shorts', 'Jeans', 'Pants']);
-    const swapGroup = TOP_SWAP.has(item.category)
-      ? ci => TOP_SWAP.has(ci.category)
-      : BOTTOM_SWAP.has(item.category)
-      ? ci => BOTTOM_SWAP.has(ci.category)
-      : LINGERIE_COSTUME_SWAP.has(item.category)
-      ? ci => LINGERIE_COSTUME_SWAP.has(ci.category)
-      : ci => ci.category === item.category;
+    const COVERS_ALL = new Set([...TOP_SWAP, ...BOTTOM_SWAP]); // categories that conflict with Costume/Lingerie
+    let swapGroup;
+    if (TOP_SWAP.has(item.category)) {
+      // Top added: remove other tops + any Costume/Lingerie
+      swapGroup = ci => TOP_SWAP.has(ci.category) || LINGERIE_COSTUME.has(ci.category);
+    } else if (BOTTOM_SWAP.has(item.category)) {
+      // Bottom added: remove other bottoms + any Costume/Lingerie
+      swapGroup = ci => BOTTOM_SWAP.has(ci.category) || LINGERIE_COSTUME.has(ci.category);
+    } else if (LINGERIE_COSTUME.has(item.category)) {
+      // Costume/Lingerie added: remove each other + all tops and bottoms
+      swapGroup = ci => LINGERIE_COSTUME.has(ci.category) || COVERS_ALL.has(ci.category);
+    } else {
+      swapGroup = ci => ci.category === item.category;
+    }
     const toRemove = canvasItems.filter(swapGroup);
     toRemove.forEach(ci => document.getElementById(ci.id)?.remove());
     canvasItems = canvasItems.filter(ci => !swapGroup(ci));
